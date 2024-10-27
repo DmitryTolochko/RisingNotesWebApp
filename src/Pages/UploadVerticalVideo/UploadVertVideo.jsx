@@ -53,12 +53,15 @@ function InstallVerticalVideo(){
         // смена обложки
         event.preventDefault();
         if (event.target.files.length > 0) {
-            setVertSkinfile(event.target.files[0]);
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                setCurrentVertSkin(event.target.result);
-            };
-            reader.readAsDataURL(event.target.files[0]);
+            let file = event.target.files[0];
+            if (file.size <=5*1024*1024) {
+                setVertSkinfile(file);
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    setCurrentVertSkin(event.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
         }
     }
 
@@ -70,16 +73,10 @@ function InstallVerticalVideo(){
     async function uploadVideo() {
         // загрузка видео
         formData.append('Title', title);
-        console.log(title)
         formData.append('Description', description);
-        console.log(description)
         formData.append('RelatedSongId', songId);
-        console.log(songId)
         formData.append('PreviewFile.File', vertskinfile);
-        console.log(vertskinfile)
         formData.append('ClipFile.File', videoFile);
-        console.log(videoFile)
-        console.log(formData);
 
         await axiosAuthorized.post('api/short-video', formData, {
             headers: {
@@ -153,7 +150,7 @@ function InstallVerticalVideo(){
                                             <p className='uploadtrack-p2'>.mp4 или .mkv, макс. 100ГБ</p>
                                         </div>
                                         <p className='or'>или</p>
-                                        <CustomButton text={'Выберите файл'} func={() => {return}} success={'Изменить'} icon={uploadImg}/>
+                                        <CustomButton text={'Выберите файл'} func={() => getInputFile()} success={'Изменить'} icon={uploadImg}/>
                                     </div>
                                 )}
                         </div>

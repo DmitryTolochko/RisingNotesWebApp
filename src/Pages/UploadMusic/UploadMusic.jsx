@@ -103,18 +103,46 @@ function UploadMusic(){
         songSetterRef.current.click();
     }
 
-    const changeLogo = (event) => {
+    async function changeLogo (event) {
         // смена картинки
         event.preventDefault();
         if (event.target.files.length > 0) {
-            setLogofile(event.target.files[0]);
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                setCurrentImage(event.target.result);
-            };
-            reader.readAsDataURL(event.target.files[0]);
+            let file = event.target.files[0];
+            const imageSrc = await loadImage(file);
+            if (file.size <=5*1024*1024 && await checkAspectRatio(imageSrc)) {
+                setLogofile(file);
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    setCurrentImage(event.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
         }
     }
+
+    const loadImage = async (file) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    };
+
+    const checkAspectRatio = async (imageSrc) => {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.src = imageSrc;
+          
+            img.onload = () => {
+                const width = img.width;
+                const height = img.height;
+                console.log(width);
+                console.log(height);
+                resolve(width == height);
+            };
+        });
+    };
 
     const changeSong = (event) => {
         // смена песни
@@ -300,7 +328,7 @@ function UploadMusic(){
                                         <p className='uploadtrack-p2'>.mp3 или .wav, макс. 100мб</p>
                                     </div>
                                     <p className='or'>или</p>
-                                    <CustomButton text={'Выберите файл'} func={() => {return}} success={'Изменить'} icon={uploadImg}/>
+                                    <CustomButton text={'Выберите файл'} func={() => getInputFile()} success={'Изменить'} icon={uploadImg}/>
                                 </div>
                             )}
                             
@@ -379,7 +407,7 @@ function UploadMusic(){
                             ) : (<></>)}
                     </div> : ''}
 
-                    <input type='file' accept=".jpg,.png" className='input-file' ref={imageSetterRef} onChange={changeLogo}></input>
+                    <input type='file' accept=".jpg,.png" max='5000000' className='input-file' ref={imageSetterRef} onChange={changeLogo}></input>
                     <input type='file' accept=".mp3,.wav" className='input-file' ref={songSetterRef} onChange={changeSong}></input>
                     <audio ref={audioRef} src={songFileName ? api + `api/song/${songFileName}/file` : ''}
                         type="audio/mpeg" controls style={{ display: 'none' }}/>
