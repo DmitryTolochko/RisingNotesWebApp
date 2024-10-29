@@ -1,40 +1,42 @@
+import { api, axiosAuthorized, axiosPictures } from '../App/App'
+import { useEffect, useState } from 'react'
+import { NavLink, useNavigate } from "react-router-dom"
+import { useCookies } from 'react-cookie'
+
+import { useSelector, useDispatch } from 'react-redux'
+import { updatePlaylistsValue } from '../../Redux/slices/playlistsSlice';
+import { updateValue } from '../../Redux/slices/searchSlice'
+
 import searchIcon from '../../Images/sidebar/Vector.svg';
 import wave from '../../Images/sidebar/vave.svg';
 import warning from '../../Images/sidebar/warning.svg';
 import like from '../../Images/sidebar/like.svg';
 import placeholder from '../../Images/main-placeholder.png';
-import { useContext, useEffect, useState } from 'react';
-import {NavLink, useNavigate} from "react-router-dom";
-import SidebarCollapser from './SidebarCollpaser/SidebarCollapser'
 import subsIcon from '../../Images/sidebar/subs-icon.svg';
-import { PlaylistsContext, SearchQueryContext, api, axiosAuthorized, axiosPictures } from '../App/App'
-import { useCookies } from 'react-cookie';
+
+import SidebarCollapser from './SidebarCollpaser/SidebarCollapser'
 import useSearchClean from '../../Hooks/useSearchClean/useSearchClean';
-import { useMediaQuery } from 'react-responsive'
-import './Sidebar.css';
 import useMenuToggle from '../../Hooks/useMenuToggle/useMenuToggle';
 
+import './Sidebar.css';
 
 
 function Sidebar(props) {
    const [search, setSearch] = useState(searchIcon)
-   // const [collapsed, setCollapsed] = useState(true)
    const [searchQuery, setSearchQuery] = useState('')
    const [playlistsInfo, setPlaylistsInfo] = useState([]); 
-   const {searchInput, setSearchInput} = useContext(SearchQueryContext);
-   const {playlists, setPlaylists} = useContext(PlaylistsContext);
    const navigate = useNavigate();
    const [cookies, setCookies] = useCookies(['accessToken', 'refreshToken', 'authorId', 'role', 'userId']);
-
+   
    const {cleanQuery} = useSearchClean()
    const {collapsed, toggler} = useMenuToggle()
 
-   const isMobile = useMediaQuery({
-      query: '(max-width: 720px)'
-   })
-
+   const dispatch = useDispatch()
+   const searchInput = useSelector((state) => state.searchInput.value)
+   const playlists = useSelector((state) => state.playlists.value)
+   
    useEffect(()=>{
-      setSearchInput(searchQuery);
+      dispatch(updateValue(searchQuery))
    },[searchQuery]);
 
    useEffect(() => {
@@ -90,7 +92,7 @@ function Sidebar(props) {
       .then (
          response => {
             id = response.data.id
-            setPlaylists(e => e = [...e, id])
+            dispatch(updatePlaylistsValue([...playlists, id]))
          }
       )
       navigate(`/playlist/${id}`)
@@ -114,12 +116,13 @@ function Sidebar(props) {
                   <img src={search} alt="" draggable='false' />
                </button>
                <input 
-               className='searchbar' 
-               type="text" 
-               placeholder='Поиск'
-               value={searchInput}
-               onSubmit={handleQuerySubmit}
-               onInput={handleQueryChange}/>
+                  className='searchbar' 
+                  type="text" 
+                  placeholder='Поиск'
+                  value={searchInput}
+                  onSubmit={handleQuerySubmit}
+                  onInput={handleQueryChange}
+               />
             </form>
          </div>
          <div className="music-container">

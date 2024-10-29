@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { ResizeContext } from '../../Components/App/App';
+import { useSelector } from 'react-redux';
 
 import editIcon from '../../Images/account-page/edit-icon.svg';
 import message from '../../Images/controller/Chat_Dots.png';
@@ -23,9 +23,9 @@ const statusColor = {
     5: 'red'
 }
 
-export default function RequestSong ({info}) {
-    const {resize, setResize} = useContext(ResizeContext);    
-    
+export default function RequestSong ({info}) { 
+    const resize = useSelector((state)=> state.resize.value)
+
     return (
         <Link to={'/uploadmusic/' + info.id}>
             <div className='track'>

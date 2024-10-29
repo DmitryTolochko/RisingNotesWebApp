@@ -4,16 +4,18 @@ import subsIcon from '../../../Images/artist-card/Users.svg'
 import linkIcon from '../../../Images/artist-card/Link.svg'
 import vkIcon from '../../../Images/artist-card/Social Icons.svg'
 import yandexIcon from '../../../Images/artist-card/yandex.svg'
-import defaultAvatar from '../../../Images/main-placeholder.png';
-import { useContext, useEffect, useState } from "react"
-import { ResizeContext, SubscriptionsContext, api, axiosPictures } from "../../App/App"
+import defaultAvatar from '../../../Images/main-placeholder.png'
+import { useEffect, useState } from "react"
+import { api, axiosPictures } from "../../App/App"
 import { useParams } from "react-router-dom"
+import { useSelector } from "react-redux"
 
 function ArtistInfo(props) {
-    
     const artistImage = props.artist.artistImage
     const artistName = props.artist.artistName
     const artistInfoText = props.artist.artistInfoText
+    const resize = useSelector((state)=> state.resize.value)
+    const subscriptions = useSelector((state)=> state.subscriptions.value)
     const [subcribersCount, setSubscribersCount] = useState(props.artist.subscribersCount);
     const site = props.artist.socialLinks.site
     const vk = props.artist.socialLinks.vk
@@ -21,10 +23,8 @@ function ArtistInfo(props) {
     const userId = props.artist.userId;
 
     const params = useParams();
-    const {subscriptions, setSubscriptions} = useContext(SubscriptionsContext);
     const [isSubscribed, setIsSubscribed] = useState(subscriptions.includes(params.id));
     const [isImageExist, setIsImageExist] = useState(false);
-    const {resize, setResize} = useContext(ResizeContext);
 
     useEffect(() => {
         // проверка наличия картинки и подписки

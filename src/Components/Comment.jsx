@@ -8,12 +8,14 @@ import xIcon from '../Images/commentaries/x-icon.svg';
 
 import { ResizeContext, api, axiosPictures, axiosUnauthorized } from './App/App';
 import { axiosAuthorized } from './App/App';
+import { useSelector } from 'react-redux';
 
 const Comment = (props) => {
     const [isDeleted, setIsDeleted] = useState(false);
     const [comment, setComment] = useState(props.data.text);
     const [cookies, setCookies] = useCookies(['userId']);
-    const {resize, setResize} = useContext(ResizeContext);
+
+    const resize = useSelector((state)=> state.resize.value)
     const [avatar, setAvatar] = useState(placeholder);
 
     useEffect(() => {

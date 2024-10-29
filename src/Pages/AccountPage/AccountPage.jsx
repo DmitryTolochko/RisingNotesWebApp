@@ -5,10 +5,10 @@ import musicIcon from '../../Images/account-page/music-icon.svg';
 import creditCard from '../../Images/account-page/credit-card-icon.svg';
 import AccountUser from "./AccountUser/AccountUser";
 import AccountMusician from "./AccountMusician/AccountMusician";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import AccountPayment from "./AccountPayment/AccountPayment";
 import { useCookies, withCookies } from 'react-cookie';
-import { ResizeContext, api, axiosAuthorized, axiosUnauthorized } from '../../Components/App/App';
+import {  api, axiosAuthorized, axiosUnauthorized } from '../../Components/App/App';
 import { jwtDecode } from 'jwt-decode';
 import AccountNonMusician from "./AccountMusician/AccountNonMusician";
 import { useNavigate } from "react-router-dom";
@@ -16,7 +16,7 @@ import Loader from "../../Components/Loader/Loader";
 import blogIcon from '../../Images/account-page/blog.svg';
 import clipsIcon from '../../Images/account-page/clips.svg';
 import profileIcon from '../../Images/account-page/profile.svg';
-
+import { useSelector } from "react-redux";
 import './AccountPage.css';
 import Songs from "./Songs/Songs";
 import Clips from "./Clips/Clips";
@@ -35,7 +35,8 @@ export default function AccountPage () {
     const [authorId, setAuthorId] = useState(undefined);
     const [isLoaded, setIsLoaded] = useState(false);
     const [email, setEmail] = useState('');
-    const {resize, setResize} = useContext(ResizeContext); 
+
+    const resize = useSelector((state)=> state.resize.value)
 
     useEffect(() => {
         // попытка загрузки информации и перенаправление

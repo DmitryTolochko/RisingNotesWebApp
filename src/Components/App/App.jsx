@@ -1,5 +1,4 @@
 import './App.css';
-
 import Header from "../Header/Header";
 import Login from "../Login/Login"
 import Registration from "../Registration/Registration";
@@ -7,8 +6,8 @@ import Sidebar from "../Sidebar/Sidebar";
 import Player from "../Player/Player";
 
 import ArtistCard from '../../Pages/ArtistCard/ArtistCard.jsx'
-import { Routes, Route, Link, createBrowserRouter, createRoutesFromElements, RouterProvider, useSubmit, useNavigate } from 'react-router-dom';
-import React, { Fragment, createContext } from "react";
+import { Routes, Route, useNavigate } from 'react-router-dom';
+import React, { createContext } from "react";
 import Featured from '../../Pages/Featured/Featured';
 import Excluded from '../../Pages/Excluded/Excluded';
 import Subscriptions from '../../Pages/Subsriptions/Subscriptions';
@@ -21,8 +20,6 @@ import UploadMusic from '../../Pages/UploadMusic/UploadMusic.jsx';
 import UploadVideo from '../../Pages/UploadVideo/UploadVideo.jsx';
 import InstallVerticalVideo from '../../Pages/UploadVerticalVideo/UploadVertVideo.jsx';
 import ErrorPage from '../../Pages/404Page/404Page';
-import { FiltersProvider } from '../../Hooks/useFilters/useFilters';
-import { CacheProvider } from '../../Hooks/useSearchInput/useSearchCache.js';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
@@ -34,8 +31,10 @@ import Footer from '../Footer/Footer.jsx';
 import VideoPlayer from '../VideoPLayer/VideoPlayer.jsx';
 import VertVideoPlayer from '../BlogVideoPlayer/BlogVideoPlayer.jsx';
 
-// export const api = process.env.REACT_APP_API_ENDPOINT;
-export const api = 'http://81.31.247.227/'
+import { useSelector, useDispatch } from 'react-redux';
+import { updateResizeValue } from '../../Redux/slices/resizeSlice.js';
+
+export const api = 'http://81.31.247.227/';
 
 export const axiosAuthorized = axios.create({
     baseURL: api,
@@ -65,55 +64,36 @@ export const axiosPictures = axios.create({
     },
 });
 
-export const PlayerContext = createContext({});
-export const CurrentSongContext = createContext({});
-export const SubscriptionsContext = createContext({});
-export const FeaturedContext = createContext({});
-export const ExcludedContext = createContext({});
-export const PlaylistsContext = createContext({});
-export const VideoPlayerContext = createContext({});
-export const VertVideoPlayerContext = createContext({});
-export const VertVideoInfoContext = createContext({});
 // ссылка на переменную
-export const SearchQueryContext = createContext({});
-export const ResizeContext = createContext({});
 
 function App() {
-    const navigate = useNavigate();
+    //Redux Dispatcher
+    const dispatch = useDispatch()
+
+    //Redux slices data
+    const resize_ = useSelector((state) => state.resize.value)
+    const playlists_ = useSelector((state) => state.playlists.value)
+    const excluded_ = useSelector((state) => state.excluded.value)
+    const featured_ = useSelector((state) => state.featured.value)
+    const subscriptions_ = useSelector((state) => state.subscriptions.value)
+    const currentSong_ = useSelector((state) => state.currentSong.value)
+    const songs_ = useSelector((state) => state.songs.value)
+    
+    //State hooks
     const [errorVisibility, setErrorVisibility] = useState(false);
     const [errorText, setErrorText] = useState('');
-
-    const songsJSON = localStorage.getItem('SONGS');
-    const currentSongJSON = localStorage.getItem('CURR_SONG');
-    const subsJSON = localStorage.getItem('SUBS');
-    const featuredJSON = localStorage.getItem('FEATURED');
-    const excludedJSON = localStorage.getItem('EXCLUDED');
-    const playlistsJSON = localStorage.getItem('PLAYLISTS');
-    const resizeJSON = localStorage.getItem('RESIZE');
-    // подгружаю из браузера
-
-    const [subscriptions, setSubscriptions] = useState(subsJSON ? JSON.parse(subsJSON) : []);
-    const [featured, setFeatured] = useState(featuredJSON ? JSON.parse(featuredJSON) : []);
-    const [songs, setSongs] = useState(songsJSON ? JSON.parse(songsJSON) : []);
-    const [video, setVideo] = useState('');
-    const [vertvideo, setVertVideo] = useState('');
-    const [vertVideoInfo, setVertVideoInfo] = useState('');
-    const [excluded, setExcluded] = useState(excludedJSON ? JSON.parse(excludedJSON) : []);
-    const [currentSong, setCurrentSong] = useState(currentSongJSON === undefined ? '' : JSON.parse(currentSongJSON));
-    // проверка на наличие
-    const [playlists, setPlaylists] = useState(playlistsJSON ? JSON.parse(playlistsJSON) : []);
+    
+    const navigate = useNavigate();
     const [cookies, setCookies] = useCookies(['accessToken', 'refreshToken', 'authorId', 'role', 'userId']);
-    const [resize, setResize] = useState(resizeJSON ? JSON.parse(resizeJSON) : 'standart');
-    const [searchInput, setSearchInput] = useState('');
 
     useEffect(() => {
         // изменение со стандартной на мобильную версию
         function handleResize() {
             if (window.innerWidth <= 720) {
-                setResize('mobile');
+                dispatch(updateResizeValue('mobile'))
             }
             else {
-                setResize('standart');
+                dispatch(updateResizeValue('standart'))
             }
         }
         window.addEventListener('resize', handleResize);
@@ -282,82 +262,59 @@ function App() {
 
     useEffect(() => {
         // обновление переменных в браузере, только тогда когда чет поменялось
-        localStorage.setItem('SONGS', JSON.stringify(songs));
-        localStorage.setItem('CURR_SONG', JSON.stringify(currentSong));
-        localStorage.setItem('SUBS', JSON.stringify(subscriptions));
-        localStorage.setItem('FEATURED', JSON.stringify(featured));
-        localStorage.setItem('EXCLUDED', JSON.stringify(excluded));
-        localStorage.setItem('PLAYLISTS', JSON.stringify(playlists));
-        localStorage.setItem('RESIZE', JSON.stringify(resize));
-    }, [songs, currentSong, subscriptions, featured, excluded, playlists, resize]);
-
-    function searchInputHandler(input) {
-        setSearchInput(input)
-    }
+        localStorage.setItem('SONGS', JSON.stringify(songs_));
+        localStorage.setItem('CURR_SONG', JSON.stringify(currentSong_));
+        localStorage.setItem('SUBS', JSON.stringify(subscriptions_));
+        localStorage.setItem('FEATURED', JSON.stringify(featured_));
+        localStorage.setItem('EXCLUDED', JSON.stringify(excluded_));
+        localStorage.setItem('PLAYLISTS', JSON.stringify(playlists_));
+        localStorage.setItem('RESIZE', JSON.stringify(resize_));
+    }, [songs_, currentSong_, subscriptions_, featured_, excluded_, playlists_, resize_]);
 
     return (
-        <ResizeContext.Provider value={{resize, setResize}}>
-        <FiltersProvider>
-        <CacheProvider>
-        <SearchQueryContext.Provider value={{searchInput, setSearchInput}}>
-            <PlaylistsContext.Provider value={{playlists, setPlaylists}}>
-                <ExcludedContext.Provider value={{excluded, setExcluded}}>
-                    <FeaturedContext.Provider value={{featured, setFeatured}}>
-                        <SubscriptionsContext.Provider value={{subscriptions, setSubscriptions}}>
-                            <CurrentSongContext.Provider value={{currentSong, setCurrentSong}}>
-                                <PlayerContext.Provider value={{songs, setSongs}}>
-                                    <VideoPlayerContext.Provider value={{ video, setVideo }}>
-                                        <VertVideoPlayerContext.Provider value={{ vertvideo, setVertVideo }}>
-                                            <VertVideoInfoContext.Provider value={{vertVideoInfo, setVertVideoInfo}}>
-                                                <div className="App">
-                                                    <VertVideoPlayer />
-                                                    <VideoPlayer />
-                                                    <Header/>
-                                                    <MusicPlayer/>
-                                                    {cookies.role === 'admin' ? <></> : <Sidebar></Sidebar>}
-                                                    <SearchResults/>
-                                                    <ErrorMessage text={errorText} visibility={errorVisibility}/>
-                                                    <Routes>
-                                                        <Route path={'/login'} element={<Login/>}/>
-                                                        <Route path={'/registration'} element={<Registration/>}/>
-                                                        <Route path={'/artist/:id'} element={<ArtistCard/>}/>
-                                                        <Route path={'/commentaries/:id'} element={<Commentaries/>}/>
-                                                        <Route path={'/playlist/:id'} element={<PlaylistWindow/>}/>
-                                                        <Route path={'/uploadmusic/:id'} element={<UploadMusic/>}/>
-                                                        <Route path={'*'} element={<ErrorPage/>}/>
-                                                        <Route path={'/verticalvideo'} element={<BlogVideo/>}/>
-                                                        {cookies.role === 'admin' ? (<>
-                                                            <Route path={'/'} element={<AdminPanel/>}/>
-                                                        </>) : (
-                                                        <>
-                                                            <Route path={'/'} element={<Player/>}/>
-                                                            <Route path={'/featured'} element={<Featured/>}/>
-                                                            <Route path={'/excluded'} element={<Excluded/>}/>
-                                                            <Route path={'/account'} element={<AccountPage/>}/>
-                                                            <Route path={'/subscriptions'} element={<Subscriptions/>}/>
-                                                            <Route path={'/uploadmusic'} element={<UploadMusic/>}/>
-                                                            <Route path={'/uploadvideo'} element={<UploadVideo/>}/>
-                                                            <Route path={'/uploadvertvideo'} element={<InstallVerticalVideo/>}/>
-                                                        </>
-                                                        )}
-                                                        
-                                                    </Routes>  
-                                                    <Footer/>
-                                                </div>
-                                            </VertVideoInfoContext.Provider>
-                                        </VertVideoPlayerContext.Provider>
-                                    </VideoPlayerContext.Provider>
-                                </PlayerContext.Provider>
-                            </CurrentSongContext.Provider>
-                        </SubscriptionsContext.Provider>
-                    </FeaturedContext.Provider>
-                </ExcludedContext.Provider>
-            </PlaylistsContext.Provider>
-        </SearchQueryContext.Provider>
-    </CacheProvider>
-    </FiltersProvider>
-    </ResizeContext.Provider>
+        <div className="App">
+            <Header/>
+            {cookies.role === 'admin' ? <></> : <Sidebar></Sidebar>}
+            <SearchResults/>
+            <ErrorMessage text={errorText} visibility={errorVisibility}/>
+            <Players/>
+            <Routes>
+                <Route path={'/login'} element={<Login/>}/>
+                <Route path={'/registration'} element={<Registration/>}/>
+                <Route path={'/artist/:id'} element={<ArtistCard/>}/>
+                <Route path={'/commentaries/:id'} element={<Commentaries/>}/>
+                <Route path={'/playlist/:id'} element={<PlaylistWindow/>}/>
+                <Route path={'/uploadmusic/:id'} element={<UploadMusic/>}/>
+                <Route path={'*'} element={<ErrorPage/>}/>
+                <Route path={'/verticalvideo'} element={<BlogVideo/>}/>
+                {cookies.role === 'admin' ? (<>
+                    <Route path={'/'} element={<AdminPanel/>}/>
+                </>) : (
+                <>
+                    <Route path={'/'} element={<Player/>}/>
+                    <Route path={'/featured'} element={<Featured/>}/>
+                    <Route path={'/excluded'} element={<Excluded/>}/>
+                    <Route path={'/account'} element={<AccountPage/>}/>
+                    <Route path={'/subscriptions'} element={<Subscriptions/>}/>
+                    <Route path={'/uploadmusic'} element={<UploadMusic/>}/>
+                    <Route path={'/uploadvideo'} element={<UploadVideo/>}/>
+                    <Route path={'/uploadvertvideo'} element={<InstallVerticalVideo/>}/>
+                </>
+                )}
+            </Routes>  
+            <Footer/>
+        </div>
     );
+}
+
+const Players = () => {
+    return(
+        <>
+            <VertVideoPlayer />
+            <MusicPlayer/>
+            <VideoPlayer />
+        </>
+    )
 }
 
 export default App;

@@ -28,43 +28,62 @@ const timeFormatters = {
     'more-than-five':[300001, 3600000]
 }
 
-/**
- * Функция для обновления фильтров
- * @function
- * 
- * @param {any} filterId - тип фильтра: genre | language | similar | mood | duration | extra
- * @param {any} filterValue - значение фильтра
- * @param {any} filterOrAnd - значение предиката для фильтра
- * @return {object} обновленное состояние фильтров
- */
-export function filtersUpdater(filterId, filterValue, filterOrAnd, filters){
-    let temp = filters
-    switch(filterId){
-        case "genre":
-            temp.genre = filterValue
-            temp.genreOrAnd = filterOrAnd
-            break
-        case "language":
-            temp.language = filterValue
-            temp.languageOrAnd = filterOrAnd
-            break
-        case "similar":
-            temp.similar = filterValue
-            temp.similarOrAnd = filterOrAnd
-            break
-        case "mood":
-            temp.mood = filterValue
-            temp.moodOrAnd = filterOrAnd
-            break
-        case "duration":
-            temp.duration = filterValue
-            break
-        case "extra":
-            temp.extra = filterValue
-            break
-    }
-    return temp
-}
+// /**
+//  * Функция для обновления фильтров
+//  * @function
+//  * 
+//  * @param {any} filterId - тип фильтра: genre | language | similar | mood | duration | extra
+//  * @param {any} filterValue - значение фильтра
+//  * @param {any} filterOrAnd - значение предиката для фильтра
+//  * @return {object} обновленное состояние фильтров
+//  */
+// export function filtersUpdater(filterId, filterValue, filterOrAnd, filters){
+//     let temp = filters
+//     switch(filterId){
+//         case "genre":
+//             temp.genre = filterValue
+//             temp.genreOrAnd = filterOrAnd
+//             break
+//         case "language":
+//             temp.language = filterValue
+//             temp.languageOrAnd = filterOrAnd
+//             break
+//         case "similar":
+//             temp.similar = filterValue
+//             temp.similarOrAnd = filterOrAnd
+//             break
+//         case "mood":
+//             temp.mood = filterValue
+//             temp.moodOrAnd = filterOrAnd
+//             break
+//         case "duration":
+//             temp.duration = filterValue
+//             break
+//         case "extra":
+//             temp.extra = filterValue
+//             break
+//     }
+//     return temp
+// }
+
+// export function filtersReseter(filters){
+//     let temp = filters
+
+//     temp.genre = []
+//     temp.genreOrAnd = 'and'
+//     temp.language = []
+//     temp.languageOrAnd= 'and'
+//     temp.similar = []
+//     temp.similarOrAnd= 'and'
+//     temp.mood = []
+//     temp.moodOrAnd = 'and'
+//     temp.duration = 'any'
+//     temp.extra = {
+//             explicit : "Disabled",
+//             removed : "Disabled"}
+
+//     return temp
+// }
 
 /**
  * Преобразует текущие фильтры в JSON строку
@@ -121,7 +140,7 @@ export async function songsByFiltersGetter(filters){
         return result.songList
     }
     catch(err){
-        console.log(err);
+        return -1
     }
 }
 

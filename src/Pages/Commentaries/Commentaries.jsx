@@ -1,6 +1,6 @@
 import BackButton from '../../Components/BackButton';
 import Comment from '../../Components/Comment';
-import { ResizeContext, VideoPlayerContext, api, axiosPictures } from '../../Components/App/App';
+import {  VideoPlayerContext, api, axiosPictures } from '../../Components/App/App';
 import React, { useContext } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useEffect, useState } from "react";
@@ -9,6 +9,7 @@ import commentsIcon from '../../Images/controller/message.svg';
 import sendIcon from '../../Images/controller/sendIcon.svg';
 import burgerIcon from '../../Images/controller/menu.svg';
 import playIcon from '../../Images/player/PlayBtn.svg';
+import { useSelector } from 'react-redux';
 
 import './Commentaries.css';
 import CustomButton from '../../Components/CustomButton/CustomButton';
@@ -26,7 +27,7 @@ const Commentaries = (props) => {
 
     const [currPage, setCurrPage] = useState(0);
     const [songText, setText] = useState('');
-    const {resize, setResize} = useContext(ResizeContext);
+    const resize = useSelector((state)=> state.resize.value)
     const {setVideo } = useContext(VideoPlayerContext);
 
     useEffect(() => {
