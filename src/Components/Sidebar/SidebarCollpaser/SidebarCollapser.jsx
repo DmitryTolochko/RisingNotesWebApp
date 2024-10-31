@@ -5,6 +5,7 @@ import like from '../../../Images/sidebar/like.svg'
 import { NavLink} from "react-router-dom";
 import { useContext, useState, useEffect } from 'react';
 import subsIcon from '../../../Images/sidebar/subs-icon.svg';
+import messengerIcon from '../../../Images/sidebar/messenger.png';
 
 import { useDispatch, useSelector } from 'react-redux'
 import { updateValue } from '../../../Redux/slices/searchSlice';
@@ -59,13 +60,20 @@ function SidebarCollapser(props){
                      <img src={warning} alt="" className="nav-icon" />
                   </NavLink>
                </li>
-                  <li> 
-                     <NavLink onClick={clearQuery} className ={({ isActive }) => (isActive ? 'nav-link remove active' : 'nav-link remove ' )}
-                     to={'/subscriptions'} 
-                     style={({ isActive }) => (isActive ? {color: '#FE1170'} : {color: '#787885'})}>
-                        <img src={subsIcon} alt="" className="nav-icon" />
-                     </NavLink>
-                  </li>
+               <li> 
+                  <NavLink onClick={clearQuery} className ={({ isActive }) => (isActive ? 'nav-link remove active' : 'nav-link remove ' )}
+                  to={'/subscriptions'} 
+                  style={({ isActive }) => (isActive ? {color: '#FE1170'} : {color: '#787885'})}>
+                     <img src={subsIcon} alt="" className="nav-icon" />
+                  </NavLink>
+               </li>
+               <li> 
+                  <NavLink onClick={clearQuery} className ={({ isActive }) => (isActive ? 'nav-link remove active' : 'nav-link remove ' )}
+                  to={'/messenger'} 
+                  style={({ isActive }) => (isActive ? {color: '#FE1170'} : {color: '#787885'})}>
+                     <img src={messengerIcon} alt="" className="nav-icon" />
+                  </NavLink>
+               </li>
             </ul>
          </nav>    
       </div>

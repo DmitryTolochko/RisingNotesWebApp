@@ -11,6 +11,7 @@ import songsReducer from './slices/songsSlice.js'
 import vertVideoInfoReducer from './slices/vertVideoInfoSlice.js'
 import videoPlayerReducer from './slices/videoPlayerSlice.js'
 import vertVideoPlayerReducer from './slices/vertVideoPlayerSlice.js'
+import musicIsPlayingReducer from './slices/musicIsPlayingSlice.js'
 
 const reducers = {
     searchInput: searchReducer,
@@ -25,7 +26,8 @@ const reducers = {
     songs: songsReducer,
     vertVideoInfo: vertVideoInfoReducer,
     videoPlayer: videoPlayerReducer,
-    vertVideoPlayer: vertVideoPlayerReducer
+    vertVideoPlayer: vertVideoPlayerReducer,
+    musicIsPlaying: musicIsPlayingReducer
 }
 
 export default reducers

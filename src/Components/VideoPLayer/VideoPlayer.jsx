@@ -4,17 +4,17 @@ import closeButton from '../../Images/playerforvideo/closebutton.svg'
 import risingnotes from '../../Images/playerforvideo/risingnotes.svg'
 import { useSelector, useDispatch } from 'react-redux';
 import { updateVideoPlayerValue } from '../../Redux/slices/videoPlayerSlice';
+import { updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlice';
 
 
 
 function VideoPlayer() {
     const videoRef = useRef();
-    const video = useSelector((state)=>state.videoPlayer.value)
-    const dispatch = useDispatch()
+    const video = useSelector((state)=>state.videoPlayer.value);
+    const dispatch = useDispatch();
 
     useEffect(() => {
         handlePlayVideo();
-        console.log(video)
     }, [video])
 
     function handlePlayVideo() {
@@ -26,12 +26,14 @@ function VideoPlayer() {
             // playFunc(video);
             videoRef.current.src = video;
             videoRef.current.play();
+            dispatch(updateMusicIsPlayingValue(false));
         }
         else {
             const url = URL.createObjectURL(video);
             // playFunc(url);
             videoRef.current.src = url;
             videoRef.current.play();
+            dispatch(updateMusicIsPlayingValue(false));
         }
     }
 
@@ -76,7 +78,7 @@ function VideoPlayer() {
                         dispatch(
                             updateVideoPlayerValue(false)
                             )}>
-                    <img src={closeButton}/></button>
+                    <img src={closeButton} /></button>
                     <video className='video-player' ref={videoRef} type="video/mp4" preload="auto" controls/>
                 </div>
                 : <></>

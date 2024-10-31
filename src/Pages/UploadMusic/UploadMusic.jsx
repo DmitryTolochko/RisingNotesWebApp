@@ -52,6 +52,8 @@ function UploadMusic(){
 
     async function uploadToModeration() {
         // Отправка на модерацию
+
+        let id = undefined;
         formData.append('Name', name)
         formData.append('Lyrics', lyrics)
         formData.append('Instrumental', lyrics ? lyrics.length > 0 : false)
@@ -79,8 +81,15 @@ function UploadMusic(){
                     "Content-Type": "multipart/form-data",
                 }
             })
-            .then(response => {navigate('/account')})
+            .then(response => id = response.data.id)
             .catch(err => {return Promise.reject(err)});
+
+            // await axiosAuthorized.post(`/api/song/upload-request/logo`, formData, {
+            //     headers: {
+            //         "Content-Type": "multipart/form-data",
+            //     }
+            // })
+            // .catch(err => {return Promise.reject(err)});
         }
         else if (role === 'authoredit') {
             // редактирование песни
@@ -94,7 +103,8 @@ function UploadMusic(){
         }
     }
 
-    const handleImageInput = () => {
+    const handleImageInput = (e) => {
+        e.preventDefault();
         imageSetterRef.current.click();
     }
 
@@ -102,22 +112,54 @@ function UploadMusic(){
         songSetterRef.current.click();
     }
 
-    const changeLogo = (event) => {
+    async function changeLogo (event) {
         // смена картинки
         event.preventDefault();
-        setLogofile(event.target.files[0]);
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            setCurrentImage(event.target.result);
-        };
-        reader.readAsDataURL(event.target.files[0]);
+        if (event.target.files.length > 0) {
+            let file = event.target.files[0];
+            const imageSrc = await loadImage(file);
+            if (file.size <=5*1024*1024 && await checkAspectRatio(imageSrc)) {
+                setLogofile(file);
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    setCurrentImage(event.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
     }
+
+    const loadImage = async (file) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    };
+
+    const checkAspectRatio = async (imageSrc) => {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.src = imageSrc;
+          
+            img.onload = () => {
+                const width = img.width;
+                const height = img.height;
+                console.log(width);
+                console.log(height);
+                resolve(width == height);
+            };
+        });
+    };
 
     const changeSong = (event) => {
         // смена песни
         event.preventDefault();
-        setSongFileName(event.target.files[0].name);
-        setSongfile(event.target.files[0]);
+        if (event.target.files.length > 0) {
+            setSongFileName(event.target.files[0].name);
+            setSongfile(event.target.files[0]);
+        }
     }
 
     useEffect(() => {
@@ -237,10 +279,16 @@ function UploadMusic(){
 
     const { getRootProps: getInputFile } = useDropzone({
         // обработка файла закинутого drag & drop
-        accept: ".mp3",
+        accept: {
+            "audio/mpeg": [".mp3"],
+            "audio/wav": [".wav"]
+        },
+        maxSize: 100000000,
         onDrop: acceptedFiles => {
-            setSongFileName(acceptedFiles[0].name);
-            setSongfile(acceptedFiles[0]);
+            if (acceptedFiles.length > 0) {
+                setSongFileName(acceptedFiles[0].name);
+                setSongfile(acceptedFiles[0]);
+            }
         },
     });   
     
@@ -289,7 +337,7 @@ function UploadMusic(){
                                         <p className='uploadtrack-p2'>.mp3 или .wav, макс. 100мб</p>
                                     </div>
                                     <p className='or'>или</p>
-                                    <CustomButton text={'Выберите файл'} func={() => {return}} success={'Изменить'} icon={uploadImg}/>
+                                    <CustomButton text={'Выберите файл'} func={() => getInputFile()} success={'Изменить'} icon={uploadImg}/>
                                 </div>
                             )}
                             
@@ -300,7 +348,7 @@ function UploadMusic(){
                 <div className='song-information-2'>
                     <div className='column'>
                         <h2 className='column1-h2'>Название трека</h2>
-                        <input className='inp-column1' placeholder={'Введите название...'} value={name} onChange={e => setName(e.target.value)}/>
+                        <input className='inp-column1' placeholder={name === undefined ? 'Введите название...' : 'Это обязательное поле'} value={name} onChange={e => setName(e.target.value)}/>
                     </div>
                     <div className='column'>
                         <h2 className='column1-h2'>Настроение</h2>
@@ -368,8 +416,8 @@ function UploadMusic(){
                             ) : (<></>)}
                     </div> : ''}
 
-                    <input type='file' accept=".jpg,.png" className='input-file' ref={imageSetterRef} onChange={changeLogo}></input>
-                    <input type='file' accept=".mp3" className='input-file' ref={songSetterRef} onChange={changeSong}></input>
+                    <input type='file' accept=".jpg,.png" max='5000000' className='input-file' ref={imageSetterRef} onChange={changeLogo}></input>
+                    <input type='file' accept=".mp3,.wav" className='input-file' ref={songSetterRef} onChange={changeSong}></input>
                     <audio ref={audioRef} src={songFileName ? api + `api/song/${songFileName}/file` : ''}
                         type="audio/mpeg" controls style={{ display: 'none' }}/>
                 </div>

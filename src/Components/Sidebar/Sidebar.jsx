@@ -13,6 +13,7 @@ import warning from '../../Images/sidebar/warning.svg';
 import like from '../../Images/sidebar/like.svg';
 import placeholder from '../../Images/main-placeholder.png';
 import subsIcon from '../../Images/sidebar/subs-icon.svg';
+import messengerIcon from '../../Images/sidebar/messenger.png';
 
 import SidebarCollapser from './SidebarCollpaser/SidebarCollapser'
 import useSearchClean from '../../Hooks/useSearchClean/useSearchClean';
@@ -159,6 +160,14 @@ function Sidebar(props) {
                      style={({ isActive }) => (isActive ? {color: '#FE1170'} : {color: '#787885'})}>
                         <img src={subsIcon} alt="" className="nav-icon" draggable='false' />
                         <span>Подписки</span>
+                     </NavLink>
+                  </li>
+                  <li> 
+                     <NavLink draggable='false' onClick={sidebarClickHandler} className ={({ isActive }) => (isActive ? 'nav-link remove active' : 'nav-link remove ' )}
+                     to={'/messenger'} 
+                     style={({ isActive }) => (isActive ? {color: '#FE1170'} : {color: '#787885'})}>
+                        <img src={messengerIcon} alt="" className="nav-icon" draggable='false' />
+                        <span>Мессенджер</span>
                      </NavLink>
                   </li>
                </ul>

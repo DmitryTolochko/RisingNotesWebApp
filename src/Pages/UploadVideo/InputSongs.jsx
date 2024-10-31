@@ -2,10 +2,10 @@ import React, { useRef } from 'react';
 import { useEffect, useState } from "react"
 import { useParams } from 'react-router-dom';
 import { useCookies, withCookies } from 'react-cookie';
-import { axiosAuthorized } from '../../Components/App/App';
+import { api, axiosAuthorized, axiosPictures, axiosUnauthorized } from '../../Components/App/App';
 
 
-function InputSongs({ setSong }){
+function InputSongs({ setSong, isClipFree=true}){
     const [songs, setSongs] = useState([]);
     const [choosen, setChoosenSong] = useState([]);
     const [cookies, setCookies] = useCookies(['authorId']);
@@ -16,15 +16,32 @@ function InputSongs({ setSong }){
         console.log(id)
     }
 
-    // Функция для выполнения запроса к API
+    // Подгрузка песен и фильтр на те, у которых нет клипа
     const fetchSongs = async () => {
+        let allSongs = [];
         await axiosAuthorized.get(`api/author/${cookies.authorId}/song/list`)
         .then(response => {
-            setSongs(response.data.songInfoList);
+            allSongs = response.data.songInfoList;
         })
         .catch(err =>{
             console.log(err)
-        })
+        });
+
+        if (!isClipFree) {
+            let filteredSongs = await Promise.all(allSongs.map(async (song) => {
+                try{
+                    const response = await axiosPictures.get(api + 'api/music-clip/by-song/' + song.id)
+                    return;
+                } catch (error) {
+                    return song;
+                }
+            }));
+
+            filteredSongs = filteredSongs.filter(e => e !== undefined);
+            setSongs(filteredSongs);
+        } else {
+            setSongs(allSongs);
+        }
     };
   
     // Вызов функции при монтировании компонента

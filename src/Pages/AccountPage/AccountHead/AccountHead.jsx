@@ -49,18 +49,24 @@ export default function AccountHead (props) {
     const changeLogo = (event) => {
         // изменение аватарки
         event.preventDefault();
-        const formData = new FormData();
-        formData.append('File', event.target.files[0]);
-        formData.append('type', 'image/jpeg');
+        if (event.target.files.length > 0) {
+            let file = event.target.files[0];
+            if (file.size <= 5*1024*1024) {
+                setIsImageExist(false);
+                const formData = new FormData();
+                formData.append('File', file);
+                formData.append('type', 'image/jpeg');
 
-        axiosAuthorized.patch(`api/user/logo`, formData, {
-            headers: {
-                "Content-Type": "multipart/form-data",
+                axiosAuthorized.patch(`api/user/logo`, formData, {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    }
+                })
+                .then(response => {
+                    window.location.reload();
+                });
             }
-        })
-        .then(response => {
-            window.location.reload();
-        });
+        }
     }
 
     return (
@@ -82,7 +88,7 @@ export default function AccountHead (props) {
                 ) : <></>}
             </span>
 
-            <input type='file' accept=".jpg,.png" className='input-file' ref={fileRef} onChange={changeLogo}></input>
+            <input type='file' accept=".jpg,.png" className='input-file' ref={fileRef} onChange={changeLogo} maxSize='5000000'></input>
         </div>
     );
 }

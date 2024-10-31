@@ -10,6 +10,20 @@
     }
 }
 
+.comment-page {
+    text-align: start;
+    margin-bottom: 80px;
+    /* background-color: #0F141D; */
+
+    width: 100%;
+    max-width: 1220px;
+    z-index: 5;
+    
+    @media screen and (max-width: 720px){ 
+        margin-top: 40px;
+    }
+}
+
 .comm-head > img {
     max-width: 276px;
     width: 100%;
@@ -54,6 +68,9 @@
 }
 
 .comm-page-author {
+    display: flex;
+    gap: 12px;
+    align-items: center;
     margin-bottom: 10px;
     color: #C5C5C5;
     font-size: 28px;
@@ -63,6 +80,12 @@
         font-size: 16px;
         margin: 0;
     }
+}
+
+.comm-page-author > img {
+    width: 32px;
+    height: 32px;
+    border-radius: 100%;
 }
 
 .comm-page-author:hover {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import BackButton from '../../Components/BackButton';
 import VideoPrewiew from '../../Images/installvideo/videoprewiew.svg';
 import { useState, useRef } from 'react'
@@ -30,7 +30,11 @@ function UploadVideo(){
     const [description, setDescription] = useState(undefined);
     const [songId, setSongId] = useState([]);
     const [title, setTitle] = useState([]);
-    const formData= new FormData();
+
+    useEffect(() => {
+        if (videoFile !== undefined)
+            console.log(videoFile.size);
+    }, [videoFile]);
     
 
     function handleChoosenSong(id, title) {
@@ -39,54 +43,83 @@ function UploadVideo(){
     }
 
     async function uploadVideo() {
+        // загрузка видео
+        let formData = new FormData();
+        let clipId = undefined;
+        let uploadId = undefined;
         
         formData.append('Title', title);
-        console.log(title)
         formData.append('Description', description);
-        console.log(description)
         formData.append('SongId', songId);
-        console.log(songId)
-        formData.append('PreviewFile.File', skinfile);
-        console.log(skinfile)
-        formData.append('ClipFile.File', videoFile);
-        console.log(videoFile)
-        console.log(formData);
 
         await axiosAuthorized.post('api/music-clip', formData, {
             headers: {
                 "Content-Type": "multipart/form-data",
             }
         })
-        .then(response => {navigate('/account')})
+        .then(response => clipId = response.data.id)
         .catch(err => {return Promise.reject(err)});
-        
+
+        formData = new FormData();
+        formData.append('File', skinfile);
+
+        await axiosAuthorized.patch('api/music-clip/' + clipId + '/preview', formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            }
+        })
+        .catch(err => {return Promise.reject(err)});
+
+        await axiosAuthorized.post('api/music-clip/' + clipId + '/file/start-upload')
+        .then(response => uploadId = response.data.uploadId)
+        .catch(err => {return Promise.reject(err)});
+
+        if (videoFile.size <= 50 * 1024 * 1024) {
+            // загрузка видео размером не больше 50 мб.
+            await uploadFilePart(videoFile, 1, true, uploadId, clipId);
+        }
+        else {
+            // загрузка видео по частям
+            let totalSize = videoFile.size;
+            let currentPart = 0;
+            const chunkSize = 6 * 1024 * 1024;
+            const totalParts = Math.ceil(totalSize/chunkSize);
+
+            for (let start = 0; start < totalSize; start+=chunkSize) {
+                currentPart += 1;
+                const chunk = videoFile.slice(start, start + chunkSize);
+                await uploadFilePart(chunk, currentPart, currentPart === totalParts, uploadId, clipId);
+            }
+        }
+    }
+
+    async function uploadFilePart(filePart, partNumber, isLast, uploadId, clipId) {
+        // загрузка куска видео
+        let formData = new FormData();
+        formData.append('File', filePart);
+        formData.append('UploadId', uploadId);
+        formData.append('PartNumber', partNumber);
+        formData.append('IsLastPart', isLast);
+        await axiosAuthorized.post('api/music-clip/' + clipId + '/file/upload-part', formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            }
+        })
+        .catch(err => {return Promise.reject(err)});
     }
 
     function handlePlayVideo() {
         // плеер видео
-        dispatch(updateVideoPlayerValue(videoFile))
-        // if (isPlaying) {
-        //     videoRef.current.pause();
-        //     setIsPlaying(false);
-        // }
-        // else if (typeof videoFile === "string" && videoFile.includes('api/music-clip')) {
-        //     setIsPlaying(true);
-        //     videoRef.current.src = videoFile;
-        //     videoRef.current.play();
-        // }
-        // else {
-        //     setIsPlaying(true);
-        //     const url = URL.createObjectURL(videoFile);
-        //     videoRef.current.src = url;
-        //     videoRef.current.play();
-        // }
+        dispatch(updateVideoPlayerValue(videoFile));
     }
 
     const changeVideo = (event) => {
         // смена клипа
         event.preventDefault();
-        setVideoFileName(event.target.files[0].name);
-        setVideofile(event.target.files[0]);
+        if (event.target.files.length > 0) {
+            setVideoFileName(event.target.files[0].name);
+            setVideofile(event.target.files[0]);
+        }
     }
 
 
@@ -96,22 +129,34 @@ function UploadVideo(){
 
     const { getRootProps: getInputFile } = useDropzone({
         // обработка файла закинутого drag & drop
-        accept: ".mp4,.mkv,.avi,.mov",
+        accept: {
+            "video/mp4": [".mp4", ".avi"],
+            "video/x-msvideo": [".mkv"],
+            "video/mpeg": [".mov"]
+        },
+        maxSize: 200000000,
         onDrop: acceptedFiles => {
-            setVideoFileName(acceptedFiles[0].name);
-            setVideofile(acceptedFiles[0]);
+            if (acceptedFiles.length > 0) {
+                setVideoFileName(acceptedFiles[0].name);
+                setVideofile(acceptedFiles[0]);
+            }
         },
     });   
 
     const changeSkin = (event) => {
         // смена обложки
         event.preventDefault();
-        setSkinfile(event.target.files[0]);
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            setCurrentSkin(event.target.result);
-        };
-        reader.readAsDataURL(event.target.files[0]);
+        if (event.target.files.length > 0) {
+            let file = event.target.files[0];
+            if (file.size <=5*1024*1024) {
+                setSkinfile(file);
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    setCurrentSkin(event.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
     }
 
     return (
@@ -139,7 +184,7 @@ function UploadVideo(){
                                         <p className='uploadtrack-p2'>.mp4 или .mkv, макс. 200мб</p>
                                     </div>
                                     <p className='or'>или</p>
-                                    <CustomButton text={'Выберите файл'} func={() => {return}} success={'Изменить'} icon={uploadImg}/>
+                                    <CustomButton text={'Выберите файл'} func={() => getInputFile()} success={'Изменить'} icon={uploadImg}/>
                                 </div>
                             )}
                         </div>
@@ -148,7 +193,7 @@ function UploadVideo(){
                 <div className='video-information-2'>
                     <div className='column1-2'>
                         <h2 className='uploadvideo-h2'>Выберите связанный трек</h2>
-                        <InputSongs placeholder={"Выберите связанный трек..."} setSong={handleChoosenSong}/>
+                        <InputSongs placeholder={"Выберите связанный трек..."} setSong={handleChoosenSong} isClipFree={false}/>
                     </div> 
                     <div className='column1-2'>
                         <h2 className='uploadvideo-h2'>Описание</h2>
@@ -157,9 +202,9 @@ function UploadVideo(){
                 </div>
                 <div className='video-information-3' >
                     <div className='button-and-text'>
-                        <CustomButton text={'Опубликовать*'} func={() => uploadVideo()} success={'Опубликовано'} icon={uploadImg}/>
+                        <CustomButton text={'Опубликовать'} func={() => uploadVideo()} success={'Опубликовано'} icon={uploadImg}/>
                     </div>
-                    <text className='warning-upload'>*перед публикацией видео будет отправлено на модерацию</text>
+                    {/* <text className='warning-upload'>*перед публикацией видео будет отправлено на модерацию</text> */}
 
                     <input type='file' accept=".jpg,.png" className='input-file' ref={skinSetterRef} onChange={changeSkin}></input>
                     <input type='file' accept=".mp4,.avi,.mkv,.mov" className='input-file' ref={videoSetterRef} onChange={changeVideo}></input>

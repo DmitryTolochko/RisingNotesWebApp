@@ -8,6 +8,7 @@ import { handleVideoEnter, handleVideoHover, handleVideoLeave, handleVideoMove }
 import { useDispatch } from 'react-redux'
 import { updateVertVideoInfoValue } from '../../Redux/slices/vertVideoInfoSlice'
 import { updateVertVideoPlayerValue } from '../../Redux/slices/vertVideoPlayerSlice'
+import { updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlice'
 
 function VerticalClip(props) {
     const [dataFetched, setDataFetched] = useState(false)
@@ -61,6 +62,7 @@ function VerticalClip(props) {
     }
 
     const handleVertClick = () =>{
+        dispatch(updateMusicIsPlayingValue(false));
         dispatch(updateVertVideoPlayerValue(
             api + `api/short-video/${props.id}/file`
         ))

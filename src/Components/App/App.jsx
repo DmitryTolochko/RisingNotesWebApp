@@ -17,7 +17,7 @@ import MusicPlayer from '../MusicPlayer/MusicPlayer';
 import PlaylistWindow from '../../Pages/PlaylistWindow/PlaylistWindow';
 import SearchResults from '../SearchResults/SearchResults';
 import UploadMusic from '../../Pages/UploadMusic/UploadMusic.jsx';
-import UploadVideo from '../../Pages/InstallVideo/UploadVideo.jsx';
+import UploadVideo from '../../Pages/UploadVideo/UploadVideo.jsx';
 import InstallVerticalVideo from '../../Pages/UploadVerticalVideo/UploadVertVideo.jsx';
 import ErrorPage from '../../Pages/404Page/404Page';
 import { useState, useEffect } from 'react';
@@ -33,6 +33,7 @@ import VertVideoPlayer from '../BlogVideoPlayer/BlogVideoPlayer.jsx';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { updateResizeValue } from '../../Redux/slices/resizeSlice.js';
+import Messenger from '../../Pages/Messenger/Messenger.jsx';
 
 export const api = 'http://81.31.247.227/';
 
@@ -168,7 +169,11 @@ function App() {
             return config;
         },
         error => {
-            if (error.response?.status === 404) {
+            if (error.response === undefined) {
+                setErrorText('Нет сети');
+                setErrorVisibility(true);
+            }
+            else if (error.response?.status === 404) {
                 setErrorText('Указанного объекта не существует');
                 setErrorVisibility(true);
                 // window.location.replace('/404');
@@ -194,7 +199,7 @@ function App() {
             else if (error.response?.status === 400) {
                 setErrorText(error.message);
                 setErrorVisibility(true);
-                return Promise.reject(error);
+                return Promise.reject(error.response);
             }
             else {
                 setErrorText(error.message);
@@ -209,7 +214,11 @@ function App() {
             return config;
         },
         error => {
-            if (error.response?.status === 404) {
+            if (error.response === undefined) {
+                setErrorText('Нет сети');
+                setErrorVisibility(true);
+            }
+            else if (error.response?.status === 404) {
                 setErrorText('Указанного объекта не существует');
                 setErrorVisibility(true);
                 // window.location.replace('/404');
@@ -230,7 +239,7 @@ function App() {
             else if (error.response?.status === 400) {
                 setErrorText(error.message);
                 setErrorVisibility(true);
-                return Promise.reject(error);
+                return Promise.reject(error.response);
             }
             else {
                 setErrorText(error.message);
@@ -291,6 +300,7 @@ function App() {
                     <Route path={'/uploadmusic'} element={<UploadMusic/>}/>
                     <Route path={'/uploadvideo'} element={<UploadVideo/>}/>
                     <Route path={'/uploadvertvideo'} element={<InstallVerticalVideo/>}/>
+                    <Route path={'/messenger'} element={<Messenger/>}/>
                 </>
                 )}
             </Routes>  

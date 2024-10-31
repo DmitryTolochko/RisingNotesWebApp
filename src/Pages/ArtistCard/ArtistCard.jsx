@@ -88,7 +88,7 @@ function ArtistCard(){
     if (isLoaded || artist?.userId)
         return(
             <section className="comment-page-wrapper">
-                <div className="featured">
+                <div className="comment-page">
                     <BackButton/>
                     <ArtistInfo artist={artist} 
                         handleSubscribe={handleSubscribe} 

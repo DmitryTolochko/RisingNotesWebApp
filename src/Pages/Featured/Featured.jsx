@@ -13,16 +13,19 @@ import { updatePlaylistsValue } from '../../Redux/slices/playlistsSlice';
 
 import './Featured.css';
 import Loader from '../../Components/Loader/Loader';
+import { updateSongsValue } from '../../Redux/slices/songsSlice';
+import { updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlice';
 
 export default function Featured() {
     const navigate = useNavigate();
     const [songs, setSongs] = useState([]);
     const [cookies, setCookies] = useCookies(['accessToken', 'refreshToken', 'authorId', 'role', 'userId']);
-    const [isLoaded, setIsLoaded] = useState(false)
-    const dispatch = useDispatch()
+    const [isLoaded, setIsLoaded] = useState(false);
+    const dispatch = useDispatch();
 
-    const playlists = useSelector((state) => state.playlists.value)
-    const featured = useSelector((state) => state.featured.value)
+    const playlists = useSelector((state) => state.playlists.value);
+    const featured = useSelector((state) => state.featured.value);
+    const playableList = useSelector((state) => state.songs.value);
     const subscriptions = useSelector((state) => state.subscriptions.value)
   
     useEffect(() => {
@@ -55,11 +58,25 @@ export default function Featured() {
         .then (
             response => {
                 id = response.data.id
-                dispatch(updatePlaylistsValue([...playlists, id]) )
+                dispatch(updatePlaylistsValue([...playlists, id]))
             }
         )
         navigate(`/playlist/${id}`)
     };
+
+    function updatePlayableList (startId) {
+        // Обновить текущий список вопроизведения
+        let arr = featured.slice(featured.findIndex(e => e === startId));
+        dispatch(updateSongsValue(arr));
+        dispatch(updateMusicIsPlayingValue(true));
+    }
+
+    function updatePlayableList (startId) {
+        // Обновить текущий список вопроизведения
+        let arr = featured.slice(featured.findIndex(e => e === startId));
+        dispatch(updateSongsValue(arr));
+        dispatch(updateMusicIsPlayingValue(true));
+    }
 
     const tabs = [
         {id:'main', label: 'Главная'},

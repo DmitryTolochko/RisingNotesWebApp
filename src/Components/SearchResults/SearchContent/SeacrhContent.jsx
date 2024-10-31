@@ -6,8 +6,11 @@ import Clip from '../../Clip/Clip'
 import pfpPlaceholder from '../../../Images/main-placeholder.png';
 import SearchArtistCard from '../../SearchArtistCard/SearchArtistCard'
 import VerticalClip from '../../VerticalClip/VerticalClip'
+import { updateMusicIsPlayingValue } from '../../../Redux/slices/musicIsPlayingSlice'
+import { useDispatch } from 'react-redux'
 
 function SearchContent(props){
+    const dispatch = useDispatch();
     const searchResult = props.search
 
     if(searchResult.artists?.length === 0 && searchResult.tracks?.length === 0 && !searchResult.playlists && !searchResult.clips)
@@ -16,6 +19,10 @@ function SearchContent(props){
 
     function updateNavType(type){
         props.navChanger(type)
+    }
+
+    function setIsPlaying() {
+        dispatch(updateMusicIsPlayingValue(true))
     }
 
     switch(props.navType){
@@ -84,7 +91,13 @@ function SearchContent(props){
                 </div>
                 <div className="search-tracks-content">
                     {tracks?.map(track =>(
-                        <Song key={track.id} id={track.id} name={track.name} duration={track.durationMs} artist={track.artistName} />
+                        <Song 
+                        key={track.id} 
+                        id={track.id} 
+                        name={track.name} 
+                        duration={track.durationMs} 
+                        artist={track.artistName} 
+                        onClick={setIsPlaying}/>
                     ))}
                 </div>
             </div>)
@@ -152,7 +165,7 @@ function SearchContent(props){
                         </button>
                     </div>
                     <div className="search-authors-content">
-                        <div className='playlists'>
+                        <div className='subscriptions'>
                             {artists?.map((artist, index) => (
                                 <SearchArtistCard key={index} artist={artist} srcErrHandler={addDefaultSrc}/>
                             ))}

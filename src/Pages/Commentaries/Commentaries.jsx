@@ -1,6 +1,6 @@
 import BackButton from '../../Components/BackButton';
 import Comment from '../../Components/Comment';
-import {  api } from '../../Components/App/App';
+import {  api, axiosPictures } from '../../Components/App/App';
 import React, { useContext } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useEffect, useState } from "react";
@@ -9,10 +9,13 @@ import commentsIcon from '../../Images/controller/message.svg';
 import sendIcon from '../../Images/controller/sendIcon.svg';
 import burgerIcon from '../../Images/controller/menu.svg';
 import playIcon from '../../Images/player/PlayBtn.svg';
-import { useSelector } from 'react-redux';
+import defaultAvatar from '../../Images/image-placeholder/user_logo_small_placeholder.png';
+import { useDispatch, useSelector } from 'react-redux';
 
 import './Commentaries.css';
 import CustomButton from '../../Components/CustomButton/CustomButton';
+import { updateVertVideoPlayerValue } from '../../Redux/slices/vertVideoPlayerSlice';
+import { updateVideoPlayerValue } from '../../Redux/slices/videoPlayerSlice';
 
 const Commentaries = (props) => {
     const params = useParams();
@@ -23,47 +26,61 @@ const Commentaries = (props) => {
     const [songAuthor, setSongAuthor] = useState('');
     const [authorId, setAuthorId] = useState('');
     const [genres, setGenres] = useState([]);
+    const [clipId, setClipId] = useState(undefined);
 
     const [currPage, setCurrPage] = useState(0);
     const [songText, setText] = useState('');
-    const resize = useSelector((state)=> state.resize.value)
+    const resize = useSelector((state)=> state.resize.value);
+    const dispatch = useDispatch();
+    const [artistAvatar, setArtistAvatar] = useState(defaultAvatar);
 
     useEffect(() => {
-        axiosUnauthorized.get(`api/song/${params.id}/comment/list`)
+        getAllInfo();
+    }, [isDataUpdated, params.id]);
+
+    async function getAllInfo () {
+        let authorId = undefined;
+
+        await axiosUnauthorized.get(`api/song/${params.id}/comment/list`)
             .then(response => {
                 let arr = response.data.commentList;
                 arr.reverse();
                 setComments(arr);
-                console.log(arr);
             })
             .catch(err=>{
                 console.log(err);
             });
 
-        axiosUnauthorized.get(`api/song/${params.id}`)
+        await axiosUnauthorized.get(`api/song/${params.id}`)
             .then(response => {
                 setSongName(response.data.name);
                 setGenres(response.data.genreList);
+                setSongAuthor(response.data.authorName);
                 setText(response.data.lyrics ? response.data.lyrics : 'Мы не знаем текст этой песни :(');
-                axiosUnauthorized.get(`api/author/${response.data.authorId}`)
-                    .then(resp => {
-                        setSongAuthor(resp.data.name);
-                    })
-                    .catch(err => {
-                        console.log(err);
-                        throw err;
-                    });
+                authorId = response.data.authorId;
+                setAuthorId(authorId);
             })
             .catch(err => {
                 console.log(err);
                 throw err;
             });
-        
-        axiosUnauthorized.get(`api/song/${params.id}`)
+
+        await axiosPictures.get('api/author/' + authorId + '/logo')
             .then(response => {
-                setAuthorId(response.data.authorId);
+                setArtistAvatar(api + `api/author/` + authorId + `/logo`)
+            })
+            .catch(err => {
+                setArtistAvatar(defaultAvatar);
             });
-    }, [isDataUpdated, params.id]);
+
+        await axiosPictures.get(api + 'api/music-clip/by-song/' + params.id)
+            .then(response => {
+                setClipId(response?.data.clipId);
+            })
+            .catch(err => {
+                setClipId(undefined);
+            })
+    }
 
     const handleSendComment = () => {
         if (comment !== '') {
@@ -93,25 +110,25 @@ const Commentaries = (props) => {
 
     return (
         <div className='comment-page-wrapper'>
-            <div className='featured'>
+            <div className='comment-page'>
                 <BackButton/>
 
                 <div className='comm-head'>
                     <img alt='cover' src={(api + `api/song/${params.id}/logo?width=500&height=500`)} draggable='false'/>
                     <span className='comm-page-text'>
                         <h2 className='comm-page-h2'>{songName}</h2>
-                        <Link to={`/artist/${authorId}`} className='comm-page-author'>{songAuthor}</Link>
+                        <Link to={`/artist/${authorId}`} className='comm-page-author'><img src={artistAvatar} alt='avatar'/>{songAuthor}</Link>
                         <div className='comm-head-buttons'>
                             {genres.map(el => <span key={el} className='song-tag'>{el}</span>)}
                         </div>
-                        {resize === 'mobile' ? (
-                            <CustomButton text={'Смотреть клип'} icon={playIcon}/>
+                        {clipId && resize === 'mobile' ? (
+                            <CustomButton text={'Смотреть клип'} icon={playIcon} func={() => dispatch(updateVideoPlayerValue(api + `api/music-clip/${clipId}/file`))} success={'Смотреть клип'}/>
                         ) : 
                         (<></>)}
                     </span>
-                    {resize === 'standart' ? (
+                    {clipId && resize === 'standart' ? (
                         <div className='comm-head-button'>
-                            <CustomButton text={'Смотреть клип'} icon={playIcon}/>
+                            <CustomButton text={'Смотреть клип'} icon={playIcon} func={() => dispatch(updateVideoPlayerValue(api + `api/music-clip/${clipId}/file`))} success={'Смотреть клип'}/>
                         </div>
                     ) : 
                     (<></>)}
