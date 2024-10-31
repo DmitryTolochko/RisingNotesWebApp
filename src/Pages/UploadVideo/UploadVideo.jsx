@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import BackButton from '../../Components/BackButton';
 import VideoPrewiew from '../../Images/installvideo/videoprewiew.svg';
 import { useState, useRef } from 'react'
@@ -30,7 +30,11 @@ function UploadVideo(){
     const [description, setDescription] = useState(undefined);
     const [songId, setSongId] = useState([]);
     const [title, setTitle] = useState([]);
-    const formData= new FormData();
+
+    useEffect(() => {
+        if (videoFile !== undefined)
+            console.log(videoFile.size);
+    }, [videoFile]);
     
 
     function handleChoosenSong(id, title) {
@@ -40,40 +44,73 @@ function UploadVideo(){
 
     async function uploadVideo() {
         // загрузка видео
+        let formData = new FormData();
+        let clipId = undefined;
+        let uploadId = undefined;
+        
         formData.append('Title', title);
         formData.append('Description', description);
         formData.append('SongId', songId);
-        formData.append('PreviewFile.File', skinfile);
-        formData.append('ClipFile.File', videoFile);
 
         await axiosAuthorized.post('api/music-clip', formData, {
             headers: {
                 "Content-Type": "multipart/form-data",
             }
         })
-        .then(response => {navigate('/account')})
+        .then(response => clipId = response.data.id)
         .catch(err => {return Promise.reject(err)});
-        
+
+        formData = new FormData();
+        formData.append('File', skinfile);
+
+        await axiosAuthorized.patch('api/music-clip/' + clipId + '/preview', formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            }
+        })
+        .catch(err => {return Promise.reject(err)});
+
+        await axiosAuthorized.post('api/music-clip/' + clipId + '/file/start-upload')
+        .then(response => uploadId = response.data.uploadId)
+        .catch(err => {return Promise.reject(err)});
+
+        if (videoFile.size <= 50 * 1024 * 1024) {
+            // загрузка видео размером не больше 50 мб.
+            await uploadFilePart(videoFile, 1, true, uploadId, clipId);
+        }
+        else {
+            // загрузка видео по частям
+            let totalSize = videoFile.size;
+            let currentPart = 0;
+            const chunkSize = 6 * 1024 * 1024;
+            const totalParts = Math.ceil(totalSize/chunkSize);
+
+            for (let start = 0; start < totalSize; start+=chunkSize) {
+                currentPart += 1;
+                const chunk = videoFile.slice(start, start + chunkSize);
+                await uploadFilePart(chunk, currentPart, currentPart === totalParts, uploadId, clipId);
+            }
+        }
+    }
+
+    async function uploadFilePart(filePart, partNumber, isLast, uploadId, clipId) {
+        // загрузка куска видео
+        let formData = new FormData();
+        formData.append('File', filePart);
+        formData.append('UploadId', uploadId);
+        formData.append('PartNumber', partNumber);
+        formData.append('IsLastPart', isLast);
+        await axiosAuthorized.post('api/music-clip/' + clipId + '/file/upload-part', formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            }
+        })
+        .catch(err => {return Promise.reject(err)});
     }
 
     function handlePlayVideo() {
         // плеер видео
-        dispatch(updateVideoPlayerValue(videoFile))
-        // if (isPlaying) {
-        //     videoRef.current.pause();
-        //     setIsPlaying(false);
-        // }
-        // else if (typeof videoFile === "string" && videoFile.includes('api/music-clip')) {
-        //     setIsPlaying(true);
-        //     videoRef.current.src = videoFile;
-        //     videoRef.current.play();
-        // }
-        // else {
-        //     setIsPlaying(true);
-        //     const url = URL.createObjectURL(videoFile);
-        //     videoRef.current.src = url;
-        //     videoRef.current.play();
-        // }
+        dispatch(updateVideoPlayerValue(videoFile));
     }
 
     const changeVideo = (event) => {

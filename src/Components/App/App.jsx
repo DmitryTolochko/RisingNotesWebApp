@@ -33,6 +33,7 @@ import VertVideoPlayer from '../BlogVideoPlayer/BlogVideoPlayer.jsx';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { updateResizeValue } from '../../Redux/slices/resizeSlice.js';
+import Messenger from '../../Pages/Messenger/Messenger.jsx';
 
 export const api = 'http://81.31.247.227/';
 
@@ -299,6 +300,7 @@ function App() {
                     <Route path={'/uploadmusic'} element={<UploadMusic/>}/>
                     <Route path={'/uploadvideo'} element={<UploadVideo/>}/>
                     <Route path={'/uploadvertvideo'} element={<InstallVerticalVideo/>}/>
+                    <Route path={'/messenger'} element={<Messenger/>}/>
                 </>
                 )}
             </Routes>  

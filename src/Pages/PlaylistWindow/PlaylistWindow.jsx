@@ -11,6 +11,8 @@ import { updatePlaylistsValue } from '../../Redux/slices/playlistsSlice';
 import { api, axiosAuthorized, axiosPictures, axiosUnauthorized} from '../../Components/App/App';
 
 import './PlaylistWindow.css';
+import { updateSongsValue } from '../../Redux/slices/songsSlice';
+import { updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlice';
 
 function PlaylistWindow(){
     const imageSetterRef = useRef(null);
@@ -24,7 +26,7 @@ function PlaylistWindow(){
     const [isPrivate, setIsPrivate] = useState(false);
 
     const playlists = useSelector((state)=>state.playlists.value)
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
     
 
     function reviewAvatar() {
@@ -145,6 +147,14 @@ function PlaylistWindow(){
         setIsPrivate(!isPrivate);
     };
 
+    function updatePlayableList (startId) {
+        // Обновить текущий список вопроизведения
+        let songsList = songs.map(el => el.id);
+        let arr = songsList.slice(songsList.findIndex(e => e === startId));
+        dispatch(updateSongsValue(arr));
+        dispatch(updateMusicIsPlayingValue(true));
+    }
+
     return (
         <div className='comment-page-wrapper'>
             <div className='comment-page'>
@@ -181,7 +191,14 @@ function PlaylistWindow(){
                 </div>
                 <div className='tracks'>
                     {songs.map(el => (
-                        <Song key={el.id} id={el.id} name={el.name} duration={el.durationMs} artist={el.authorName} genres={el.genreList}/>
+                        <Song 
+                        key={el.id} 
+                        id={el.id} 
+                        name={el.name} 
+                        duration={el.durationMs} 
+                        artist={el.authorName} 
+                        genres={el.genreList}
+                        onClick={updatePlayableList}/>
                     ))}
                 </div>
             </div>

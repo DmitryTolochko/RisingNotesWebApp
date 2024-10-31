@@ -6,7 +6,7 @@ import statsIcon from '../../../Images/account-page/stats-icon.svg';
 import { api, axiosAuthorized, axiosUnauthorized } from '../../../Components/App/App';
 
 const statusType = {
-    0: 'Неизвестно',
+    0: 'Нет файлов',
     1: 'На модерации',
     2: 'На доработке',
     3: 'Опубликовано',

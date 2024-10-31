@@ -1,15 +1,17 @@
 import { Link } from 'react-router-dom';
-import authorButtonIcon from '../../../Images/player/authorButtonIcon.svg'
 import currentSongIcon from '../../../Images/player/currentSongIcon.svg'
 import playBtn from '../../../Images/player/PlayBtn.svg'
 import CustomButton from '../../CustomButton/CustomButton'
-import { useContext, useEffect, useState } from 'react';
-import { api, axiosPictures, axiosUnauthorized, VideoPlayerContext } from '../../App/App';
+import { useEffect, useState } from 'react';
+import { api, axiosPictures, axiosUnauthorized} from '../../App/App';
+import { useSelector, useDispatch } from 'react-redux';
+import { updateVideoPlayerValue } from '../../../Redux/slices/videoPlayerSlice';
 
 function SongCover(props) {
     let currentTrack = props.track;
     const [clipId, setClipId] = useState(undefined);
-    const {setVideo } = useContext(VideoPlayerContext);
+    const videoPlayer = useSelector((state)=>state.videoPlayer.value);
+    const dispatch = useDispatch();
 
     useEffect(() => {
         if (currentTrack.id !== '')
@@ -46,7 +48,7 @@ function SongCover(props) {
                 ))}
             </div>
             {clipId !== undefined ? (
-                <CustomButton text='Смотреть клип' icon={playBtn} func={() => setVideo(api + `api/music-clip/${clipId}/file`)} success={'Смотреть клип'}/>
+                <CustomButton text='Смотреть клип' icon={playBtn} func={() => dispatch(updateVideoPlayerValue(api + `api/music-clip/${clipId}/file`))} success={'Смотреть клип'}/>
             ) : (<></>)}
             
         </div>

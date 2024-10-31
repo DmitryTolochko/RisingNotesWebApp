@@ -8,6 +8,7 @@
     color: #787885;
     background-color: #191E28;
     top: 25px;
+    z-index: 100;
 }
 
 .song-modal__title {

@@ -52,6 +52,8 @@ function UploadMusic(){
 
     async function uploadToModeration() {
         // Отправка на модерацию
+
+        let id = undefined;
         formData.append('Name', name)
         formData.append('Lyrics', lyrics)
         formData.append('Instrumental', lyrics ? lyrics.length > 0 : false)
@@ -79,8 +81,15 @@ function UploadMusic(){
                     "Content-Type": "multipart/form-data",
                 }
             })
-            .then(response => {navigate('/account')})
+            .then(response => id = response.data.id)
             .catch(err => {return Promise.reject(err)});
+
+            // await axiosAuthorized.post(`/api/song/upload-request/logo`, formData, {
+            //     headers: {
+            //         "Content-Type": "multipart/form-data",
+            //     }
+            // })
+            // .catch(err => {return Promise.reject(err)});
         }
         else if (role === 'authoredit') {
             // редактирование песни

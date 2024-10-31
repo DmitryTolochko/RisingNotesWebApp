@@ -15,9 +15,8 @@
 }
 
 .player-exit-button:hover {
-    background: none; 
+    color: #FE1170;
     cursor: pointer;
-    border: 3px solid #FE1170;
 }
 
 .video-player {

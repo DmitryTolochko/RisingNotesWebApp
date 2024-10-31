@@ -25,9 +25,10 @@ import { updateExcludedValue } from '../../Redux/slices/excludedSlice';
 import { updateFeaturedValue } from '../../Redux/slices/featuredSlice';
 import { updateCurrentSongValue } from '../../Redux/slices/currentSongSlice';
 import { updateSongsValue } from '../../Redux/slices/songsSlice';
+import { updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlice';
 
 const MusicPlayer = () => {
-    const [isPlaying, setIsPlaying] = useState(false);  
+    // const [isPlaying, setIsPlaying] = useState(false);  
     const [nextSongIndex, setNextSongIndex] = useState(0);
     const audioRef = useRef(null);
     const [trackCurrentDuration, setTrackCurrentDuration] = useState(0);
@@ -51,6 +52,7 @@ const MusicPlayer = () => {
     const resize = useSelector((state)=> state.resize.value)
     const currentSong = useSelector((state)=> state.currentSong.value)
     const songs = useSelector((state)=> state.songs.value)
+    const isPlaying = useSelector((state) => state.musicIsPlaying.value)
 
     useEffect(() => {
         // скрытие плеера
@@ -97,36 +99,41 @@ const MusicPlayer = () => {
             dispatch(updateCurrentSongValue(songs[0]))
         }
 
-    }, [songs, currentSong])
+    }, [songs, currentSong]);
 
-    const handlePlayPause = () => { 
-        // Пауза в плеере
-        clearInterval(handleRef.current);
+    useEffect(() => {
+        //реагирование на флаг паузы плеера
         let audio = audioRef.current;
+      
         if (isPlaying && audioRef.current) {
-            audio.pause();
+            audio.play()
+            const intervalId = setInterval(() => {
+                setTrackCurrentDuration(t => t = audioRef.current.currentTime);
+                setTrackDuration(t => t = audioRef.current.duration);
+            }, 1);
+          
+            return () => {
+                clearInterval(intervalId);
+            };
+        } else if (audioRef.current) {
+            audio.pause()
         }
-        else {
-            if (audioRef.current) {
-                audio.play();
-                handleRef.current = setInterval(() => {
-                    setTrackCurrentDuration(t => t = audioRef.current.currentTime);
-                    setTrackDuration(t => t = audioRef.current.duration);
-                }, 1);
-            }
-        }
-        setIsPlaying(isPlaying => isPlaying = !isPlaying);
+    }, [isPlaying]);
+
+    const handlePlayPause = async (e) => { 
+        e.preventDefault();
+        dispatch(updateMusicIsPlayingValue(!isPlaying));
     };
 
     const handleNextSong = () => {
         // следующая песня или первая в очереди
         clearInterval(handleRef.current);
         const songsCount = songs.length;
-        if (nextSongIndex + 1 == songsCount)
+        if (nextSongIndex + 1 == songsCount) 
             setNextSongIndex(0);
-        else
+        else {
             setNextSongIndex(nextSongIndex => nextSongIndex + 1);
-
+        }
         audioRef.current.currentTime = 0;
 
         dispatch(updateCurrentSongValue(songs[nextSongIndex]))

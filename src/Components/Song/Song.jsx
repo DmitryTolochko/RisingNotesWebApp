@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import heart from '../../Images/controller/heart.svg';
 import redHeart from '../../Images/red-heart.svg';
@@ -6,7 +6,7 @@ import message from '../../Images/controller/Chat_Dots.png';
 import dislike from '../../Images/controller/thumbs-down.svg';
 import redDislike from '../../Images/controller/dislike-red.svg';
 import list from '../../Images/list.svg'
-import { api, axiosAuthorized } from '../App/App';
+import { api, axiosAuthorized, axiosPictures, axiosUnauthorized } from '../App/App';
 import thumb from '../../Images/main-placeholder.png';
 import check from '../../Images/check_big.svg';
 import useSearchClean from '../../Hooks/useSearchClean/useSearchClean';
@@ -17,10 +17,11 @@ import { updateFeaturedValue } from '../../Redux/slices/featuredSlice';
 import { updateCurrentSongValue } from '../../Redux/slices/currentSongSlice';
 import { updateSongsValue } from '../../Redux/slices/songsSlice';
 import './Song.css';
+import { updatePlaylistsValue } from '../../Redux/slices/playlistsSlice';
 
-function Song(props) {
+function Song({id, onClick=undefined, duration, artist, genres, name}) {
     const [modalIsHidden, setModalIsHidden] = useState(true);
-    const [duration, setDuration] = useState(0);
+    const [formatedDuration, setDuration] = useState(0);
     const {cleanQuery} = useSearchClean()
 
     const dispatch = useDispatch()
@@ -29,7 +30,11 @@ function Song(props) {
     const featured = useSelector((state)=>state.featured.value)
     const songs = useSelector((state)=>state.songs.value)
     const [playlistsInfo, setPlaylistsInfo] = useState([]);
-    const {playlists, setPlaylists} = useContext(PlaylistsContext);
+    const playlists = useSelector((state)=>state.playlists.value);
+
+    function addSongsToPlayableList() {
+        onClick(id);
+    }
 
     async function changeModalState () {
         // собрать информацию по плейлистам
@@ -53,41 +58,45 @@ function Song(props) {
 
     useEffect(() => {
         // установить длительность песни в правильном формате
-        setDuration(formatTime(props.duration))
+        setDuration(formatTime(duration))
     }, []);
 
     async function handleToFavorite() {
         // добавление и удаление из избранных
-        if (featured.includes(props.id)) {
-            await axiosAuthorized.delete(api + `api/song/favorite/${props.id}`).then(resp => {
-                dispatch(updateFeaturedValue(featured.filter(el => el != props.id)))
+        if (featured.includes(id)) {
+            await axiosAuthorized.delete(api + `api/song/favorite/${id}`).then(resp => {
+                dispatch(updateFeaturedValue(featured.filter(el => el != id)))
             });
         }
         else {
-            await axiosAuthorized.patch(api + `api/song/favorite/${props.id}`).then(resp => {
-                dispatch(updateFeaturedValue([...featured, props.id]))
+            await axiosAuthorized.patch(api + `api/song/favorite/${id}`).then(resp => {
+                dispatch(updateFeaturedValue([...featured, id]))
             });
         }
     };
 
     async function handleToExcluded() {
         // добавление и удаление из исключенных
-        if (excluded.includes(props.id)) {
-            await axiosAuthorized.delete(api + `api/excluded-track/${props.id}`).then(resp => {
-                dispatch(updateExcludedValue(excluded.filter(el => el != props.id)))
+        if (excluded.includes(id)) {
+            await axiosAuthorized.delete(api + `api/excluded-track/${id}`).then(resp => {
+                dispatch(updateExcludedValue(excluded.filter(el => el != id)))
             });
         }
         else {
-            await axiosAuthorized.post(api + `api/excluded-track/${props.id}`).then(resp => {
-                dispatch(updateExcludedValue([...excluded, props.id]))
+            await axiosAuthorized.post(api + `api/excluded-track/${id}`).then(resp => {
+                dispatch(updateExcludedValue([...excluded, id]))
             });
         }
     };
 
     const handleAddToSongs = () => {
+        if (onClick !== undefined) {
+            addSongsToPlayableList();
+        } else {
+            dispatch(updateSongsValue([...songs, id]));
+        }
         // добавить песню в конец плеера и включить ее
-        dispatch(updateSongsValue([...songs, props.id]))
-        dispatch(updateCurrentSongValue(props.id));
+        dispatch(updateCurrentSongValue(id));
     };
 
     async function getPlaylistsInfo() {
@@ -104,7 +113,7 @@ function Song(props) {
 
                 await axiosUnauthorized.get(`api/playlist/` + el +`/song/list`)
                 .then(resp => {
-                    if (resp.data.songList.filter(el => el.id === props.id).length > 0)
+                    if (resp.data.songList.filter(el => el.id === id).length > 0)
                     {
                         isSongInPlaylist = true;
                     }
@@ -117,8 +126,6 @@ function Song(props) {
                     isSongInPlaylist: isSongInPlaylist
                 };
            }));
-        //    arr = arr.filter(el => el.isSongInPlaylist === false);
-        //    console.log(arr);
            setPlaylistsInfo(arr);
         }
         catch (err) {
@@ -128,13 +135,13 @@ function Song(props) {
 
     async function addToPlaylist(playlistId) {
         // Добавить в плейлист
-        await axiosAuthorized.patch(api + `api/playlist/` + playlistId + '/song/' + props.id).then(response => {
+        await axiosAuthorized.patch(api + `api/playlist/` + playlistId + '/song/' + id).then(response => {
             changeModalState();
         })
     }
 
     async function excludeFromPlaylist(playlistId) {
-        await axiosAuthorized.delete(api + `api/playlist/` + playlistId + '/song/' + props.id).then(response => {
+        await axiosAuthorized.delete(api + `api/playlist/` + playlistId + '/song/' + id).then(response => {
             changeModalState();
         })
     }
@@ -143,14 +150,15 @@ function Song(props) {
         // Создать новый плейлист и добавить в него песню
         let id = 0
         let formData = new FormData();
-        formData.append('Name', props.artist + ' - ' + props.name)
+        formData.append('Name', artist + ' - ' + name)
         await axiosAuthorized.post(api + 'api/playlist', formData, { headers: {
             "Content-Type": "multipart/form-data",
         }})
         .then (
             response => {
                 id = response.data.id
-                setPlaylists(e => e = [...e, id]);
+                dispatch(updatePlaylistsValue([...playlists, id]))
+                // setPlaylists(e => e = [...e, id]);
                 addToPlaylist(id);
             }
         )
@@ -160,14 +168,14 @@ function Song(props) {
     return (
         <>
             <div className='track'>
-                <img onClick={handleAddToSongs} alt='cover' src={api + `api/song/${props.id}/logo?width=100&height=100`} draggable='false'/>
-                <p onClick={handleAddToSongs} className='song-title-t'>{props.name}
-                    <p className='songAuthor'>{props.artist}</p>
+                <img onClick={handleAddToSongs} alt='cover' src={api + `api/song/${id}/logo?width=100&height=100`} draggable='false'/>
+                <p onClick={handleAddToSongs} className='song-title-t'>{name}
+                    <p className='songAuthor'>{artist}</p>
                 </p>
                 {resize === 'standart' ? (
                     <>
-                        {props?.genres?.length > 0 ? <p className='song-genre'>{props?.genres[0]}</p> : <p className='song-genre'>Без жанра</p>}
-                        <p className='song-duration'>{duration}</p>
+                        {genres?.length > 0 ? <p className='song-genre'>{genres[0]}</p> : <p className='song-genre'>Без жанра</p>}
+                        <p className='song-duration'>{formatedDuration}</p>
                     </>
                 ) : (
                     <></>
@@ -176,12 +184,12 @@ function Song(props) {
                 {resize === 'standart' ? (
                     <div className='track-buttons'>
                         <a><img alt='list' src={list} onClick={changeModalState}/></a>
-                        <a onClick={handleToExcluded}><img alt='dislike' src={excluded.includes(props.id) ? redDislike : dislike}/></a>
-                        <a onClick={handleToFavorite}><img alt='like' src={featured.includes(props.id) ? redHeart : heart}/></a>
-                        <Link to={`/commentaries/${props.id}`} onClick={cleanQuery}><img alt='comment' src={message}/></Link>
+                        <a onClick={handleToExcluded}><img alt='dislike' src={excluded.includes(id) ? redDislike : dislike}/></a>
+                        <a onClick={handleToFavorite}><img alt='like' src={featured.includes(id) ? redHeart : heart}/></a>
+                        <Link to={`/commentaries/${id}`} onClick={cleanQuery}><img alt='comment' src={message}/></Link>
                     </div>
                 ): (
-                    <a onClick={handleToFavorite}><img alt='like' src={featured.includes(props.id) ? redHeart : heart}/></a>
+                    <a onClick={handleToFavorite}><img alt='like' src={featured.includes(id) ? redHeart : heart}/></a>
                 )}
                 
                 

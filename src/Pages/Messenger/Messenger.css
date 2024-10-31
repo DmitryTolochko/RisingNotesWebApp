@@ -1,0 +1,89 @@
+.messenger {
+    height: 100%;
+}
+
+.contacts {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    width: 360px;
+    margin-bottom: 239px;
+
+    overflow-y: scroll;
+    max-height: 70%;
+    min-height: 0;
+
+    mask-image: linear-gradient(to top, transparent 0%, black 15%);
+    mask-repeat: no-repeat;
+    mask-position: center;
+}
+
+.contact {
+    display: flex;
+    gap: 12px;
+    padding: 20px 0px;
+    justify-content: center;
+    align-items: center;
+
+    height: 88px;
+    border-bottom: 1px solid #2C323D;
+    
+    width: 320px;
+    cursor: pointer;
+}
+
+.contact:hover {
+    background-color: #2C323D;
+    padding-left: 12px;
+    width: 360px;
+    padding-right: 40px;
+}
+
+.contact-info {
+    color: #787885;
+    font-family: Montserrat;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+
+    width: 100%;
+}
+
+.contact-info > span {
+    display: flex;
+    justify-content: space-between;
+}
+
+.contact-name {
+    color: white;
+    font-size: 20px;
+}
+
+.contact-info > p {
+    text-wrap: nowrap;
+}
+
+.chat {
+    position: absolute;
+    width: 860px;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 0;
+    margin-left: 360px;
+    background: linear-gradient(0deg, transparent 0%, #191E28 100%);  
+    border-left: #2C323D solid 1px;
+    border-right: #2C323D solid 1px;
+
+    margin-bottom: 239px;
+    gap: 12px;
+
+    color: #787885;
+    font-family: Montserrat;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
