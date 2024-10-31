@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { updateFilterValue, setDefaultFilterValue } from '../../../Redux/slices/filtersSlice'
 import { updateSongsValue } from '../../../Redux/slices/songsSlice'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { getGenres, getLanguages, getMoods } from './APICallers/FiltersGetter'
 import { songsByFiltersGetter, extractSongsIdsList } from './FIlters/Filters';
 
@@ -82,6 +82,9 @@ function FilterComponent(){
         setPopupVisible(false)
     }
 
+
+
+
     if(!isLoading)
         return(
             <div id='filters-container-id' className="filters-container"> 
@@ -94,15 +97,8 @@ function FilterComponent(){
                     <FilterTimeElement  name="Длительность" id="duration" updater = {filtersUpdateFunction}/>
                     <FilterChckboxElement name="Дополнительно" id="extra"  updater = {filtersUpdateFunction}/>
                     <button className='filters-apply-btn' disabled={filtersDisabled} onClick={updateSongs}>Применить фильтры</button>
-                    
-                    <FilterNotificationPopup 
-                        visible={popupVisible}
-                        notificationText={'К сожалению, нам не удалось найти песни с подходящими фильтрами'}
-                        actionButtonText={'Сбросить фильтры'}
-                        actionButtonCallback={popupCallback}
-                    />
                 </div>
             </div>
-        )    
+    )    
 }
 export default FilterComponent

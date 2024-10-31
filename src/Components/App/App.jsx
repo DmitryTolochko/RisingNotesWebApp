@@ -70,7 +70,7 @@ function App() {
     //Redux Dispatcher
     const dispatch = useDispatch()
 
-    //Redux slices data
+    //Redux data slices 
     const resize_ = useSelector((state) => state.resize.value)
     const playlists_ = useSelector((state) => state.playlists.value)
     const excluded_ = useSelector((state) => state.excluded.value)

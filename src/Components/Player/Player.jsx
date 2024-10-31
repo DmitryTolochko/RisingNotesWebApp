@@ -88,8 +88,10 @@ function Player() {
                     <SongCover track = {currentTrack}/>
                     <div className="player-filters-toggle">
                         <button id='f-toggle-btn' onClick={toggleFilters} className="player-filters-toggle-btn">
+                            <span>Настроить волну</span>
+                            <img className='player-filters-toggle-img' src={FilterBtn} alt="" />
                         </button>
-                        <img className='player-filters-toggle-img' src={FilterBtn} alt="" />
+                        
                     </div>  
                 </section>
                 <FilterComponent/>

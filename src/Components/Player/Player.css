@@ -306,9 +306,8 @@
     animation: 250ms infinite;
 }
 .player-filters-toggle{
-    position:fixed;
-    margin: 0 auto;
-    transform: translateX(-50%);
+    position:absolute;
+    width: 100%;
     bottom:150px;
     display: flex;
     flex-direction: column;
@@ -329,27 +328,28 @@
     }
 }
 .player-filters-toggle-btn{
-    position: relative;
     display: flex;
     align-items: center;
-    justify-content: center;
-    width: 64px;
+
+    width: max-content;
     height: 64px;
-    border-radius: 50%;
+    gap:15px;
+    padding-inline: 25px;
+    border-radius: 32px;
+    margin: 0 auto;
+    
     background-color: #FE1170;
     box-shadow: 0 0 0 #FE1170;
-    opacity: 90%;
     backdrop-filter: blur(21px);
+    transform-origin: center;
 }
-.player-filters-toggle > span{
+.player-filters-toggle-btn > span{
     font-family: var(--text-font);
     font-size: 16px;
 }
+
 .player-filters-toggle-img{
     pointer-events: none;
-    position: absolute;
-    top: 33px;
-    transform: translate(-1px,-50%); 
 }
 
 .f-btn-active{
