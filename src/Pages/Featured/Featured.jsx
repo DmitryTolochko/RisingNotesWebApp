@@ -4,6 +4,7 @@ import BackButton from '../../Components/BackButton';
 import Playlist from '../../Components/Playlist';
 import Song from '../../Components/Song/Song';
 import newPlaylist from '../../Images/featured/newplaylist.png';
+import Subscription from '../../Components/Subscription';
 import { api, axiosAuthorized, axiosUnauthorized} from '../../Components/App/App';
 import { useCookies } from 'react-cookie';
 
@@ -22,7 +23,8 @@ export default function Featured() {
 
     const playlists = useSelector((state) => state.playlists.value)
     const featured = useSelector((state) => state.featured.value)
-
+    const subscriptions = useSelector((state) => state.subscriptions.value)
+  
     useEffect(() => {
         if (!cookies.role) {
             navigate("/login");
@@ -59,7 +61,97 @@ export default function Featured() {
         navigate(`/playlist/${id}`)
     };
 
-    
+    const tabs = [
+        {id:'main', label: 'Главная'},
+        {id:'playlists', label: 'Плейлисты'},
+        {id:'tracks', label: 'Треки'},
+        {id:'subscriptions', label: 'Подписки'}
+    ]
+    const [activeTab, setActiveTab] = useState('main')
+
+    const TabSelector = () =>{
+        return(
+            <>
+            <h1 className='featured-title'>Избранное</h1>
+            <nav className='featured-nav'>
+                {tabs.map((tab, index)=>(
+                    <button 
+                        key={index} 
+                        className={tab.id == activeTab? "featured-nav__tab-button active" :"featured-nav__tab-button" }
+                        onClick={() => setActiveTab(tab.id)}
+                    >
+                        {tab.label}
+                    </button>
+                ))}
+            </nav>
+        </>
+        )
+    }
+    const Playlists = () =>{
+        return(
+            <section className='featured-section'>
+                <h2 className='featured-section__title'>Плейлисты</h2>
+                <div className="playlists">
+                    {playlists?.map(el => (
+                        <Playlist key={el} id={el}/>
+                    ))}
+                    <div draggable='false' className='playlist'>
+                        <img draggable='false' className='new-playlist' alt='add new playlist' src={newPlaylist} onClick={addNewPlaylist}/>
+                    </div>
+                </div>
+            </section>
+        )
+    }
+    const Tracks = () =>{
+        return(
+            <section className='featured-section'>
+                <h2 className='featured-section__title'>Треки</h2>
+                <div className='tracks'>
+                    {songs.map(el => (
+                        <Song key={el.id} id={el.id} name={el.name} duration={el.durationMs} artist={el.authorName} genres={el.genreList}/>
+                    ))}
+                    {songs.length === 0 ? <p style={{color: '#FE1170'}}>Список пуст</p> : <></>}
+                </div>
+            </section>
+        )
+    }
+    const Subscriptions = () =>{
+        return(
+            <section className='featured-section'>
+                <h2 className='featured-section__title'>Подписки</h2>
+                <div>
+                    {subscriptions.map((id) =>
+                        <Subscription authorId={id}/>
+                    )}
+                </div>
+            </section>
+        )
+    }
+
+    const Main = () =>{
+        return(
+            <>
+                <Playlists/>
+                <Tracks/>
+                <Subscriptions/>
+            </>
+        )
+    }
+
+    const FeaturedContent = ({tab}) =>{
+        switch(tab){
+            case 'main':
+                return(<Main/>)
+            case 'playlists':
+                return(<Playlists/>)
+            case 'tracks':
+                return(<Tracks/>)
+            case 'subscriptions':
+                return(<Subscriptions/>)
+            default:
+                return(<Main/>)
+        }
+    }
 
     if (!isLoaded) {
         return(
@@ -75,26 +167,8 @@ export default function Featured() {
         <div className='comment-page-wrapper'>
             <div className='featured'>
                 <BackButton/>
-                <div className='search-element'>
-                    <h2 className='sub-h2'>Плейлисты</h2>
-                </div>
-                <div className='subscriptions'>
-                    {playlists?.map(el => (
-                        <Playlist key={el} id={el}/>
-                    ))}
-                    <div draggable='false' className='playlist'>
-                        <img draggable='false' className='new-playlist' alt='add new playlist' src={newPlaylist} onClick={addNewPlaylist}/>
-                        {/* <img draggable='false' className='playlistskin' alt='cover' src={isreviewSkin ? api + `api/playlist/${props.id}/logo?width=400&height=400` : SongCover}/> */}
-                    </div>
-                    
-                </div>
-                <h3 className='sub-h2'>Избранные треки</h3>
-                <div className='tracks'>
-                    {songs.map(el => (
-                        <Song key={el.id} id={el.id} name={el.name} duration={el.durationMs} artist={el.authorName} genres={el.genreList}/>
-                    ))}
-                    {songs.length === 0 ? <p style={{color: '#FE1170'}}>Список пуст</p> : <></>}
-                </div>
+                <TabSelector/>
+                <FeaturedContent tab={activeTab}/>
             </div>
         </div>
     )

@@ -82,3 +82,47 @@
     text-align: start;
     width: 100%;
 }
+
+
+.featured-nav{
+    display: flex;
+    border-bottom: 4px solid #191E28;
+}
+
+.featured-nav__tab-button{
+    cursor: pointer;
+    padding-inline: 40px;
+    padding-bottom: 20px;
+    transform: translateY(4px);
+
+    font-family: 'Montserrat', sans-serif;
+    font-size: 18px;
+}
+.featured-nav__tab-button.active{
+    border-bottom: 4px solid #FE1170;
+    padding-bottom: 16px;
+}
+
+.featured-section__title{
+    padding: 35px 0 15px 0;
+    font-weight: 400;
+    font-size: 24px;
+    font-family: 'Montserrat', sans-serif;
+}
+.featured-section{
+    margin-bottom: 50px;
+}
+.featured-section > .playlists{
+    margin: 0;
+}
+
+.featured-section > .tracks > .track:last-child{
+    margin: 0;
+}
+
+.featured-title{
+    font-weight: 400;
+    font-size: 24px;
+    font-family: 'Montserrat', sans-serif;
+    margin-bottom: 15px;
+}
