@@ -71,13 +71,6 @@ export default function Featured() {
         dispatch(updateMusicIsPlayingValue(true));
     }
 
-    function updatePlayableList (startId) {
-        // Обновить текущий список вопроизведения
-        let arr = featured.slice(featured.findIndex(e => e === startId));
-        dispatch(updateSongsValue(arr));
-        dispatch(updateMusicIsPlayingValue(true));
-    }
-
     const tabs = [
         {id:'main', label: 'Главная'},
         {id:'playlists', label: 'Плейлисты'},
@@ -125,7 +118,14 @@ export default function Featured() {
                 <h2 className='featured-section__title'>Треки</h2>
                 <div className='tracks'>
                     {songs.map(el => (
-                        <Song key={el.id} id={el.id} name={el.name} duration={el.durationMs} artist={el.authorName} genres={el.genreList}/>
+                        <Song 
+                        key={el.id} 
+                        id={el.id} 
+                        name={el.name} 
+                        duration={el.durationMs} 
+                        artist={el.authorName} 
+                        genres={el.genreList}
+                        onClick={updatePlayableList}/>
                     ))}
                     {songs.length === 0 ? <p style={{color: '#FE1170'}}>Список пуст</p> : <></>}
                 </div>
