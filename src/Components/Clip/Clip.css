@@ -9,6 +9,7 @@
     margin-bottom: 40px;
     gap:24px;
     width: 31%;
+    position: relative;
 
     @media screen and (max-width: 720px){ 
         width: 100%;
@@ -124,4 +125,43 @@
 }
 .clip-video{
     width: 100%;
+}
+
+.delete-popup{
+    background: linear-gradient(119deg, rgba(25,30,40,1) 100%, rgba(180,180,180,0.7) 100%, rgba(15,20,29,0.5) 100%); 
+    padding: 15px;
+    position: absolute;
+    left: 0;
+    width: 100%;
+    border-radius: 10px;
+    gap:10px;
+}
+
+.delete-popup > p{
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+.delete-popup > .popup-actions{
+    display: flex;
+    gap:10px;
+}
+.delete-popup > .popup-actions > button{
+    border: 1px solid #FE1170;
+    padding: 5px 10px 5px 5px;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: 250ms ease-in-out;
+    display: flex;
+    align-items: center;
+    gap:5px;
+}
+
+.delete-popup > .popup-actions > button:hover{
+    background-color: #FE1170;
+    cursor: pointer;
+}
+
+.delete-popup > .popup-actions > button.primary{
+    background-color: #FE1170;
+    padding: 5px 10px;
 }

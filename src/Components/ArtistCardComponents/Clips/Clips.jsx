@@ -31,6 +31,24 @@ export default function Clips(props) {
     },[params])
 
 
+    const deleteClip = (id) => {
+        // try{
+        //     const response = await axios({
+        //         method:'DELETE',
+        //         url: api + 'api/music-clip/' + id,
+        //     })
+        //     if(response){
+        //         getArtistClips()
+        //             .then(res=>setClips(res))
+        //             .catch(err=>console.log(err))
+        //     }
+        // }
+        // catch(err){
+        //     return Promise.reject(err);
+        // }
+        console.log(id)
+    }
+
 
     return (
         <div className="artist-clips">
@@ -39,8 +57,10 @@ export default function Clips(props) {
                         key={index} 
                         clipId={clip.id} 
                         authorId={clip.uploaderId} 
-                        songId={clip.songId} 
-                        name={clip.title} />
+                        songId={clip.songId}
+                        name={clip.title} 
+                        deleteFunc={deleteClip}
+                    />
                 ))}
         </div>
     )

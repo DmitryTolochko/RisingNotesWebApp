@@ -1,6 +1,7 @@
 import './Clip.css';
 import viewsIcon from '../../Images/account-page/stats-icon.svg';
 import editIcon from '../../Images/account-page/edit-icon.svg';
+import trashIcon from '../../Images/trash.svg'
 import { api } from '../App/App';
 import axios from 'axios';
 import { useEffect, useState, useRef } from 'react';
@@ -14,7 +15,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { updateCurrentSongValue } from '../../Redux/slices/currentSongSlice';
 import { updateSongsValue } from '../../Redux/slices/songsSlice';
 import { updateVideoPlayerValue } from '../../Redux/slices/videoPlayerSlice';
-
 
 const statusType = {
     0: 'Неизвестно',
@@ -34,12 +34,15 @@ const statusColor = {
     5: 'red'
 }
 
-function Clip({key, clipId, authorId, songId, name, status, views, isArtist=false}) {
+function Clip({key, clipId, authorId, songId, name, deleteFunc, isArtist=false}) {
     const [videoLoaded, setVideoLoaded] = useState(false)
     const [authorName, setAuthorName] = useState('')
+    const [deletePopupVisible, setDeletePopupVisible] = useState(false)
     const videoPreviewRef = useRef(undefined)
     const previewRef = useRef(undefined)
     const {cleanQuery} = useSearchClean()
+
+    let status = 0, views=0;
     
     const songs = useSelector((state)=>state.songs.value)
     const dispatch = useDispatch()
@@ -122,7 +125,25 @@ function Clip({key, clipId, authorId, songId, name, status, views, isArtist=fals
                         <div className={'song-status-dot ' + statusColor[status]}></div>
                         {statusType[status]}
                     </p>
-                    <a href={`/uploadvideo`}><img alt='list' src={editIcon} /></a>
+                    <button title='Удалить клип' onClick={()=>setDeletePopupVisible(true)}>
+                        <img alt='list' src={trashIcon} />
+                    </button>
+
+                    {deletePopupVisible && 
+                        <div className="delete-popup">
+                            <p>Вы действительно хотите удалить этот клип?</p>
+                            <div className="popup-actions">
+                                <button onClick={() => deleteFunc(clipId)}>
+                                    <img src={trashIcon} alt=""/>
+                                    <span>Да</span>
+                                </button>
+                                <button className='primary' onClick={()=>setDeletePopupVisible(false)}>
+                                    <span>Нет</span>
+                                </button>
+                            </div>
+                        </div>
+                    }
+
                 </div>
             ) : (<></>)}
         </div>
