@@ -252,7 +252,7 @@
     .filters{
         height: calc(100vh - 160px);
         justify-content: space-between;
-        padding: 30% 40px;
+        padding: 10vh 40px;
     }
 }
 
@@ -264,5 +264,6 @@
     .filters{
         background-color: #1a202b;
         width: 100%;
+        gap:0;
     }
 }
