@@ -119,13 +119,14 @@ export default function Featured() {
                 <div className='tracks'>
                     {songs.map(el => (
                         <Song 
-                        key={el.id} 
-                        id={el.id} 
-                        name={el.name} 
-                        duration={el.durationMs} 
-                        artist={el.authorName} 
-                        genres={el.genreList}
-                        onClick={updatePlayableList}/>
+                            key={el.id} 
+                            id={el.id} 
+                            name={el.name} 
+                            duration={el.durationMs} 
+                            artist={el.authorName} 
+                            genres={el.genreList}
+                            onClick={updatePlayableList}
+                        />
                     ))}
                     {songs.length === 0 ? <p style={{color: '#FE1170'}}>Список пуст</p> : <></>}
                 </div>

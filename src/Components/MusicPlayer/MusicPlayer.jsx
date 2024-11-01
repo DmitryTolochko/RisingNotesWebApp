@@ -26,6 +26,7 @@ import { updateFeaturedValue } from '../../Redux/slices/featuredSlice';
 import { updateCurrentSongValue } from '../../Redux/slices/currentSongSlice';
 import { updateSongsValue } from '../../Redux/slices/songsSlice';
 import { updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlice';
+import filtersToggle from '../../Hooks/filtersToggle';
 
 const MusicPlayer = () => {
     // const [isPlaying, setIsPlaying] = useState(false);  
@@ -244,6 +245,7 @@ const MusicPlayer = () => {
         }
     };
 
+
     if (resize === 'standart') {
         return (<div className={"music-player-wrapper " + hiddenTag}>
             <audio ref={audioRef} src={currentSong ? api + `api/song/${currentSong}/file` : ''}
@@ -306,7 +308,7 @@ const MusicPlayer = () => {
                         <p>{songName}</p>
                         <Link to={`/artist/${authorId}`} className='mobile-music-player-author'>{songAuthor}</Link>
                     </span>
-                    <button className='mobile-filters-button'><img src={filtersImg}/></button>
+                    <button className='mobile-filters-button' onClick={filtersToggle}><img src={filtersImg}/></button>
                 </div>
                 <div className='mobile-music-player-buttons'>
                     <div className='music-player-buttons'>

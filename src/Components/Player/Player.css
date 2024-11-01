@@ -23,10 +23,6 @@
 .filters-container{
     z-index: 8;
 }
-.lyrics-container,
-.filters-container{
-    padding-top: 78px;
-}
 
 /* BG-IMAGE */
 .player-bg-image{

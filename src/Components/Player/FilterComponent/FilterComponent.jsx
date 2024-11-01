@@ -9,7 +9,8 @@ import { updateSongsValue } from '../../../Redux/slices/songsSlice'
 
 import { useState, useEffect, useRef } from 'react'
 import { getGenres, getLanguages, getMoods } from './APICallers/FiltersGetter'
-import { songsByFiltersGetter, extractSongsIdsList } from './FIlters/Filters';
+import { songsByFiltersGetter, extractSongsIdsList } from './FIlters/Filters'
+import filtersToggle from '../../../Hooks/filtersToggle'
 
 import './FilterComponent.css';
 
@@ -67,6 +68,7 @@ function FilterComponent(){
             const songs = extractSongsIdsList(res)
             setPopupVisible(false)
             dispatch(updateSongsValue(songs))
+            filtersToggle()
         })
         .catch(err=> {
             console.log('Error while getting songs by filters: \n')

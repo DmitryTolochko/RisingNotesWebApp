@@ -4,6 +4,7 @@ import songCoverTemplate from '../../Images/main-placeholder.png';
 import FilterComponent from './FilterComponent/FilterComponent.jsx'
 import SongCover from './PlayerComponents/SongCover.jsx'
 import FilterBtn from '../../Images/player/FilterBtn.svg';
+import filtersToggle from '../../Hooks/filtersToggle.js';
 
 import './Player.css';
 import { api, axiosPictures, axiosUnauthorized } from '../App/App.jsx';
@@ -74,14 +75,13 @@ function Player() {
     }
 
 
-    const toggleFilters = () =>{
-        console.log(process.env)
-        let filters = document.getElementById('filters-container-id')
-        let btn = document.getElementById('f-toggle-btn')
-        if(!filters) return
-        filters.classList.toggle('filters-toggled')
-        btn.classList.toggle('f-btn-active')
-    }
+    // const toggleFilters = () =>{
+    //     let filters = document.getElementById('filters-container-id')
+    //     let btn = document.getElementById('f-toggle-btn')
+    //     if(!filters) return
+    //     filters.classList.toggle('filters-toggled')
+    //     btn.classList.toggle('f-btn-active')
+    // }
 
     if (isLoaded){
         return (
@@ -89,7 +89,7 @@ function Player() {
                 <section className="comment-page-wrapper">           
                     <SongCover track = {currentTrack}/>
                     <div className="player-filters-toggle">
-                        <button id='f-toggle-btn' onClick={toggleFilters} className="player-filters-toggle-btn">
+                        <button id='f-toggle-btn' onClick={filtersToggle} className="player-filters-toggle-btn">
                             <span>Настроить волну</span>
                             <img className='player-filters-toggle-img' src={FilterBtn} alt="" />
                         </button>
@@ -108,7 +108,7 @@ function Player() {
                     {/* <SongCover track = {currentTrack}/> */}
                     <Loader/>
                     <div className="player-filters-toggle">
-                        <button id='f-toggle-btn' onClick={toggleFilters} className="player-filters-toggle-btn">
+                        <button id='f-toggle-btn' onClick={filtersToggle} className="player-filters-toggle-btn">
                         </button>
                         <img className='player-filters-toggle-img' src={FilterBtn} alt="" />
                     </div>  
