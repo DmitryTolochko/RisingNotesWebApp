@@ -126,3 +126,11 @@
     font-family: 'Montserrat', sans-serif;
     margin-bottom: 15px;
 }
+
+
+@media screen and (max-width: 720px){ 
+    .featured-nav__tab-button{
+        padding-inline: 2%;
+        font-size: 16px;
+    }
+}
