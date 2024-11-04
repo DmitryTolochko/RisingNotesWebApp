@@ -34,7 +34,7 @@ const statusColor = {
     5: 'red'
 }
 
-function Clip({key, clipId, authorId, songId, name, deleteFunc, isArtist=false}) {
+function Clip({key, clipId, authorId, songId, name, deleteFunc=undefined, isArtist=false}) {
     const [videoLoaded, setVideoLoaded] = useState(false)
     const [authorName, setAuthorName] = useState('')
     const [deletePopupVisible, setDeletePopupVisible] = useState(false)
@@ -72,6 +72,7 @@ function Clip({key, clipId, authorId, songId, name, deleteFunc, isArtist=false})
             .then(res=>setAuthorName(res))
             .catch(err=>console.log(err))
     },[])
+
 
 
     return ( 
@@ -133,7 +134,7 @@ function Clip({key, clipId, authorId, songId, name, deleteFunc, isArtist=false})
                         <div className="delete-popup">
                             <p>Вы действительно хотите удалить этот клип?</p>
                             <div className="popup-actions">
-                                <button onClick={() => deleteFunc(clipId)}>
+                                <button onClick={() => {if(deleteFunc) deleteFunc(clipId)}}>
                                     <img src={trashIcon} alt=""/>
                                     <span>Да</span>
                                 </button>

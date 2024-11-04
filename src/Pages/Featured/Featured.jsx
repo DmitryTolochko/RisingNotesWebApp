@@ -103,7 +103,7 @@ export default function Featured() {
                 <h2 className='featured-section__title'>Плейлисты</h2>
                 <div className="playlists">
                     {playlists?.map(el => (
-                        <Playlist key={el} id={el}/>
+                        <Playlist id={el}/>
                     ))}
                     <div draggable='false' className='playlist'>
                         <img draggable='false' className='new-playlist' alt='add new playlist' src={newPlaylist} onClick={addNewPlaylist}/>
@@ -119,7 +119,6 @@ export default function Featured() {
                 <div className='tracks'>
                     {songs.map(el => (
                         <Song 
-                            key={el.id} 
                             id={el.id} 
                             name={el.name} 
                             duration={el.durationMs} 
