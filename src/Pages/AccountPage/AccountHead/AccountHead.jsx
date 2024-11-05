@@ -40,7 +40,7 @@ export default function AccountHead (props) {
                 setAuditions(response.data.auditionCount);
             });
         }
-    }, [props]);
+    }, []);
 
     const handleFileInput = () => {
         fileRef.current.click();

@@ -1,27 +1,21 @@
 import Clip from "../../Clip/Clip";
 import './Clips.css';
 import { useState, useEffect } from "react";
-import axios from "axios";
-import { api } from "../../App/App";
+import { api, axiosUnauthorized } from "../../App/App";
 import { useParams } from "react-router-dom";
 
-export default function Clips(props) {
+export default function Clips({artistId, count=0, offset=0}) {
     const [clips, setClips] = useState(undefined);
     const params = useParams();
 
     const getArtistClips = async ()=> {
-        try{
-            const response = await axios({
-                method:'GET',
-                url: api + 'api/music-clip/by-author/' + props.artistId,
-                responseType: 'application/json'
-            })
-            let result = JSON.parse(response.data).musicClipList
-            return result
-        }
-        catch(err){
-            console.log(err);
-        }
+        // получить список клипов автора
+        let response = await axiosUnauthorized.get(`api/music-clip/by-author/${artistId}` + (count == 0 ? '' : `&count=${count}&offset=${offset}`))
+        .catch(err => {
+            throw err;
+        });
+        let result = response?.data.musicClipList;
+        return result;
     }
 
     useEffect(()=>{

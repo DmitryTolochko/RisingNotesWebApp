@@ -200,12 +200,19 @@ function UploadMusic(){
 
     const deleteSong = () => {
         // Удаление песни
-        axiosAuthorized.patch(`/api/song/upload-request/${params.id}/admin`, {
-            status: 5, 
-            comment: comment
-        })
-        .then( response => {navigate(-1)})
-        .catch(err => console.log(err));
+        if (role === 'admin' ) {
+            axiosAuthorized.patch(`/api/song/upload-request/${params.id}/admin`, {
+                status: 5, 
+                comment: comment
+            })
+            .then( response => {navigate(-1)})
+            .catch(err => console.log(err));
+        }
+        else if (role === 'authoredit') {
+            axiosAuthorized.delete(`api/song/` + params.id)
+            .then( response => {navigate(-1)})
+            .catch(err => console.log(err));
+        }
     }
 
     async function getGenreList() {

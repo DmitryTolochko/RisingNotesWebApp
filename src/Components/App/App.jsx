@@ -25,7 +25,6 @@ import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import { useCookies } from 'react-cookie';
 import AccountPage from '../../Pages/AccountPage/AccountPage';
-import BlogVideo from '../../Pages/BlogVideo/BlogVideo.jsx';
 import ErrorMessage from '../ErrorMessage/ErrorMessage.jsx';
 import Footer from '../Footer/Footer.jsx';
 import VideoPlayer from '../VideoPLayer/VideoPlayer.jsx';
@@ -287,7 +286,6 @@ function App() {
                 <Route path={'/playlist/:id'} element={<PlaylistWindow/>}/>
                 <Route path={'/uploadmusic/:id'} element={<UploadMusic/>}/>
                 <Route path={'*'} element={<ErrorPage/>}/>
-                <Route path={'/verticalvideo'} element={<BlogVideo/>}/>
                 {cookies.role === 'admin' ? (<>
                     <Route path={'/'} element={<AdminPanel/>}/>
                 </>) : (
@@ -296,7 +294,6 @@ function App() {
                     <Route path={'/featured'} element={<Featured/>}/>
                     <Route path={'/excluded'} element={<Excluded/>}/>
                     <Route path={'/account'} element={<AccountPage/>}/>
-                    <Route path={'/subscriptions'} element={<Subscriptions/>}/>
                     <Route path={'/uploadmusic'} element={<UploadMusic/>}/>
                     <Route path={'/uploadvideo'} element={<UploadVideo/>}/>
                     <Route path={'/uploadvertvideo'} element={<InstallVerticalVideo/>}/>

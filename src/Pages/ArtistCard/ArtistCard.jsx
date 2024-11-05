@@ -121,21 +121,21 @@ function ArtistCard(){
                             <img src={arrowRight} alt="" />
                         </button>
                         </p>
-                        <Songs artist={artist}/> 
+                        <Songs artist={artist} /> 
                         <p className='top-tracks-title'>Клипы
                         <button className='search-show-more' onClick={() => handleChangePage(2)}>
                             <span>Смотреть все</span>
                             <img src={arrowRight} alt="" />
                         </button>
                         </p>
-                        <Clips artistId={params.id}/> 
+                        <Clips artistId={params.id} /> 
                         <p className='top-tracks-title'>Блог
                         <button className='search-show-more' onClick={() => handleChangePage(3)}>
                             <span>Смотреть все</span>
                             <img src={arrowRight} alt="" />
                         </button>
                         </p>
-                        <Blog artistId={params.id}/>
+                        <Blog artistId={params.id} />
                     </>: <></>}
                     {currPage === 1 ? <Songs artist={artist}/> : <></>}
                     {currPage === 2 ? <Clips artistId={params.id}/> : <></>}
