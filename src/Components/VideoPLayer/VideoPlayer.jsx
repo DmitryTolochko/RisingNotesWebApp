@@ -29,9 +29,9 @@ function VideoPlayer() {
             dispatch(updateMusicIsPlayingValue(false));
         }
         else {
-            const url = URL.createObjectURL(video);
+            // const url = URL.createObjectURL(video);
             // playFunc(url);
-            videoRef.current.src = url;
+            videoRef.current.src = video;
             videoRef.current.play();
             dispatch(updateMusicIsPlayingValue(false));
         }

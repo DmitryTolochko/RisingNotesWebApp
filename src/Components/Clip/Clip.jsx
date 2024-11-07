@@ -1,7 +1,7 @@
 import './Clip.css';
 import viewsIcon from '../../Images/account-page/stats-icon.svg';
 import editIcon from '../../Images/account-page/edit-icon.svg';
-import { api } from '../App/App';
+import { api, axiosUnauthorized } from '../App/App';
 import axios from 'axios';
 import { useEffect, useState, useRef } from 'react';
 import { NavLink } from 'react-router-dom';
@@ -42,7 +42,30 @@ function Clip({key, clipId, authorId, songId, name, status, views, isArtist=fals
     const {cleanQuery} = useSearchClean()
     
     const songs = useSelector((state)=>state.songs.value)
+    const [clipLink, setClipLink] = useState(undefined);
+    const [previewLink, setPreviewLink] = useState(undefined);
     const dispatch = useDispatch()
+
+    useEffect(() => {
+        getClipLink()
+            .then(response => setClipLink(response));
+        getPreviewLink()
+            .then(response => setPreviewLink(response));
+    }, []);
+
+    async function getClipLink() {
+        let response = await axiosUnauthorized.get('api/music-clip/' + clipId + '/file/link')
+        .catch(err => Promise.reject(err));
+
+        return response?.data?.presignedLink;
+    }
+
+    async function getPreviewLink() {
+        let response = await axiosUnauthorized.get('api/music-clip/' + clipId + '/preview/link')
+        .catch(err => Promise.reject(err));
+
+        return response?.data?.presignedLink;
+    }
     
     const getAuthorName = async (id) =>{
         try{
@@ -80,9 +103,9 @@ function Clip({key, clipId, authorId, songId, name, status, views, isArtist=fals
             <div className="cover-wrapper" style={videoLoaded?{display:'block'}:{display:'none'}}>
                 <div className="clip-video" onClick={() =>
                     dispatch(
-                        updateVideoPlayerValue(api + `api/music-clip/${clipId}/file`)
+                        updateVideoPlayerValue(clipLink)
                     )} 
-                        onMouseOver={() => handleVideoHover(videoPreviewRef, api + `api/music-clip/${clipId}/file` )}
+                        onMouseOver={() => handleVideoHover(videoPreviewRef, clipLink)}
                         onMouseEnter={() => handleVideoEnter(previewRef)}
                         onMouseMove={() => handleVideoMove(videoPreviewRef)}
                         onMouseLeave={() => handleVideoLeave(previewRef, videoPreviewRef)}>
@@ -90,7 +113,7 @@ function Clip({key, clipId, authorId, songId, name, status, views, isArtist=fals
                         draggable='false'
                         className='clip-cover'
                         onLoad={()=>{setVideoLoaded(true)}}
-                        src={api + `api/music-clip/${clipId}/preview`} 
+                        src={previewLink} 
                         alt="" 
                         style={{width:'100%', objectFit:'cover', pointerEvents:'none'}} />
                     <video ref={videoPreviewRef}
