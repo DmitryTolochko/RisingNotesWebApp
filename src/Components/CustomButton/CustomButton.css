@@ -1,4 +1,5 @@
 .custom-button {
+    transition: all .2s ease;
     border-radius: 15px;
     background: #FE1170;
 
@@ -40,4 +41,10 @@
 
 .loading {
     animation: spin  1s linear infinite;
+}
+
+.custom-button:disabled {
+    cursor: not-allowed;
+    background-color: #787885;
+    transition: all .2s ease;
 }

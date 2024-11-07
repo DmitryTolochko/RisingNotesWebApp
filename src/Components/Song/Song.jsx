@@ -5,7 +5,7 @@ import redHeart from '../../Images/red-heart.svg';
 import message from '../../Images/controller/Chat_Dots.png';
 import dislike from '../../Images/controller/thumbs-down.svg';
 import redDislike from '../../Images/controller/dislike-red.svg';
-import list from '../../Images/list.svg'
+import list from '../../Images/list.svg';
 import { api, axiosAuthorized, axiosPictures, axiosUnauthorized } from '../App/App';
 import thumb from '../../Images/main-placeholder.png';
 import check from '../../Images/check_big.svg';
@@ -18,6 +18,8 @@ import { updateCurrentSongValue } from '../../Redux/slices/currentSongSlice';
 import { updateSongsValue } from '../../Redux/slices/songsSlice';
 import './Song.css';
 import { updatePlaylistsValue } from '../../Redux/slices/playlistsSlice';
+import { updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlice';
+import PlaylistModalMenu from '../PlaylistModalMenu/PlaylistModalMenu';
 
 function Song({id, onClick=undefined, duration, artist, genres, name}) {
     const [modalIsHidden, setModalIsHidden] = useState(true);
@@ -37,9 +39,6 @@ function Song({id, onClick=undefined, duration, artist, genres, name}) {
     }
 
     async function changeModalState () {
-        // собрать информацию по плейлистам
-        if (modalIsHidden)
-            await getPlaylistsInfo();
         // показать/скрыть окно с плейлистами
         setModalIsHidden(modalIsHidden => modalIsHidden = !modalIsHidden);
     }
@@ -97,73 +96,8 @@ function Song({id, onClick=undefined, duration, artist, genres, name}) {
         }
         // добавить песню в конец плеера и включить ее
         dispatch(updateCurrentSongValue(id));
+        dispatch(updateMusicIsPlayingValue(true));
     };
-
-    async function getPlaylistsInfo() {
-        // Получить или обновить информацию о плейлистах
-        try {
-           let arr = await Promise.all(playlists.map(async (el) => {
-                const response = await axiosAuthorized.get(`api/playlist/${el}`)
-                .catch(err => console.log(err));
-                let img = true;
-                await axiosPictures.get(api + `api/playlist/${el}/logo?width=400&height=400`)
-                .catch(err => {img = false});
-
-                let isSongInPlaylist = false;
-
-                await axiosUnauthorized.get(`api/playlist/` + el +`/song/list`)
-                .then(resp => {
-                    if (resp.data.songList.filter(el => el.id === id).length > 0)
-                    {
-                        isSongInPlaylist = true;
-                    }
-                })
-
-                return {
-                    name: response?.data?.name,
-                    id: el,
-                    img: img,
-                    isSongInPlaylist: isSongInPlaylist
-                };
-           }));
-           setPlaylistsInfo(arr);
-        }
-        catch (err) {
-           console.log(err);
-        }
-    }  
-
-    async function addToPlaylist(playlistId) {
-        // Добавить в плейлист
-        await axiosAuthorized.patch(api + `api/playlist/` + playlistId + '/song/' + id).then(response => {
-            changeModalState();
-        })
-    }
-
-    async function excludeFromPlaylist(playlistId) {
-        await axiosAuthorized.delete(api + `api/playlist/` + playlistId + '/song/' + id).then(response => {
-            changeModalState();
-        })
-    }
-
-    async function createNewPlaylist() {
-        // Создать новый плейлист и добавить в него песню
-        let id = 0
-        let formData = new FormData();
-        formData.append('Name', artist + ' - ' + name)
-        await axiosAuthorized.post(api + 'api/playlist', formData, { headers: {
-            "Content-Type": "multipart/form-data",
-        }})
-        .then (
-            response => {
-                id = response.data.id
-                dispatch(updatePlaylistsValue([...playlists, id]))
-                // setPlaylists(e => e = [...e, id]);
-                addToPlaylist(id);
-            }
-        )
-
-    }
 
     return (
         <>
@@ -172,6 +106,7 @@ function Song({id, onClick=undefined, duration, artist, genres, name}) {
                 <p onClick={handleAddToSongs} className='song-title-t'>{name}
                     <p className='songAuthor'>{artist}</p>
                 </p>
+                
                 {resize === 'standart' ? (
                     <>
                         {genres?.length > 0 ? <p className='song-genre'>{genres[0]}</p> : <p className='song-genre'>Без жанра</p>}
@@ -191,36 +126,8 @@ function Song({id, onClick=undefined, duration, artist, genres, name}) {
                 ): (
                     <a onClick={handleToFavorite}><img alt='like' src={featured.includes(id) ? redHeart : heart}/></a>
                 )}
-                
-                
-            
-            {!modalIsHidden ? (
-                    <div className="list-modal-window">
-                        <div className="song-modal">
-                            <p className="song-modal__title">
-                                Добавить в плейлист
-                            </p>
-                            <div className='song-modal__playlists'>
-                                <ul>
-                                    {playlistsInfo?.map(el => {
-                                        return (
-                                            <li className={el.isSongInPlaylist ? 'song-modal__playlist red-text' : 'song-modal__playlist'} key={el.id} onClick={
-                                                el.isSongInPlaylist ? () => excludeFromPlaylist(el.id) : () => addToPlaylist(el.id)}>
-                                                {el.isSongInPlaylist ? <img className='song-modal__playlist-thumb-selected' src={check} alt=""/> : <></>}
-                                                <img className='song-modal__playlist-thumb'draggable='false' 
-                                                    src={el.img ? api + `api/playlist/${el.id}/logo?width=400&height=400` : thumb}/>
-                                                <span className='song-modal__playlist-name'>{el.name}</span>
-                                            </li>
-                                        )
-                                    })}
-                                </ul>
-                            </div>
-                            <button className='song-modal__add-button' onClick={createNewPlaylist}>
-                                + Новый плейлист
-                            </button>
-                        </div>
-                </div>
-                ) : (<></>)}
+
+                {!modalIsHidden ? (<PlaylistModalMenu songAuthor={artist} songName={name} id={id}/>) : (<></>)}
             </div>
         </>
     )

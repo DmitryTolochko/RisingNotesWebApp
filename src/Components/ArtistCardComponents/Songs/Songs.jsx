@@ -18,7 +18,7 @@ function Songs({artist, count=0, offset=0}) {
     }, [params]);
 
     async function getSongs() {
-        let response = await axiosUnauthorized.get(`api/author/${params.id}/song/list`  + (count == 0 ? '' : `&count=${count}&offset=${offset}`))
+        let response = await axiosUnauthorized.get(`api/author/${params.id}/song/list`  + (count == 0 ? '' : `?count=${count}&offset=${offset}`))
         .catch(err => {
             throw err;
         })

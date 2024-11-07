@@ -8,7 +8,7 @@ function Blog({artistId, count=0, offset=0}) {
     const params = useParams();
 
     const getArtistVert = async ()=> {
-        let response = await axiosUnauthorized.get(`api/short-video/by-author/${artistId}` + (count == 0 ? '' : `&count=${count}&offset=${offset}`))
+        let response = await axiosUnauthorized.get(`api/short-video/by-author/${artistId}` + (count == 0 ? '' : `?count=${count}&offset=${offset}`))
         .catch(err => {
             throw err;
         });

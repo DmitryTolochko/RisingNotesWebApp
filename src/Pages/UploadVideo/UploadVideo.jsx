@@ -16,20 +16,38 @@ import InputSongs from './InputSongs';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { updateVideoPlayerValue } from '../../Redux/slices/videoPlayerSlice';
+import CustomInput from '../../Components/CustomInput/CustomInput';
 
 function UploadVideo(){
     const dispatch = useDispatch()
-    const navigate = useNavigate();
     const skinSetterRef = useRef(null);
-    const [skinfile, setSkinfile] = useState(undefined);
-    const [currentSkin, setCurrentSkin] = useState(VideoPrewiew);
+    const [imageFile, setImageFile] = useState(undefined);
+    const [image, setImage] = useState(VideoPrewiew);
     const [videoFile, setVideofile] = useState(undefined);
     const [isPlaying, setIsPlaying] = useState(false);
     const [videoFileName, setVideoFileName] = useState(null);
     const videoSetterRef = useRef(null);
     const [description, setDescription] = useState(undefined);
-    const [songId, setSongId] = useState([]);
-    const [title, setTitle] = useState([]);
+    const [songId, setSongId] = useState(undefined);
+    const [title, setTitle] = useState(undefined);
+
+    const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+
+    useEffect(() => {
+        setIsButtonDisabled(checkInputs());
+    }, [imageFile, videoFile, songId])
+
+    function checkInputs() {
+        let arr = [imageFile, videoFile, songId];
+        let flag = false;
+        arr.forEach((input) => {
+            if (input == undefined || input == '' || (input == [] && input.length == 0)) {
+                console.log(input == undefined);
+                flag = true;
+            }
+        })
+        return flag;
+    }
 
     useEffect(() => {
         if (videoFile !== undefined)
@@ -62,7 +80,7 @@ function UploadVideo(){
         .catch(err => {return Promise.reject(err)});
 
         formData = new FormData();
-        formData.append('File', skinfile);
+        formData.append('File', imageFile);
 
         await axiosAuthorized.patch('api/music-clip/' + clipId + '/preview', formData, {
             headers: {
@@ -152,10 +170,10 @@ function UploadVideo(){
         if (event.target.files.length > 0) {
             let file = event.target.files[0];
             if (file.size <=5*1024*1024) {
-                setSkinfile(file);
+                setImageFile(file);
                 const reader = new FileReader();
                 reader.onload = (event) => {
-                    setCurrentSkin(event.target.result);
+                    setImage(event.target.result);
                 };
                 reader.readAsDataURL(file);
             }
@@ -169,7 +187,7 @@ function UploadVideo(){
                 <div className='video-information-1'>
                     <div className='video-skin-wrapper' onClick={handleSkinInput}>
                         <div className='video-skin-change'><img draggable='false' src={bigEdit}/></div>
-                        <img draggable='false' className='video-prewiew' alt='video prewiew' src={currentSkin}/> 
+                        <img draggable='false' className='video-prewiew' alt='video prewiew' src={image}/> 
                     </div>
                     <span className='song-info'>
                         <h1 className='newtrack-h1'>Новый клип</h1>
@@ -195,17 +213,30 @@ function UploadVideo(){
                 </div>
                 <div className='video-information-2'>
                     <div className='column1-2'>
-                        <h2 className='uploadvideo-h2'>Выберите связанный трек</h2>
-                        <InputSongs placeholder={"Выберите связанный трек..."} setSong={handleChoosenSong} isClipFree={false}/>
+                        <h2 className='uploadvideo-h2'></h2>
+                        <InputSongs 
+                            heading={'Связанный трек'}
+                            setSong={handleChoosenSong} 
+                            isClipFree={false}
+                            isRequired={true}/>
                     </div> 
                     <div className='column1-2'>
-                        <h2 className='uploadvideo-h2'>Описание</h2>
-                        <textarea className="input-installvideo" placeholder={'Введите описание...'} value={description} onChange={e => setDescription(e.target.value)}/>
+                        <CustomInput
+                            heading={'Описание'}
+                            placeholder={'Введите описание...'} 
+                            value={description} 
+                            onChange={e => setDescription(e.target.value)}
+                            isTextArea={true}/>
                     </div>
                 </div>
                 <div className='video-information-3' >
                     <div className='button-and-text'>
-                        <CustomButton text={'Опубликовать'} func={() => uploadVideo()} success={'Опубликовано'} icon={uploadImg}/>
+                        <CustomButton 
+                            text={'Опубликовать'} 
+                            func={() => uploadVideo()} 
+                            success={'Опубликовано'} 
+                            icon={uploadImg}
+                            disabled={isButtonDisabled}/>
                     </div>
                     {/* <text className='warning-upload'>*перед публикацией видео будет отправлено на модерацию</text> */}
 

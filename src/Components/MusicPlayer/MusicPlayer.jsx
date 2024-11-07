@@ -13,6 +13,7 @@ import redDislike from '../../Images/controller/dislike-red.svg';
 import cover from '../../Images/main-placeholder.png';
 import vol from '../../Images/controller/volume-2.svg';
 import filtersImg from '../../Images/player/FilterBtn.svg';
+import listIcon from '../../Images/list.svg';
 
 import { api } from '../App/App';
 import { axiosAuthorized, axiosUnauthorized } from '../App/App';
@@ -26,9 +27,9 @@ import { updateFeaturedValue } from '../../Redux/slices/featuredSlice';
 import { updateCurrentSongValue } from '../../Redux/slices/currentSongSlice';
 import { updateSongsValue } from '../../Redux/slices/songsSlice';
 import { updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlice';
+import PlaylistModalMenu from '../PlaylistModalMenu/PlaylistModalMenu';
 
 const MusicPlayer = () => {
-    // const [isPlaying, setIsPlaying] = useState(false);  
     const [nextSongIndex, setNextSongIndex] = useState(0);
     const audioRef = useRef(null);
     const [trackCurrentDuration, setTrackCurrentDuration] = useState(0);
@@ -39,12 +40,14 @@ const MusicPlayer = () => {
     const [authorId, setAuthorId] = useState('');
     const location = useLocation();
     const [hiddenTag, setHiddenTag] = useState('');
+    const [coverLink, setCoverLink] = useState(cover);
     
     const {cleanQuery} = useSearchClean();
     
     const volumeJSON = localStorage.getItem('VOL');
     const [volume, setVolume] = useState(volumeJSON ? JSON.parse(volumeJSON) : 1);
     const [cookies, setCookies] = useCookies(['role']);
+    const [modalIsHidden, setModalIsHidden] = useState(true);
 
     const dispatch = useDispatch()
     const excluded = useSelector((state)=>state.excluded.value)
@@ -75,6 +78,8 @@ const MusicPlayer = () => {
     useEffect(() => {
         // обновление информации о текущей песне и сброс плеера
         if(currentSong !== '' && currentSong !== null){
+            getSongLink();
+            getCoverLink();
             axiosUnauthorized.get(`api/song/${currentSong}`)
             .then(response => {
                 setSongName(response.data.name);
@@ -124,6 +129,21 @@ const MusicPlayer = () => {
         e.preventDefault();
         dispatch(updateMusicIsPlayingValue(!isPlaying));
     };
+
+    async function getSongLink() {
+        // получить прямую ссылку на файл песни 
+        await axiosUnauthorized.get(`api/song/${currentSong}/file/link`).then(response => {
+            audioRef.current.src = response.data.presignedLink;
+        })
+        .catch(err => {audioRef.current.src = ''});
+    }
+
+    async function getCoverLink() {
+        await axiosUnauthorized.get(`api/song/${currentSong}/logo/link`).then(response => {
+            setCoverLink(response.data.presignedLink);
+        })
+        .catch(err => {setCoverLink(cover)});
+    }
 
     const handleNextSong = () => {
         // следующая песня или первая в очереди
@@ -195,7 +215,7 @@ const MusicPlayer = () => {
         return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
     };
 
-    function showModal() {
+    function showVolumeModal() {
         // отображение окна громкости
         const vl_md = document.getElementById('volume-modal')
         if(vl_md.classList.contains('volume-modal-hidden')){
@@ -203,13 +223,17 @@ const MusicPlayer = () => {
         }
     };
 
-    function hideModal() {
+    function hideVolumeModal() {
         // скрытие окна громкости
         const vl_md = document.getElementById('volume-modal')
         if(!vl_md.classList.contains('volume-modal-hidden')){
             vl_md.classList.add('volume-modal-hidden');
         }
     };
+
+    async function changePlaylistModalState () {
+        setModalIsHidden(modalIsHidden => modalIsHidden = !modalIsHidden);
+    }
 
     async function handleToFavorite() {
         // добавление в избранное
@@ -246,11 +270,10 @@ const MusicPlayer = () => {
 
     if (resize === 'standart') {
         return (<div className={"music-player-wrapper " + hiddenTag}>
-            <audio ref={audioRef} src={currentSong ? api + `api/song/${currentSong}/file` : ''}
+            <audio ref={audioRef}
                 onEnded={handleNextSong} type="audio/mpeg" autoPlay={isPlaying} controls style={{ display: 'none' }}/>
             <div className={`music-player-1 ` + hiddenTag}>
-                <img className={isPlaying ? 'music-player-cover rotate' : 'music-player-cover'} draggable='false' src={currentSong ?
-                (api + `api/song/${currentSong}/logo?width=100&height=100`) : cover} alt='cover'/>
+                <img className={isPlaying ? 'music-player-cover rotate' : 'music-player-cover'} draggable='false' src={coverLink} alt='cover'/>
 
                 <span className='music-player-head'>
                     <p className='music-player-head-song'>{songName}</p>
@@ -271,8 +294,10 @@ const MusicPlayer = () => {
                     <Link to={currentSong === '' ? '' : `/commentaries/${currentSong}`} onClick={cleanQuery}>
                         <img alt='comment' src={message} draggable='false'/>
                     </Link>
+                    <a onClick={changePlaylistModalState}><img src={listIcon} draggable='false'/></a>
                     <a onClick={handleToFavorite}><img alt='like' draggable='false' src={featured.includes(currentSong) ? redHeart : heart}/></a>
                 </div>
+                {!modalIsHidden ? <div className='playlist-modal-wrapper'><PlaylistModalMenu songAuthor={songAuthor} songName={songName} id={currentSong}/></div> : <></>}
                 
                 <div className="track-range">
                     <span className="header-text header__track-duration">{formatTime(trackCurrentDuration)}</span>
@@ -282,26 +307,25 @@ const MusicPlayer = () => {
                     <span className="header-text header__track-duration">{formatTime(trackDuration)}</span>
                 </div>
 
-                <div className="volume-container" onMouseLeave={hideModal}>
+                <div className="volume-container" onMouseLeave={hideVolumeModal}>
                     <div id='volume-modal' className="volume-modal volume-modal-hidden" >
                         <input type="range" className='track-range-input' min="0" max="100" onChange={handleVolumeChange} value={volume*100}/>
                     </div>
-                    <img className="header-volume-btn" src={vol} onMouseOver={showModal} draggable='false'></img>
+                    <img className="header-volume-btn" src={vol} onMouseOver={showVolumeModal} draggable='false'></img>
                 </div>
             </div>
         </div>)
     }
     else {
         return (<div className="music-player-wrapper">
-            <audio ref={audioRef} src={currentSong ? api + `api/song/${currentSong}/file` : ''}
+            <audio ref={audioRef}
                 onEnded={handleNextSong} type="audio/mpeg" autoPlay={isPlaying} controls style={{ display: 'none' }}/>
             <input className={'track-range-input mobile-player-input ' + hiddenTag} value={trackCurrentDuration} 
                         onChange={handleCurrentDurationChange}
                         type="range" id="time" name="volume" min="0" max={trackDuration}/>
             <div className={`mobile-music-player ` + hiddenTag}>
                 <div className='mobile-music-player-song'>
-                    <img className={isPlaying ? 'mobile-music-player-img rotate' : 'mobile-music-player-img'} draggable='false' src={currentSong ?
-                (api + `api/song/${currentSong}/logo?width=100&height=100`) : cover} alt='cover'/>
+                    <img className={isPlaying ? 'mobile-music-player-img rotate' : 'mobile-music-player-img'} draggable='false' src={coverLink} alt='cover'/>
                     <span>
                         <p>{songName}</p>
                         <Link to={`/artist/${authorId}`} className='mobile-music-player-author'>{songAuthor}</Link>
@@ -309,13 +333,16 @@ const MusicPlayer = () => {
                     <button className='mobile-filters-button'><img src={filtersImg}/></button>
                 </div>
                 <div className='mobile-music-player-buttons'>
+                    
                     <div className='music-player-buttons'>
                         <a onClick={handleToExcluded}><img alt='dislike' draggable='false' src={excluded.includes(currentSong) ? redDislike : dislike}/></a>
                         <Link to={currentSong === '' ? '' : `/commentaries/${currentSong}`}>
                             <img alt='comment' src={message} draggable='false'/>
                         </Link>
+                        <a onClick={changePlaylistModalState}><img src={listIcon} draggable='false'/></a>
                         <a onClick={handleToFavorite}><img alt='like' draggable='false' src={featured.includes(currentSong) ? redHeart : heart}/></a>
                     </div>
+                    {!modalIsHidden ? <div className='playlist-modal-wrapper-mobile'><PlaylistModalMenu songAuthor={songAuthor} songName={songName} id={currentSong}/></div> : <></>}
 
                     <div className='music-player-buttons'>
                         <button onClick={handlePrevSong} disabled={songs.length < 1}>

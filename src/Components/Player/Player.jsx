@@ -27,14 +27,14 @@ function Player() {
     const getCurrentTrackInfo = async () => {
         // подгрузка информации о текущем треке
         setIsLoaded(false);
-        let isImageExist = false;
+        let imageLink = songCoverTemplate;
         let info = {};
 
-        await axiosUnauthorized.get(`api/song/` + currentSong + `/logo`)
+        await axiosUnauthorized.get(`api/song/` + currentSong + `/logo/link`)
         .then(response => {
-            isImageExist = true;
+            imageLink = response.data.presignedLink;
         })
-        .catch(err => {console.log(err)});
+        .catch(err => {imageLink = songCoverTemplate});
 
         await axiosUnauthorized.get(`api/song/` + currentSong)
         .then(response => {
@@ -44,7 +44,7 @@ function Player() {
                 trackName: response.data.name,
                 authors: [response.data.authorName],
                 tags: response.data.genreList,
-                trackCover: isImageExist ? api + `api/song/` + currentSong + `/logo` : songCoverTemplate
+                trackCover: imageLink
             }
         })
         .catch(err => {console.log(err)});

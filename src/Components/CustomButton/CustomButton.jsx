@@ -4,7 +4,7 @@ import refresh from '../../Images/controller/refresh.svg';
 import './CustomButton.css';
 import { BsCloudArrowUp } from "react-icons/bs";
 
-function CustomButton({func, text, icon, success, errorText='Повторите попытку'}) {
+function CustomButton({func, text, icon, success, errorText='Повторите попытку', disabled=false}) {
     const [verifiedText, setText] = useState(text);
     const [isSent, setIsSent] = useState(false);
     const [isSending, setIsSending] = useState(false);
@@ -26,7 +26,8 @@ function CustomButton({func, text, icon, success, errorText='Повторите 
 
     return (
         <button className={`custom-button ${isSent ? 'sent' : ''}`}
-            onClick={() => handleFunc()}>
+            onClick={() => handleFunc()}
+            disabled={disabled}>
             {isSending ? 
                 <img draggable='false' alt='loading' src={refresh} className='loading'/> : 
                 <></>

@@ -1,6 +1,6 @@
 import BackButton from '../../Components/BackButton';
 import Comment from '../../Components/Comment';
-import {  api, axiosPictures } from '../../Components/App/App';
+import { api, axiosPictures } from '../../Components/App/App';
 import React from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useEffect, useState } from "react";
@@ -10,11 +10,21 @@ import sendIcon from '../../Images/controller/sendIcon.svg';
 import burgerIcon from '../../Images/controller/menu.svg';
 import playIcon from '../../Images/player/PlayBtn.svg';
 import defaultAvatar from '../../Images/image-placeholder/user_logo_small_placeholder.png';
+import placeholder from '../../Images/main-placeholder.png';
+import heartIcon from '../../Images/controller/heart.svg';
+import redHeart from '../../Images/red-heart.svg';
+import playFilledIcon from '../../Images/play.svg';
+import pauseIcon from '../../Images/Pause.svg';
+import listIcon from '../../Images/list.svg';
 import { useDispatch, useSelector } from 'react-redux';
 
 import './Commentaries.css';
 import CustomButton from '../../Components/CustomButton/CustomButton';
 import { updateVideoPlayerValue } from '../../Redux/slices/videoPlayerSlice';
+import { updateCurrentSongValue } from '../../Redux/slices/currentSongSlice';
+import { updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlice';
+import { updateFeaturedValue } from '../../Redux/slices/featuredSlice';
+import PlaylistModalMenu from '../../Components/PlaylistModalMenu/PlaylistModalMenu';
 
 const Commentaries = (props) => {
     const params = useParams();
@@ -32,12 +42,28 @@ const Commentaries = (props) => {
     const resize = useSelector((state)=> state.resize.value);
     const dispatch = useDispatch();
     const [artistAvatar, setArtistAvatar] = useState(defaultAvatar);
+    const [songLogo, setSongLogo] = useState(placeholder);
+    const [playButtonIcon, setPlayButtonIcon] = useState(playFilledIcon);
+    const featured = useSelector((state)=>state.featured.value);
+    const currentSong = useSelector((state)=> state.currentSong.value);
+    const isPlaying = useSelector((state) => state.musicIsPlaying.value);
+    const [modalIsHidden, setModalIsHidden] = useState(true);
+
+    useEffect(() => {
+        // отображение кнопки игры и паузы трека
+        if (!isPlaying || currentSong !== params.id ) {
+            setPlayButtonIcon(playFilledIcon);
+        } else {
+            setPlayButtonIcon(pauseIcon);
+        }
+    }, [isPlaying, currentSong]);
 
     useEffect(() => {
         getAllInfo();
     }, [isDataUpdated, params.id]);
 
     async function getAllInfo () {
+        // получить всю информацию
         let authorId = undefined;
 
         await axiosUnauthorized.get(`api/song/${params.id}/comment/list`)
@@ -79,9 +105,19 @@ const Commentaries = (props) => {
             .catch(err => {
                 setClipId(undefined);
             })
+
+        let response = await axiosPictures.get(api + `api/song/${params.id}/logo?width=500&height=500`)
+        .catch(err => console.log(err));
+
+        if (response?.status === 200) {
+            setSongLogo(api + `api/song/${params.id}/logo?width=500&height=500`);
+        } else {
+            setSongLogo(placeholder);
+        }
     }
 
     const handleSendComment = () => {
+        // отправить комментарий
         if (comment !== '') {
             axiosAuthorized.post(`api/song/${params.id}/comment`, {text: comment})
             .then(response => {
@@ -107,13 +143,47 @@ const Commentaries = (props) => {
         img.classList.add('bg-loaded')
     }
 
+    function handlePlaySong() {
+        // включить или выключить песню
+        if (currentSong !== params.id || !isPlaying) {
+            dispatch(updateCurrentSongValue(params.id));
+            dispatch(updateMusicIsPlayingValue(true));
+        } else if (isPlaying) {
+            dispatch(updateMusicIsPlayingValue(false));
+        }
+    };
+
+    async function handleToFavorite() {
+        // добавление и удаление из избранных
+        if (featured.includes(params.id)) {
+            await axiosAuthorized.delete(api + `api/song/favorite/${params.id}`).then(resp => {
+                dispatch(updateFeaturedValue(featured.filter(el => el != params.id)))
+            });
+        }
+        else {
+            await axiosAuthorized.patch(api + `api/song/favorite/${params.id}`).then(resp => {
+                dispatch(updateFeaturedValue([...featured, params.id]))
+            });
+        }
+    };
+
+    async function changeModalState () {
+        setModalIsHidden(modalIsHidden => modalIsHidden = !modalIsHidden);
+    }
+
     return (
         <div className='comment-page-wrapper'>
             <div className='comment-page'>
                 <BackButton/>
 
                 <div className='comm-head'>
-                    <img alt='cover' src={(api + `api/song/${params.id}/logo?width=500&height=500`)} draggable='false'/>
+                    <div className='comm-img-hover'>
+                        <a onClick={handleToFavorite}><img draggable='false' src={featured.includes(currentSong) ? redHeart : heartIcon}/></a>
+                        <a onClick={handlePlaySong}><img src={playButtonIcon} draggable='false'/></a>
+                        <a onClick={changeModalState}><img src={listIcon} draggable='false'/></a>
+                        {!modalIsHidden ? (<PlaylistModalMenu songAuthor={songAuthor} songName={songName} id={params.id}/>) : (<></>)}
+                    </div>
+                    <img alt='cover' src={songLogo} draggable='false'/>
                     <span className='comm-page-text'>
                         <h2 className='comm-page-h2'>{songName}</h2>
                         <Link to={`/artist/${authorId}`} className='comm-page-author'><img src={artistAvatar} alt='avatar'/>{songAuthor}</Link>

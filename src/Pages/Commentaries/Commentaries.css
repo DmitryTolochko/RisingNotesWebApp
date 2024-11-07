@@ -391,3 +391,55 @@ h2 {
 .song-comments {
     overflow-x: hidden;
 }
+
+.comm-img-hover {
+    transition: all .1s ease-in;
+    opacity: 0;
+    display: flex;
+    background: linear-gradient(180.00deg, rgba(104, 107, 113, 50%) 0%,rgba(23, 28, 37, 100%) 100%);
+
+    cursor: pointer;
+    position: absolute;
+    max-width: 276px;
+    width: 100%;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 1/1;
+
+    border-radius: 18px;
+
+    @media screen and (max-width: 720px){ 
+        max-width: 165px;
+    }
+}
+
+.comm-img-hover:hover {
+    opacity: 100%;
+    transition: all .1s ease-in;
+}
+
+.comm-img-hover > a {
+    background-color: rgba(15, 20, 29, 60%);
+    width: 48px;
+    height: 48px;
+    border-radius: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.comm-img-hover > a:nth-child(2) {
+    width: 72px;
+    height: 72px;
+}
+
+.comm-img-hover > a:nth-child(2) > img {
+    width: 48px;
+    height: 48px;
+}
+
+.comm-img-hover > a:hover {
+    background-color: rgba(15, 20, 29, 100%);
+    transition: all .1s ease-in;
+}

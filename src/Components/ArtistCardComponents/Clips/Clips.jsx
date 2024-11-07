@@ -10,7 +10,7 @@ export default function Clips({artistId, count=0, offset=0}) {
 
     const getArtistClips = async ()=> {
         // получить список клипов автора
-        let response = await axiosUnauthorized.get(`api/music-clip/by-author/${artistId}` + (count == 0 ? '' : `&count=${count}&offset=${offset}`))
+        let response = await axiosUnauthorized.get(`api/music-clip/by-author/${artistId}` + (count == 0 ? '' : `?count=${count}&offset=${offset}`))
         .catch(err => {
             throw err;
         });

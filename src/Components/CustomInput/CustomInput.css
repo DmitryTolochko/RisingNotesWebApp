@@ -1,0 +1,27 @@
+.input-h {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.input-alert {
+    position: absolute;
+    background-color: #191E28;
+    font-family: Montserrat;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    color: #787885;
+    padding: 12px 16px;
+
+    margin-bottom: 80px;
+    border: 1px solid #2C323D;
+    border-radius: 2px;
+}
+
+.input-alert-triangle {
+    border: 20px solid transparent; border-top: 20px solid #2C323D;
+    margin-left: -40px;
+    margin-top: -20px;
+}

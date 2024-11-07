@@ -305,3 +305,15 @@
 .hidden {
     display: none;
 }
+
+.playlist-modal-wrapper {
+    position: absolute;
+    left: 50%;
+    bottom: 400%;
+}
+
+.playlist-modal-wrapper-mobile {
+    position: absolute;
+    left: 80%;
+    bottom: 350%;
+}

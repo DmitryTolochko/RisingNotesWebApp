@@ -194,6 +194,10 @@
     font-weight: 500;
     line-height: normal;
     margin-bottom: 8px;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .column2-h2 {
@@ -221,7 +225,7 @@
     border: none;
     border-radius: 10px;
     background: #191E28;
-    color: #787885;
+    color: #FFF;
     padding-left: 16px;
 
     font-family: Montserrat;
@@ -230,6 +234,10 @@
     font-weight: 500;
     line-height: normal;
     margin-bottom: 24px;
+}
+
+.inp-column1::placeholder {
+    color: #787885;
 }
 
 .song-text-area {
@@ -419,6 +427,22 @@
     position: absolute;
     z-index: 2;
     margin-top: 50px;
+    overflow-y: scroll;
+    max-height: 400px;
+}
+
+.input-options::-webkit-scrollbar {
+    display: inline;
+    width: 5px;
+}
+
+.input-options::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color:#787885;
+  }
+  
+.input-options::-webkit-scrollbar-track {
+    border-radius: 10px;
 }
 
 .input-option {

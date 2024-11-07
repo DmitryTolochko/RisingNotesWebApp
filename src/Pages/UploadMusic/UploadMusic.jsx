@@ -1,9 +1,9 @@
 import React from 'react';
 import BackButton from '../../Components/BackButton';
 import PlaylistInstallSkin from '../../Images/main-placeholder.png';
-import InputWithTags from './InputWithTags';
+import CustomInputWithTags from '../../Components/CustomInput/CustomInputWithTags';
 import { useState, useEffect, useRef } from 'react'
-import InstallMusicText from './InstallMusicText';
+import CustomSwitch from './CustomSwitch';
 import { api, axiosAuthorized, axiosUnauthorized } from '../../Components/App/App';
 import { useCookies } from 'react-cookie';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -17,6 +17,7 @@ import trashImg from '../../Images/trash.svg';
 
 import './UploadMusic.css';
 import CustomButton from '../../Components/CustomButton/CustomButton';
+import CustomInput from '../../Components/CustomInput/CustomInput';
 
 function UploadMusic(){
     const navigate = useNavigate()
@@ -24,16 +25,14 @@ function UploadMusic(){
     const imageSetterRef = useRef(null);
     const songSetterRef = useRef(null);
     const [name, setName] = useState(undefined);
-    const [lyrics, setLyrics] = useState('');
-    const [instrumental, setInstrumental] = useState(true);
-    const [genre, setGenre] = useState([]);
-    const [vibe, setVibe] = useState([]);
-    const [language, setLanguage] = useState([]);
+    const [isLyricsExist, setIsLyricsExist] = useState(false);
+    const [lyrics, setLyrics] = useState(undefined);
+    const [genre, setGenre] = useState(undefined);
+    const [vibe, setVibe] = useState(undefined);
+    const [language, setLanguage] = useState(undefined);
     const [gender, setGender] = useState([0]);
     const [songfile, setSongfile] = useState(undefined);
     const [logofile, setLogofile] = useState(undefined);
-    const [curVibe, setCurvibe] = useState('');
-    const [isImageExist, setIsImageExist] = useState(false);
     const [cookies, setCookies] = useCookies(['accessToken', 'refreshToken', 'authorId', 'role', 'subscriptions', 'userId']);
     const [currentImage, setCurrentImage] = useState(PlaylistInstallSkin);
     const [songFileName, setSongFileName] = useState(null);
@@ -48,7 +47,30 @@ function UploadMusic(){
     const [languageList, setLanguageList] = useState([]);
     const [title, setTitle] = useState('Новый трек');
 
+    const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+
     const formData = new FormData();
+
+    useEffect(() => {
+        setIsButtonDisabled(checkInputs());
+    }, [name, isLyricsExist, lyrics, genre, vibe, language, gender, songfile, logofile])
+
+    function checkInputs() {
+        if (isLyricsExist && 
+            (lyrics == undefined || lyrics == '' || 
+            ((language == undefined || language.length == 0))))
+            return true;
+
+        let arr = [name, genre, vibe, gender, songfile, logofile];
+        let flag = false;
+        arr.forEach((input) => {
+            if (input == undefined || input == '' || (input == [] && input.length == 0)) {
+                console.log(input == undefined);
+                flag = true;
+            }
+        })
+        return flag;
+    }
 
     async function uploadToModeration() {
         // Отправка на модерацию
@@ -56,7 +78,7 @@ function UploadMusic(){
         let id = undefined;
         formData.append('Name', name)
         formData.append('Lyrics', lyrics)
-        formData.append('Instrumental', lyrics ? lyrics.length > 0 : false)
+        formData.append('Instrumental', isLyricsExist)
         vibe.forEach((item, index) => {
             formData.append(`VibeList[${index}]`, item);
         });
@@ -130,6 +152,7 @@ function UploadMusic(){
     }
 
     const loadImage = async (file) => {
+        // преобразовать изображение
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.onload = () => resolve(reader.result);
@@ -139,6 +162,7 @@ function UploadMusic(){
     };
 
     const checkAspectRatio = async (imageSrc) => {
+        // проверка изображения на соотношение 1 к 1
         return new Promise((resolve, reject) => {
             const img = new Image();
             img.src = imageSrc;
@@ -265,7 +289,7 @@ function UploadMusic(){
         await axiosAuthorized.get(`/api/song/upload-request/${params.id}`).then(response => {
             setName(response?.data?.songName);
             setLyrics(response?.data.lyrics);
-            setInstrumental(response?.data.instrumental);
+            setIsLyricsExist(response?.data.instrumental);
             setGender(response?.data.vocalGenderList[0]);
             setGenre(response?.data.genreList);
             setVibe(response?.data.vibeList);
@@ -354,16 +378,28 @@ function UploadMusic(){
 
                 <div className='song-information-2'>
                     <div className='column'>
-                        <h2 className='column1-h2'>Название трека</h2>
-                        <input className='inp-column1' placeholder={name === undefined ? 'Введите название...' : 'Это обязательное поле'} value={name} onChange={e => setName(e.target.value)}/>
+                        <CustomInput 
+                            placeholder={'Введите название...'} 
+                            value={name} 
+                            onChange={e => setName(e.target.value)}
+                            heading={'Название трека'}
+                            isRequired={true}/>
                     </div>
                     <div className='column'>
-                        <h2 className='column1-h2'>Настроение</h2>
-                        <InputWithTags placeholder={"Введите настроение..."} list={vibe} setList={setVibe} availableOptions={vibeList}/>
+                        <CustomInputWithTags 
+                            heading={'Настроение'}
+                            placeholder={"Введите настроение..."} 
+                            list={vibe} 
+                            setList={setVibe} 
+                            availableOptions={vibeList}/>
                     </div>
                     <div className='column'>
-                        <h2 className='column1-h2'>Жанры</h2>
-                        <InputWithTags placeholder={"Введите жанр..."} list={genre} setList={setGenre} availableOptions={genreList}/>
+                        <CustomInputWithTags 
+                            heading={'Жанры'}
+                            placeholder={"Введите жанр..."} 
+                            list={genre} 
+                            setList={setGenre} 
+                            availableOptions={genreList}/>
                     </div>
                     <div className='column'>
                         <h2 className='column1-h2'>Пол исполнителя</h2>
@@ -376,12 +412,21 @@ function UploadMusic(){
                 </div>
 
                 <div className='song-information-3' >
-                    <InstallMusicText lyrics={lyrics}/>
+                    <CustomSwitch flag={isLyricsExist} setFlag={setIsLyricsExist}/>
                     <div id="myDiv" className='div-text'>
-                        <h2 className='column2-h2'>Язык трека</h2>
-                        <InputWithTags placeholder={"Введите язык..."} list={language} setList={setLanguage} availableOptions={languageList}/>
-                        <h2 className='column2-h2'>Текст</h2>
-                        <textarea id='myinput' className='song-text-area' placeholder={'Введите текст...'} value={lyrics} onChange={e => setLyrics(e.target.value)}/>
+                        <CustomInputWithTags 
+                            heading={'Язык трека'}
+                            placeholder={"Введите язык..."} 
+                            list={language} 
+                            setList={setLanguage} 
+                            availableOptions={languageList}/>
+                        <CustomInput
+                            heading={'Текст'}
+                            placeholder={'Введите текст...'} 
+                            value={lyrics} 
+                            onChange={e => setLyrics(e.target.value)}
+                            isTextArea={true}
+                            isRequired={true}/>
                         <div className="text-checkbox">
                             <input type="checkbox" className='checkbox-button'/>
                             <label className='label-checkbox'>Ненормативная лексика</label>
@@ -390,7 +435,12 @@ function UploadMusic(){
                     
                     {role === 'author' ? <div>
                         <div className='button-and-text'>
-                            <CustomButton text={'Опубликовать*'} func={uploadToModeration} success={'Отправлено на модерацию'} icon={uploadImg}/>
+                            <CustomButton 
+                                text={'Опубликовать*'} 
+                                func={uploadToModeration} 
+                                success={'Отправлено на модерацию'} 
+                                icon={uploadImg}
+                                disabled={isButtonDisabled}/>
                         </div>
                             <text className='warning-upload'>*перед публикацией трек будет отправлен на модерацию</text>
                     </div> : ''}

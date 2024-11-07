@@ -13,30 +13,47 @@ import './UploadVertVideo.css';
 import CustomButton from '../../Components/CustomButton/CustomButton';
 import InputSongs from '../UploadVideo/InputSongs';
 import { useDropzone } from 'react-dropzone';
-import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { updateVertVideoInfoValue } from '../../Redux/slices/vertVideoInfoSlice';
 import { updateVertVideoPlayerValue } from '../../Redux/slices/vertVideoPlayerSlice';
+import CustomInput from '../../Components/CustomInput/CustomInput';
 
 function InstallVerticalVideo(){
     const vertskinSetterRef = useRef(null);
-    const [vertskinfile, setVertSkinfile] = useState(undefined);
-    const [currentVertSkin, setCurrentVertSkin] = useState(VideoPrewiew);
-    const navigate = useNavigate();
+    const [imageFile, setImageFile] = useState(undefined);
+    const [image, setImage] = useState(VideoPrewiew);
     const [videoFile, setVideofile] = useState(undefined);
     const [isPlaying, setIsPlaying] = useState(false);
     const [videoFileName, setVideoFileName] = useState(null);
     const videoSetterRef = useRef(null);
     const [description, setDescription] = useState(undefined);
     const [songId, setSongId] = useState(undefined);
-    const [title, setTitle] = useState([]);
+    const [title, setTitle] = useState(undefined);
 
     const [songName, setSongName] = useState('Песня не указана');
     const [authorName, setAuthorName] = useState('Автор не указан');
     const dispatch = useDispatch();
 
+    const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+
     useEffect(() => {
-        if (songId !== undefined) {
+        setIsButtonDisabled(checkInputs());
+    }, [imageFile, videoFile, description])
+
+    function checkInputs() {
+        let arr = [imageFile, videoFile, description];
+        let flag = false;
+        arr.forEach((input) => {
+            if (input == undefined || input == '' || (input == [] && input.length == 0)) {
+                console.log(input == undefined);
+                flag = true;
+            }
+        })
+        return flag;
+    }
+
+    useEffect(() => {
+        if (!(songId === undefined || songId === '')) {
             axiosUnauthorized.get(`/api/song/${songId}`)
             .then(response => {
                 setAuthorName(response.data.authorName);
@@ -55,10 +72,10 @@ function InstallVerticalVideo(){
         if (event.target.files.length > 0) {
             let file = event.target.files[0];
             if (file.size <=5*1024*1024) {
-                setVertSkinfile(file);
+                setImageFile(file);
                 const reader = new FileReader();
                 reader.onload = (event) => {
-                    setCurrentVertSkin(event.target.result);
+                    setImage(event.target.result);
                 };
                 reader.readAsDataURL(file);
             }
@@ -88,7 +105,7 @@ function InstallVerticalVideo(){
         .catch(err => {return Promise.reject(err)});
 
         formData= new FormData();
-        formData.append('File', vertskinfile);
+        formData.append('File', imageFile);
 
         await axiosAuthorized.patch('api/short-video/' + clipId + '/preview', formData, {
             headers: {
@@ -180,7 +197,7 @@ function InstallVerticalVideo(){
                 <div className='video-information-1'>
                     <div className='videovert-skin-wrapper' onClick={handleVertSkinInput}>
                         <div className='videovert-skin-change'><img draggable='false' src={bigEdit}/></div>
-                        <img draggable='false' className='vertvideo-prewiew' alt='video prewiew' src={currentVertSkin}/> 
+                        <img draggable='false' className='vertvideo-prewiew' alt='video prewiew' src={image}/> 
                     </div>
                     <span className='song-info'>
                         <h1 className='newtrack-h1'>Новое видео в блог</h1>
@@ -206,17 +223,29 @@ function InstallVerticalVideo(){
                 </div>
                 <div className='video-information-2'>
                     <div className='column1-2'>
-                        <h2 className='uploadvideo-h2'>Выберите связанный трек</h2>
-                        <InputSongs placeholder={"Выберите связанный трек..."} setSong={handleChoosenSong}/>
+                        <InputSongs 
+                            heading={'Cвязанный трек'}
+                            placeholder={"Выберите связанный трек..."} 
+                            setSong={handleChoosenSong}/>
                     </div> 
                     <div className='column1-2'>
-                        <h2 className='uploadvideo-h2'>Описание</h2>
-                        <textarea className="input-installvideo" placeholder={'Введите описание...'} value={description} onChange={e => setDescription(e.target.value)}/>
+                        <CustomInput
+                            heading={'Описание'}
+                            placeholder={'Введите описание...'} 
+                            value={description} 
+                            onChange={e => setDescription(e.target.value)}
+                            isTextArea={true}
+                            isRequired={true}/>
                     </div>
                 </div>
                 <div className='video-information-3' >
                     <div className='button-and-text'>
-                            <CustomButton text={'Опубликовать'} func={() => uploadVideo()} success={'Опубликовано'} icon={uploadImg}/>
+                        <CustomButton 
+                            text={'Опубликовать'} 
+                            func={() => uploadVideo()} 
+                            success={'Опубликовано'} 
+                            icon={uploadImg}
+                            disabled={isButtonDisabled}/>
                     </div>
                     {/* <text className='warning-upload'>*перед публикацией видео будет отправлено на модерацию</text> */}
                     <input type='file' className='input-file' ref={videoSetterRef} onChange={changeVideo}></input>
