@@ -52,7 +52,7 @@ export default function Clips() {
     return (
         <div className="account-page-user">
             <h2>Все клипы</h2>
-            <Link to={'/uploadvideo'} className='account-page-add-song'><img alt='icon' src={plus}/>Новое видео</Link>
+            <Link to={'/uploadvideo'} className='account-page-add-song'><img alt='icon' src={plus}/>Новый видеоклип</Link>
 
             <div className="artist-clips">
                 {clips?.map( (clip,index) => (

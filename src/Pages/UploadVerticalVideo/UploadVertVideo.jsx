@@ -33,8 +33,6 @@ function InstallVerticalVideo(){
 
     const [songName, setSongName] = useState('Песня не указана');
     const [authorName, setAuthorName] = useState('Автор не указан');
-
-    const formData= new FormData();
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -73,19 +71,67 @@ function InstallVerticalVideo(){
     }
 
     async function uploadVideo() {
+        let formData= new FormData();
+        let clipId = undefined;
+        let uploadId = undefined;
         // загрузка видео
         formData.append('Title', title);
         formData.append('Description', description);
         formData.append('RelatedSongId', songId);
-        formData.append('PreviewFile.File', vertskinfile);
-        formData.append('ClipFile.File', videoFile);
 
         await axiosAuthorized.post('api/short-video', formData, {
             headers: {
                 "Content-Type": "multipart/form-data",
             }
         })
-        .then(response => {navigate('/account')})
+        .then(response => clipId = response.data.id)
+        .catch(err => {return Promise.reject(err)});
+
+        formData= new FormData();
+        formData.append('File', vertskinfile);
+
+        await axiosAuthorized.patch('api/short-video/' + clipId + '/preview', formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            }
+        })
+        .catch(err => {return Promise.reject(err)});
+
+        await axiosAuthorized.post('api/short-video/' + clipId + '/file/start-upload')
+        .then(response => uploadId = response.data.uploadId)
+        .catch(err => {return Promise.reject(err)});
+
+        if (videoFile.size <= 50 * 1024 * 1024) {
+            // загрузка видео размером не больше 50 мб.
+            await uploadFilePart(videoFile, 1, true, uploadId, clipId);
+        }
+        else {
+            // загрузка видео по частям
+            let totalSize = videoFile.size;
+            let currentPart = 0;
+            const chunkSize = 6 * 1024 * 1024;
+            const totalParts = Math.ceil(totalSize/chunkSize);
+
+            for (let start = 0; start < totalSize; start+=chunkSize) {
+                currentPart += 1;
+                const chunk = videoFile.slice(start, start + chunkSize);
+                await uploadFilePart(chunk, currentPart, currentPart === totalParts, uploadId, clipId);
+            }
+        }
+    }
+
+    async function uploadFilePart(filePart, partNumber, isLast, uploadId, clipId) {
+        // загрузка куска видео
+        let formData = new FormData();
+        formData.append('File', filePart);
+        formData.append('UploadId', uploadId);
+        formData.append('PartNumber', partNumber);
+        formData.append('IsLastPart', isLast);
+        await axiosAuthorized.post('api/short-video/' + clipId + '/file/upload-part', formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            }
+        })
         .catch(err => {return Promise.reject(err)});
     }
 

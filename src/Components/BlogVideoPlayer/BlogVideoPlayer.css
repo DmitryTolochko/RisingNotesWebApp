@@ -88,20 +88,21 @@
 
 }
 
-.blog-text > button {
+.blog-close {
     margin-bottom: 71px;
 }
 
-.blog-text > span {
+.blog-author {
     display: flex;
-    gap: 7px;
+    gap: 12px;
     align-items: center;
     font-size: 28px;
     font-style: regular;
     width: 100%;
+    cursor: pointer;
 }
 
-.blog-text > span > img {
+.blog-author > img {
     width: 32px;
     height: 32px;
     border-radius: 100px;
@@ -114,6 +115,17 @@
     width: 100%;
 }
 
+.blog-fav-icon {
+    width: 28px;
+    height: 28px;
+}
+
+.blog-fav-icon:hover {
+    cursor: pointer;
+    transition: all .1s ease;
+    transform: scale(0.95);
+}
+
 .blog-song {
     border: 0px;
     border-radius: 24px;
@@ -122,11 +134,12 @@
     background: linear-gradient(90.00deg, rgb(104, 107, 113),rgb(23, 28, 37) 100%);
 
     display: flex;
-    justify-content: center;
+    justify-content: start;
+    gap: 12px;
     align-items: center;
     text-align: start;
     gap: 27px;
-    padding: 10px;
+    padding: 10px 22px;
     width: 100%;
 }
 
@@ -134,6 +147,13 @@
     width: 50px;
     height: 50px;
     border-radius: 100px;
+    cursor: pointer;
+}
+
+.blog-song > span {
+    display: flex;
+    justify-content:space-between;
+    width: 100%;
 }
 
 .blog-artist-name {
@@ -141,4 +161,24 @@
     font-size: 16px;
     font-weight: 400;
     color: rgb(197, 197, 197);
+    cursor: pointer;
+}
+
+.blog-song-name {
+    cursor: pointer;
+}
+
+.blog-comments {
+    width: 100%;
+    text-align: start;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    max-height: 60%;
+
+    mask-image: linear-gradient(to top, transparent 0%, black 15%);
+    mask-repeat: no-repeat;
+    mask-position: center;
 }

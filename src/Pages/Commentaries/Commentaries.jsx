@@ -1,7 +1,7 @@
 import BackButton from '../../Components/BackButton';
 import Comment from '../../Components/Comment';
 import {  api, axiosPictures } from '../../Components/App/App';
-import React, { useContext } from 'react';
+import React from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useEffect, useState } from "react";
 import { axiosAuthorized, axiosUnauthorized } from '../../Components/App/App';
@@ -14,7 +14,6 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import './Commentaries.css';
 import CustomButton from '../../Components/CustomButton/CustomButton';
-import { updateVertVideoPlayerValue } from '../../Redux/slices/vertVideoPlayerSlice';
 import { updateVideoPlayerValue } from '../../Redux/slices/videoPlayerSlice';
 
 const Commentaries = (props) => {
@@ -156,7 +155,9 @@ const Commentaries = (props) => {
                                 {resize === 'mobile' ? <button className='comment-btn-offset' onClick={handleSendComment}><img src={sendIcon}/></button> : <></>}
                                 {resize === 'standart' ? <CustomButton text={'Отправить'} func={handleSendComment} icon={sendIcon} errorText='Ошибка' success={'Отправить'}/> : <></>}
                         </div>
-                        {comments.map(e => (<div key={e.id} className='comment-wrapper'><Comment data={e} songId={params.id} setIsDataUpdated={setIsDataUpdated} isDataUpdated={isDataUpdated}/></div>))}
+                        <div className='song-comments'>
+                            {comments.map(e => (<div key={e.id} className='comment-wrapper'><Comment data={e} songId={params.id} setIsDataUpdated={setIsDataUpdated} isDataUpdated={isDataUpdated}/></div>))}
+                        </div>
                     </>
                 ) : 
                 (<></>)}

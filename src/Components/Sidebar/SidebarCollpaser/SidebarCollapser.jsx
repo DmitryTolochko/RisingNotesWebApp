@@ -62,13 +62,6 @@ function SidebarCollapser(props){
                </li>
                <li> 
                   <NavLink onClick={clearQuery} className ={({ isActive }) => (isActive ? 'nav-link remove active' : 'nav-link remove ' )}
-                  to={'/subscriptions'} 
-                  style={({ isActive }) => (isActive ? {color: '#FE1170'} : {color: '#787885'})}>
-                     <img src={subsIcon} alt="" className="nav-icon" />
-                  </NavLink>
-               </li>
-               <li> 
-                  <NavLink onClick={clearQuery} className ={({ isActive }) => (isActive ? 'nav-link remove active' : 'nav-link remove ' )}
                   to={'/messenger'} 
                   style={({ isActive }) => (isActive ? {color: '#FE1170'} : {color: '#787885'})}>
                      <img src={messengerIcon} alt="" className="nav-icon" />

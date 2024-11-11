@@ -111,6 +111,7 @@ h2 {
 }
 
 .comm-text-area {
+    overflow-wrap: anywhere;
     border-radius: 1px 15px 15px 15px;
     border: 0px solid;
     background: radial-gradient(228.74% 144.12% at 0.9% 2.98%, rgba(255, 255, 255, 0.40) 0%, rgba(255, 255, 255, 0.16) 60.52%, rgba(255, 255, 255, 0.00) 100%);
@@ -119,6 +120,13 @@ h2 {
     width: 100%;
     height: fit-content;
     padding: 16px 20px;
+
+    /* @media screen and (max-width: 1170px) and (min-width: 721px){ 
+        width: 90%;
+    }
+    @media screen and (max-width: 720px){ 
+        width: 88%;
+    } */
 }
 
 .comm-text-area > h2 {
@@ -139,6 +147,7 @@ h2 {
 }
 
 .comment-text {
+    /* overflow-wrap: break-word; */
     display: grid;
     gap: 10px;
     width: 100%;
@@ -264,6 +273,7 @@ h2 {
 }
 
 .comment-input-wrapper {
+    width: 100%;
     display: flex;
     gap: 40px;
     justify-content: start;
@@ -376,4 +386,8 @@ h2 {
     position: absolute;
     right: 30px;
     filter: brightness(0) saturate(100%) invert(32%) sepia(10%) saturate(7304%) hue-rotate(302deg) brightness(100%) contrast(94%);
+}
+
+.song-comments {
+    overflow-x: hidden;
 }

@@ -47,6 +47,7 @@ function UploadVideo(){
         let formData = new FormData();
         let clipId = undefined;
         let uploadId = undefined;
+        let fileExtension = '.' + videoFile.type.split('/')[1];
         
         formData.append('Title', title);
         formData.append('Description', description);
@@ -68,9 +69,11 @@ function UploadVideo(){
                 "Content-Type": "multipart/form-data",
             }
         })
-        .catch(err => {return Promise.reject(err)});
+        .catch(err => {return Promise.reject(err)});        
 
-        await axiosAuthorized.post('api/music-clip/' + clipId + '/file/start-upload')
+        await axiosAuthorized.post('api/music-clip/' + clipId + '/file/start-upload', {
+            fileExtension: fileExtension
+        })
         .then(response => uploadId = response.data.uploadId)
         .catch(err => {return Promise.reject(err)});
 

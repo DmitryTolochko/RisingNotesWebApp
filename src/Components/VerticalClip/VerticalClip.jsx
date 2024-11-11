@@ -1,20 +1,19 @@
 import { useState } from 'react'
 import './VerticalClip.css'
 import { useEffect, useRef } from 'react'
-import { api } from '../App/App'
-import axios from 'axios'
+import { api, axiosPictures, axiosUnauthorized } from '../App/App'
 import Skeleton from 'react-loading-skeleton'
 import { handleVideoEnter, handleVideoHover, handleVideoLeave, handleVideoMove } from '../Clip/handlers/ClipHandlers';
 import { useDispatch } from 'react-redux'
 import { updateVertVideoInfoValue } from '../../Redux/slices/vertVideoInfoSlice'
 import { updateVertVideoPlayerValue } from '../../Redux/slices/vertVideoPlayerSlice'
 import { updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlice'
+import defaultAvatar from '../../Images/image-placeholder/user_logo_small_placeholder.png';
 
 function VerticalClip(props) {
     const [dataFetched, setDataFetched] = useState(false)
     const [vertData, setVertData] = useState(undefined)
     const [videoLoaded, setVideoLoaded] = useState(false)
-    const [authorName, setAuthorName] = useState('')
 
     const previewRef = useRef(undefined)
     const videoPreviewRef = useRef(undefined)
@@ -30,35 +29,34 @@ function VerticalClip(props) {
             .catch(err=>console.log(err))
     },[])
 
-    const getAuthorName = async (id) =>{
-        try{
-            const response = await axios({
-                method:'GET',
-                url: api + 'api/author/' + id,
-                responseType: 'application/json'
-            })
-            let result = JSON.parse(response.data)
-            return result.name
-        }
-        catch(err){
-            return Promise.reject(err);
-        }
-    }
-
     const getVertData = async () =>{
-        try{
-            const response = await axios({
-                method:'GET',
-                url: api + `api/short-video/${props.id}`,
-                responseType: 'application/json',
-            })
-            const result = JSON.parse(response.data)
-            console.log(result)
-            return result
+        let response = await axiosUnauthorized.get(api + `api/short-video/${props.id}`)
+        .catch(err => Promise.reject(err));
+        let result = response.data;
+
+        response = await axiosPictures.get(api + 'api/author/' + result.uploaderId + '/logo')
+        .catch(err => Promise.reject(err));
+
+        if (response.status === 200) {
+            result.authorAvatar = api + 'api/author/' + result.uploaderId + '/logo';
+        } else {
+            result.authorAvatar = defaultAvatar;
         }
-        catch(err){
-            console.log('Something wrong occured when trying to fetch vert data');
+
+        response = await axiosPictures.get(api + 'api/song/' + result.relatedSongId + '/logo')
+        .catch(err => Promise.reject(err));
+
+        if (response.status === 200) {
+            result.songLogo = api + 'api/song/' + result.relatedSongId + '/logo';
+        } else {
+            result.songLogo = defaultAvatar;
         }
+
+        response = await axiosUnauthorized.get(api + 'api/author/' + result.uploaderId)
+        .catch(err => Promise.reject(err));
+
+        result.authorName = response.data.name;
+        return result;
     }
 
     const handleVertClick = () =>{
@@ -66,12 +64,7 @@ function VerticalClip(props) {
         dispatch(updateVertVideoPlayerValue(
             api + `api/short-video/${props.id}/file`
         ))
-        dispatch(updateVertVideoInfoValue( {
-            author:authorName,
-            description: vertData.description,
-            title:vertData.title,
-            songId:vertData.relatedSongId
-        }))
+        dispatch(updateVertVideoInfoValue(vertData));
     }
 
     return ( 

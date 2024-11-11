@@ -36,8 +36,8 @@ function Blog(params) {
 
     return (
         <div className="account-page-user">
-            <h2>Все клипы</h2>
-            <Link to={'/uploadvertvideo'} className='account-page-add-song'><img alt='icon' src={plus}/>Новый пост</Link>
+            <h2>Все видео</h2>
+            <Link to={'/uploadvertvideo'} className='account-page-add-song'><img alt='icon' src={plus}/>Новое видео</Link>
 
             <div className="blog">
                 {verts?.map(video=>(
