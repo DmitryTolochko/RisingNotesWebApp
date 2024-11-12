@@ -11,12 +11,14 @@ import { updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlic
 import defaultAvatar from '../../Images/image-placeholder/user_logo_small_placeholder.png';
 
 function VerticalClip(props) {
-    const [dataFetched, setDataFetched] = useState(false)
-    const [vertData, setVertData] = useState(undefined)
-    const [videoLoaded, setVideoLoaded] = useState(false)
+    const [dataFetched, setDataFetched] = useState(false);
+    const [vertData, setVertData] = useState(undefined);
+    const [videoLoaded, setVideoLoaded] = useState(false);
+    const [clipLink, setClipLink] = useState(undefined);
+    const [previewLink, setPreviewLink] = useState(undefined);
 
-    const previewRef = useRef(undefined)
-    const videoPreviewRef = useRef(undefined)
+    const previewRef = useRef(undefined);
+    const videoPreviewRef = useRef(undefined);
 
     const dispatch = useDispatch()
 
@@ -27,7 +29,14 @@ function VerticalClip(props) {
                 setDataFetched(true)
             })
             .catch(err=>console.log(err))
-    },[])
+    },[]);
+
+    useEffect(() => {
+        getClipLink()
+            .then(response => setClipLink(response));
+        getPreviewLink()
+            .then(response => setPreviewLink(response));
+    }, []);
 
     const getVertData = async () =>{
         let response = await axiosUnauthorized.get(api + `api/short-video/${props.id}`)
@@ -59,11 +68,23 @@ function VerticalClip(props) {
         return result;
     }
 
+    async function getClipLink() {
+        let response = await axiosUnauthorized.get('api/short-video/' + props.id + '/file/link')
+        .catch(err => Promise.reject(err));
+
+        return response?.data?.presignedLink;
+    }
+
+    async function getPreviewLink() {
+        let response = await axiosUnauthorized.get('api/short-video/' + props.id + '/preview/link')
+        .catch(err => Promise.reject(err));
+
+        return response?.data?.presignedLink;
+    }
+
     const handleVertClick = () =>{
         dispatch(updateMusicIsPlayingValue(false));
-        dispatch(updateVertVideoPlayerValue(
-            api + `api/short-video/${props.id}/file`
-        ))
+        dispatch(updateVertVideoPlayerValue(clipLink));
         dispatch(updateVertVideoInfoValue(vertData));
     }
 
@@ -75,7 +96,7 @@ function VerticalClip(props) {
             {!dataFetched? <></> :
              <div className="vert-video" 
                 onClick={handleVertClick}
-                onMouseOver={() => handleVideoHover(videoPreviewRef, api + `api/short-video/${props.id}/file`)}
+                onMouseOver={() => handleVideoHover(videoPreviewRef, clipLink)}
                 onMouseEnter={() => handleVideoEnter(previewRef)}
                 onMouseMove={() => handleVideoMove(videoPreviewRef)}
                 onMouseLeave={() => handleVideoLeave(previewRef, videoPreviewRef)} >
@@ -83,7 +104,7 @@ function VerticalClip(props) {
                     ref={previewRef}
                     draggable='false'
                     className='vert-cover' 
-                    src={api + `api/short-video/${props.id}/preview`}
+                    src={previewLink}
                     onLoad={()=>{setVideoLoaded(true)}}
                     alt="" 
                     style={{ objectFit:'cover', pointerEvents:'none'}} />
