@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import message from '../../../Images/controller/Chat_Dots.png';
 import statsIcon from '../../../Images/account-page/stats-icon.svg';
 import { api, axiosAuthorized, axiosUnauthorized } from '../../../Components/App/App';
+import cover from '../../../Images/main-placeholder.png';
 
 const statusType = {
     0: 'Нет файлов',
@@ -28,6 +29,7 @@ export default function Song (props) {
     const [duration, setDuration] = useState(0);
     const [songId, setSongId] = useState(undefined); 
     const [auditionCount, setAuditionCount] = useState(0);
+    const [coverLink, setCoverLink] = useState(cover);
 
     const formatTime = (miliseconds) => {
         let seconds = miliseconds * 0.001
@@ -46,6 +48,7 @@ export default function Song (props) {
             setSongName(response.data.songName);
             setDuration(response.data?.durationMs);
             setSongId(response.data.publishedSongId);
+            getCoverLink();
             if (response.data.publishedSongId) {
                 axiosUnauthorized.get(`api/song/${response.data.publishedSongId}`)
                 .then(response => {
@@ -56,9 +59,16 @@ export default function Song (props) {
         setDuration(formatTime(0));
     }, []);
 
+    async function getCoverLink() {
+        await axiosUnauthorized.get(`api/song/upload-request/${props.id}/logo/link`).then(response => {
+            setCoverLink(response.data.presignedLink);
+        })
+        .catch(err => {setCoverLink(cover)});
+    }
+
     return (
         <div className='track'>
-            <img draggable='false'alt='cover' src={api + `api/song/upload-request/${props.id}/logo?width=100&height=100`}/>
+            <img draggable='false'alt='cover' src={coverLink}/>
             <p className='song-title-t'>{songName}<p className='songAuthor'>{props.artist}</p></p>
             <p className='track-statistic'><img alt='stats' src={statsIcon}/>{auditionCount}</p>
             <p className='song-status'>
