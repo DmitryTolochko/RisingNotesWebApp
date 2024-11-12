@@ -105,13 +105,6 @@ function UploadMusic(){
             })
             .then(response => id = response.data.id)
             .catch(err => {return Promise.reject(err)});
-
-            // await axiosAuthorized.post(`/api/song/upload-request/logo`, formData, {
-            //     headers: {
-            //         "Content-Type": "multipart/form-data",
-            //     }
-            // })
-            // .catch(err => {return Promise.reject(err)});
         }
         else if (role === 'authoredit') {
             // редактирование песни
@@ -198,7 +191,7 @@ function UploadMusic(){
         await getGenreList();
         await getLanguageList();
         await getVibeList();
-        setIsLoaded(true)
+        setIsLoaded(true);
     }
 
     const acceptSong = () => {
@@ -233,7 +226,7 @@ function UploadMusic(){
             .catch(err => console.log(err));
         }
         else if (role === 'authoredit') {
-            axiosAuthorized.delete(`api/song/` + params.id)
+            axiosAuthorized.delete(`api/song/upload-request/` + params.id)
             .then( response => {navigate(-1)})
             .catch(err => console.log(err));
         }
@@ -295,6 +288,8 @@ function UploadMusic(){
             setVibe(response?.data.vibeList);
             setLanguage(response?.data.languageList);
             setSongFileName(response?.data?.songName);
+            setCurrentImage(response?.data?.logoFileLink);
+            setSongfile(response?.data?.songFileLink);
             
             if (cookies?.role !== 'admin'){
                 setRole('authoredit');
@@ -303,9 +298,6 @@ function UploadMusic(){
             setComment(response?.data?.reviewerComment);
         })
         .catch(err => {console.log(err)});
-
-        setCurrentImage(api + `api/song/upload-request/${params.id}/logo`);
-        setSongfile(api + `api/song/upload-request/${params.id}/file`);
     }
 
     const { getRootProps: getInputFile } = useDropzone({
@@ -329,7 +321,7 @@ function UploadMusic(){
             audioRef.current.pause();
             setIsPlaying(false);
         }
-        else if (typeof songfile === "string" && songfile.includes('api/song/upload-request')) {
+        else if (typeof songfile === "string") {
             setIsPlaying(true);
             audioRef.current.src = songfile;
             audioRef.current.play();
@@ -475,7 +467,7 @@ function UploadMusic(){
 
                     <input type='file' accept=".jpg,.png" max='5000000' className='input-file' ref={imageSetterRef} onChange={changeLogo}></input>
                     <input type='file' accept=".mp3,.wav" className='input-file' ref={songSetterRef} onChange={changeSong}></input>
-                    <audio ref={audioRef} src={songFileName ? api + `api/song/${songFileName}/file` : ''}
+                    <audio ref={audioRef}
                         type="audio/mpeg" controls style={{ display: 'none' }}/>
                 </div>
             </div>

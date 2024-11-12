@@ -37,7 +37,7 @@ function AdminPanel() {
         let correctList = [];
         await axiosAuthorized.get('api/song/upload-request/list/for-review')
         .then(response => {
-            list = response.data.publishRequestShortInfoList;
+            list = response?.data?.publishRequestShortInfoList;
         });
 
         for (var el of list) {
