@@ -8,6 +8,7 @@ import SearchArtistCard from '../../SearchArtistCard/SearchArtistCard'
 import VerticalClip from '../../VerticalClip/VerticalClip'
 import { updateMusicIsPlayingValue } from '../../../Redux/slices/musicIsPlayingSlice'
 import { useDispatch } from 'react-redux'
+import { Link } from 'react-router-dom'
 
 function SearchContent(props){
     const dispatch = useDispatch();

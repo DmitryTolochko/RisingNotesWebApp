@@ -5,11 +5,12 @@ import trashIcon from '../../Images/trash.svg'
 import { api } from '../App/App';
 import axios from 'axios';
 import { useEffect, useState, useRef } from 'react';
-import { NavLink } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import useSearchClean from '../../Hooks/useSearchClean/useSearchClean';
 import { handleVideoEnter, handleVideoHover, handleVideoLeave, handleVideoMove } from './handlers/ClipHandlers';
 import Skeleton from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
+import { useNavigate } from 'react-router-dom';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { updateCurrentSongValue } from '../../Redux/slices/currentSongSlice';
@@ -41,6 +42,7 @@ function Clip({key, clipId, authorId, songId, name, deleteFunc=undefined, isArti
     const videoPreviewRef = useRef(undefined)
     const previewRef = useRef(undefined)
     const {cleanQuery} = useSearchClean()
+    const navigate = useNavigate()
 
     let status = 0, views=0;
     
@@ -73,7 +75,10 @@ function Clip({key, clipId, authorId, songId, name, deleteFunc=undefined, isArti
             .catch(err=>console.log(err))
     },[])
 
-
+    // onClick={() =>
+    //     dispatch(
+    //         updateVideoPlayerValue(api + `api/music-clip/${clipId}/file`)
+    //     )} 
 
     return ( 
         <div key={key} className="clip-wrapper">
@@ -82,10 +87,7 @@ function Clip({key, clipId, authorId, songId, name, deleteFunc=undefined, isArti
                 <Skeleton baseColor='#0F141D' highlightColor="#2C323D" count={2} />
             </>}
             <div className="cover-wrapper" style={videoLoaded?{display:'block'}:{display:'none'}}>
-                <div className="clip-video" onClick={() =>
-                    dispatch(
-                        updateVideoPlayerValue(api + `api/music-clip/${clipId}/file`)
-                    )} 
+                <div className="clip-video" onClick={() => navigate(`/clipview/${clipId}`)}
                         onMouseOver={() => handleVideoHover(videoPreviewRef, api + `api/music-clip/${clipId}/file` )}
                         onMouseEnter={() => handleVideoEnter(previewRef)}
                         onMouseMove={() => handleVideoMove(videoPreviewRef)}

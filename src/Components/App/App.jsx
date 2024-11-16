@@ -19,6 +19,7 @@ import SearchResults from '../SearchResults/SearchResults';
 import UploadMusic from '../../Pages/UploadMusic/UploadMusic.jsx';
 import UploadVideo from '../../Pages/UploadVideo/UploadVideo.jsx';
 import InstallVerticalVideo from '../../Pages/UploadVerticalVideo/UploadVertVideo.jsx';
+import ClipView from '../ClipView/ClipView.jsx';
 import ErrorPage from '../../Pages/404Page/404Page';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
@@ -33,6 +34,8 @@ import VertVideoPlayer from '../BlogVideoPlayer/BlogVideoPlayer.jsx';
 import { useSelector, useDispatch } from 'react-redux';
 import { updateResizeValue } from '../../Redux/slices/resizeSlice.js';
 import Messenger from '../../Pages/Messenger/Messenger.jsx';
+
+import { useLocation } from 'react-router-dom';
 
 export const api = 'http://81.31.247.227/';
 
@@ -67,6 +70,16 @@ export const axiosPictures = axios.create({
 // ссылка на переменную
 
 function App() {
+
+    const location = useLocation()
+    useEffect(()=>{
+        const params = new URLSearchParams(location)
+        
+    },[location])
+
+
+
+
     //Redux Dispatcher
     const dispatch = useDispatch()
 
@@ -285,6 +298,7 @@ function App() {
                 <Route path={'/commentaries/:id'} element={<Commentaries/>}/>
                 <Route path={'/playlist/:id'} element={<PlaylistWindow/>}/>
                 <Route path={'/uploadmusic/:id'} element={<UploadMusic/>}/>
+                <Route path={'/clipview/:id'} element={<ClipView/>}/>
                 <Route path={'*'} element={<ErrorPage/>}/>
                 {cookies.role === 'admin' ? (<>
                     <Route path={'/'} element={<AdminPanel/>}/>

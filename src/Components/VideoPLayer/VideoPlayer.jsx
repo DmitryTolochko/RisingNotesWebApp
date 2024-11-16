@@ -7,7 +7,6 @@ import { updateVideoPlayerValue } from '../../Redux/slices/videoPlayerSlice';
 import { updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlice';
 
 
-
 function VideoPlayer() {
     const videoRef = useRef();
     const video = useSelector((state)=>state.videoPlayer.value);
@@ -74,10 +73,11 @@ function VideoPlayer() {
             {video ?
                 <div className='video-player-wrapper'>
                     <img className="rising-notes-forplayer" src={risingnotes}></img>
-                    <button className='player-exit-button' onClick={() => 
-                        dispatch(
-                            updateVideoPlayerValue(false)
-                            )}>
+                    <button className='player-exit-button' onClick={() => {
+                          dispatch(
+                              updateVideoPlayerValue(false)
+                              )}
+                    }>
                     <img src={closeButton} /></button>
                     <video className='video-player' ref={videoRef} type="video/mp4" preload="auto" controls/>
                 </div>
