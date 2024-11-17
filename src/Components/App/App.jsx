@@ -6,7 +6,7 @@ import Sidebar from "../Sidebar/Sidebar";
 import Player from "../Player/Player";
 
 import ArtistCard from '../../Pages/ArtistCard/ArtistCard.jsx'
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import { Routes, Route, useNavigate, useSearchParams} from 'react-router-dom';
 import React, { createContext } from "react";
 import Featured from '../../Pages/Featured/Featured';
 import Excluded from '../../Pages/Excluded/Excluded';
@@ -36,6 +36,7 @@ import { updateResizeValue } from '../../Redux/slices/resizeSlice.js';
 import Messenger from '../../Pages/Messenger/Messenger.jsx';
 
 import { useLocation } from 'react-router-dom';
+import { updateVideoPlayerValue } from '../../Redux/slices/videoPlayerSlice.js';
 
 export const api = 'http://81.31.247.227/';
 
@@ -70,11 +71,14 @@ export const axiosPictures = axios.create({
 // ссылка на переменную
 
 function App() {
-
     const location = useLocation()
+    const [searchParams, setSearchParams] = useSearchParams();
+
     useEffect(()=>{
-        const params = new URLSearchParams(location)
-        
+        const clipId = searchParams.get('clip_view')
+        if(clipId){
+            dispatch(updateVideoPlayerValue(api + `api/music-clip/${clipId}/file`))
+        }
     },[location])
 
 

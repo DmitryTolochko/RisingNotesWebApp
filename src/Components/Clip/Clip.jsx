@@ -11,6 +11,7 @@ import { handleVideoEnter, handleVideoHover, handleVideoLeave, handleVideoMove }
 import Skeleton from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
 import { useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { updateCurrentSongValue } from '../../Redux/slices/currentSongSlice';
@@ -39,6 +40,7 @@ function Clip({key, clipId, authorId, songId, name, deleteFunc=undefined, isArti
     const [videoLoaded, setVideoLoaded] = useState(false)
     const [authorName, setAuthorName] = useState('')
     const [deletePopupVisible, setDeletePopupVisible] = useState(false)
+    const [searchParams, setSearchParams] = useSearchParams();
     const videoPreviewRef = useRef(undefined)
     const previewRef = useRef(undefined)
     const {cleanQuery} = useSearchClean()
@@ -75,10 +77,8 @@ function Clip({key, clipId, authorId, songId, name, deleteFunc=undefined, isArti
             .catch(err=>console.log(err))
     },[])
 
-    // onClick={() =>
-    //     dispatch(
-    //         updateVideoPlayerValue(api + `api/music-clip/${clipId}/file`)
-    //     )} 
+
+    // () =>dispatch(updateVideoPlayerValue(api + `api/music-clip/${clipId}/file`))
 
     return ( 
         <div key={key} className="clip-wrapper">
@@ -87,7 +87,7 @@ function Clip({key, clipId, authorId, songId, name, deleteFunc=undefined, isArti
                 <Skeleton baseColor='#0F141D' highlightColor="#2C323D" count={2} />
             </>}
             <div className="cover-wrapper" style={videoLoaded?{display:'block'}:{display:'none'}}>
-                <div className="clip-video" onClick={() => navigate(`/clipview/${clipId}`)}
+                <div className="clip-video" onClick={()=>setSearchParams({'clip_view':clipId})} 
                         onMouseOver={() => handleVideoHover(videoPreviewRef, api + `api/music-clip/${clipId}/file` )}
                         onMouseEnter={() => handleVideoEnter(previewRef)}
                         onMouseMove={() => handleVideoMove(videoPreviewRef)}
