@@ -33,8 +33,9 @@ export default function Clips({artistId, count=0, offset=0}) {
                         key={index} 
                         clipId={clip.id} 
                         authorId={clip.uploaderId} 
-                        songId={clip.songId} 
-                        name={clip.title} />
+                        songId={clip.songId}
+                        name={clip.title} 
+                    />
                 ))}
         </div>
     )

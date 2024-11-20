@@ -6,8 +6,8 @@ import Sidebar from "../Sidebar/Sidebar";
 import Player from "../Player/Player";
 
 import ArtistCard from '../../Pages/ArtistCard/ArtistCard.jsx'
-import { Routes, Route, useNavigate } from 'react-router-dom';
-import React, { createContext } from "react";
+import { Routes, Route, useNavigate, useSearchParams} from 'react-router-dom';
+import React from "react";
 import Featured from '../../Pages/Featured/Featured';
 import Excluded from '../../Pages/Excluded/Excluded';
 import Subscriptions from '../../Pages/Subsriptions/Subscriptions';
@@ -19,6 +19,7 @@ import SearchResults from '../SearchResults/SearchResults';
 import UploadMusic from '../../Pages/UploadMusic/UploadMusic.jsx';
 import UploadVideo from '../../Pages/UploadVideo/UploadVideo.jsx';
 import InstallVerticalVideo from '../../Pages/UploadVerticalVideo/UploadVertVideo.jsx';
+import ClipView from '../ClipView/ClipView.jsx';
 import ErrorPage from '../../Pages/404Page/404Page';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
@@ -33,6 +34,9 @@ import VertVideoPlayer from '../BlogVideoPlayer/BlogVideoPlayer.jsx';
 import { useSelector, useDispatch } from 'react-redux';
 import { updateResizeValue } from '../../Redux/slices/resizeSlice.js';
 import Messenger from '../../Pages/Messenger/Messenger.jsx';
+
+import { useLocation } from 'react-router-dom';
+import { updateVideoPlayerValue } from '../../Redux/slices/videoPlayerSlice.js';
 
 export const api = 'http://81.31.247.227/';
 
@@ -67,6 +71,21 @@ export const axiosPictures = axios.create({
 // ссылка на переменную
 
 function App() {
+    const location = useLocation()
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    useEffect(()=>{
+        const clipId = searchParams.get('clip_view')
+        const shortId = searchParams.get('short_view')
+
+        if(clipId){
+            dispatch(updateVideoPlayerValue(api + `api/music-clip/${clipId}/file`))
+        }
+        if(shortId){
+            dispatch(updateVideoPlayerValue(api + `api/music-clip/${clipId}/file`))
+        }
+    },[location])
+
     //Redux Dispatcher
     const dispatch = useDispatch()
 
@@ -285,6 +304,7 @@ function App() {
                 <Route path={'/commentaries/:id'} element={<Commentaries/>}/>
                 <Route path={'/playlist/:id'} element={<PlaylistWindow/>}/>
                 <Route path={'/uploadmusic/:id'} element={<UploadMusic/>}/>
+                <Route path={'/clipview/:id'} element={<ClipView/>}/>
                 <Route path={'*'} element={<ErrorPage/>}/>
                 {cookies.role === 'admin' ? (<>
                     <Route path={'/'} element={<AdminPanel/>}/>

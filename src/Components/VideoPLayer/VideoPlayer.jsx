@@ -5,13 +5,14 @@ import risingnotes from '../../Images/playerforvideo/risingnotes.svg'
 import { useSelector, useDispatch } from 'react-redux';
 import { updateVideoPlayerValue } from '../../Redux/slices/videoPlayerSlice';
 import { updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlice';
-
+import { useSearchParams } from 'react-router-dom';
 
 
 function VideoPlayer() {
     const videoRef = useRef();
     const video = useSelector((state)=>state.videoPlayer.value);
     const dispatch = useDispatch();
+    const [searchParams, setSearchParams] = useSearchParams();
 
     useEffect(() => {
         handlePlayVideo();
@@ -25,14 +26,14 @@ function VideoPlayer() {
         else if (typeof video === "string" && video.includes('api/music-clip')) {
             // playFunc(video);
             videoRef.current.src = video;
-            videoRef.current.play();
+            // videoRef.current.play();
             dispatch(updateMusicIsPlayingValue(false));
         }
         else {
             // const url = URL.createObjectURL(video);
             // playFunc(url);
             videoRef.current.src = video;
-            videoRef.current.play();
+            // videoRef.current.play();
             dispatch(updateMusicIsPlayingValue(false));
         }
     }
@@ -74,12 +75,14 @@ function VideoPlayer() {
             {video ?
                 <div className='video-player-wrapper'>
                     <img className="rising-notes-forplayer" src={risingnotes}></img>
-                    <button className='player-exit-button' onClick={() => 
+                    <button className='player-exit-button' onClick={() => {
+                        setSearchParams({})
                         dispatch(
                             updateVideoPlayerValue(false)
-                            )}>
+                            )}
+                    }>
                     <img src={closeButton} /></button>
-                    <video className='video-player' ref={videoRef} type="video/mp4" preload="auto" controls/>
+                    <video className='video-player' ref={videoRef} type="video/mp4" preload="auto" autoPlay={false} controls/>
                 </div>
                 : <></>
             }

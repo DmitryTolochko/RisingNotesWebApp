@@ -8,6 +8,11 @@ import Subscription from '../../Components/Subscription';
 import { api, axiosAuthorized, axiosUnauthorized} from '../../Components/App/App';
 import { useCookies } from 'react-cookie';
 
+import heartIcon from '../../Images/featured/Heart_01.svg'
+import copyIcon from '../../Images/featured/Copy.svg'
+import tracksIcon from '../../Images/featured/Vector.svg'
+import subsIcon from '../../Images/featured/Subs.svg'
+
 import { useSelector, useDispatch } from 'react-redux'
 import { updatePlaylistsValue } from '../../Redux/slices/playlistsSlice';
 
@@ -15,6 +20,7 @@ import './Featured.css';
 import Loader from '../../Components/Loader/Loader';
 import { updateSongsValue } from '../../Redux/slices/songsSlice';
 import { updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlice';
+import arrowRight from '../../Images/artist-card/Chevron_Right.svg'
 
 export default function Featured() {
     const navigate = useNavigate();
@@ -72,12 +78,30 @@ export default function Featured() {
     }
 
     const tabs = [
-        {id:'main', label: 'Главная'},
-        {id:'playlists', label: 'Плейлисты'},
-        {id:'tracks', label: 'Треки'},
-        {id:'subscriptions', label: 'Подписки'}
+        {id:'main', label: 'Главная', image: heartIcon},
+        {id:'playlists', label: 'Плейлисты', image: copyIcon},
+        {id:'tracks', label: 'Треки', image: tracksIcon},
+        {id:'subscriptions', label: 'Подписки', image: subsIcon}
     ]
+
+
     const [activeTab, setActiveTab] = useState('main')
+
+
+    const ShowMoreBtn = ({collection, redirect, maxValue}) => {
+        console.log(collection?.length,maxValue, collection?.length > maxValue)
+        return(
+            <button className='featured-show-more' onClick={() => setActiveTab(redirect)}>
+                {collection?.length > maxValue && activeTab=='main' ?
+                        <>
+                            <span>Смотреть все</span>
+                            <img src={arrowRight} alt="" />
+                        </>
+                        : <></>
+                }
+            </button>
+        )
+    }
 
     const TabSelector = () =>{
         return(
@@ -90,6 +114,7 @@ export default function Featured() {
                         className={tab.id == activeTab? "featured-nav__tab-button active" :"featured-nav__tab-button" }
                         onClick={() => setActiveTab(tab.id)}
                     >
+                        <img src={tab.image} alt="" />
                         {tab.label}
                     </button>
                 ))}
@@ -97,13 +122,18 @@ export default function Featured() {
         </>
         )
     }
+
     const Playlists = () =>{
+        const playlistsToShow = playlists?.length>5 && activeTab=='main' ? playlists.slice(0,5) : playlists
         return(
             <section className='featured-section'>
-                <h2 className='featured-section__title'>Плейлисты</h2>
+                <div className="featured-section__title_wrapper">
+                    <h2 className='featured-section__title'>Плейлисты</h2>
+                    <ShowMoreBtn collection={playlists} redirect={'playlists'} maxValue={5}/>
+                </div>
                 <div className="playlists">
-                    {playlists?.map(el => (
-                        <Playlist key={el} id={el}/>
+                    {playlistsToShow?.map(el => (
+                        <Playlist id={el}/>
                     ))}
                     <div draggable='false' className='playlist'>
                         <img draggable='false' className='new-playlist' alt='add new playlist' src={newPlaylist} onClick={addNewPlaylist}/>
@@ -112,20 +142,26 @@ export default function Featured() {
             </section>
         )
     }
+
+
     const Tracks = () =>{
+        const songsToShow = songs?.length>5 && activeTab=='main' ? songs.slice(0,5) : songs
         return(
             <section className='featured-section'>
-                <h2 className='featured-section__title'>Треки</h2>
+                <div className="featured-section__title_wrapper">
+                    <h2 className='featured-section__title'>Треки</h2>
+                    <ShowMoreBtn collection={songs} redirect={'tracks'} maxValue={5}/>
+                </div>
                 <div className='tracks'>
-                    {songs.map(el => (
+                    {songsToShow.map(el => (
                         <Song 
-                        key={el.id} 
-                        id={el.id} 
-                        name={el.name} 
-                        duration={el.durationMs} 
-                        artist={el.authorName} 
-                        genres={el.genreList}
-                        onClick={updatePlayableList}/>
+                            id={el.id} 
+                            name={el.name} 
+                            duration={el.durationMs} 
+                            artist={el.authorName} 
+                            genres={el.genreList}
+                            onClick={updatePlayableList}
+                        />
                     ))}
                     {songs.length === 0 ? <p style={{color: '#FE1170'}}>Список пуст</p> : <></>}
                 </div>
@@ -133,11 +169,15 @@ export default function Featured() {
         )
     }
     const Subscriptions = () =>{
+        const subscriptionsToShow = subscriptions?.length>5 && activeTab=='main' ? subscriptions.slice(0,5) : subscriptions
         return(
             <section className='featured-section'>
-                <h2 className='featured-section__title'>Подписки</h2>
+                <div className="featured-section__title_wrapper">
+                    <h2 className='featured-section__title'>Подписки</h2>
+                    <ShowMoreBtn collection={subscriptions} redirect={'subscriptions'} maxValue={5}/>
+                </div>
                 <div>
-                    {subscriptions.map((id) =>
+                    {subscriptionsToShow.map((id) =>
                         <Subscription authorId={id}/>
                     )}
                 </div>

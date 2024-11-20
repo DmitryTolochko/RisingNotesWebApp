@@ -9,6 +9,7 @@ import { updateVertVideoInfoValue } from '../../Redux/slices/vertVideoInfoSlice'
 import { updateVertVideoPlayerValue } from '../../Redux/slices/vertVideoPlayerSlice'
 import { updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlice'
 import defaultAvatar from '../../Images/image-placeholder/user_logo_small_placeholder.png';
+import { useSearchParams } from 'react-router-dom'
 
 function VerticalClip(props) {
     const [dataFetched, setDataFetched] = useState(false);
@@ -16,7 +17,7 @@ function VerticalClip(props) {
     const [videoLoaded, setVideoLoaded] = useState(false);
     const [clipLink, setClipLink] = useState(undefined);
     const [previewLink, setPreviewLink] = useState(undefined);
-
+    const [searchParams, setSearchParams] = useSearchParams()
     const previewRef = useRef(undefined);
     const videoPreviewRef = useRef(undefined);
 
@@ -84,7 +85,10 @@ function VerticalClip(props) {
 
     const handleVertClick = () =>{
         dispatch(updateMusicIsPlayingValue(false));
-        dispatch(updateVertVideoPlayerValue(clipLink));
+        setSearchParams({'short_view':clipLink})
+        // dispatch(updateVertVideoPlayerValue(
+        //     api + `api/short-video/${props.id}/file`
+        // ))
         dispatch(updateVertVideoInfoValue(vertData));
     }
 

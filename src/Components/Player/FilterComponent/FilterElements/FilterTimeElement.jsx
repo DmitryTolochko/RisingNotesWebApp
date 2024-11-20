@@ -5,11 +5,6 @@ function FilterTimeElement({id, name, updater}){
     const[duration, setDuration] = useState('any')
     const filters = useSelector((state)=>state.filters.value)
 
-    useState(()=>{
-        console.log(filters.duration)
-        // setDuration(props.filters.duration)
-    },[filters])
-
     useEffect(()=>{
         passToParent(id, duration)
     },[duration])

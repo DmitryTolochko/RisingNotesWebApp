@@ -213,6 +213,11 @@
     animation: fade-in ease-in 250ms forwards;
 }
 
+.lyrics-container,
+.filters-container{
+    padding-top: 70px;
+}
+
 @keyframes fade-in {
     0%{
         left: 0%;
@@ -231,4 +236,34 @@
     border-radius:5px;
     margin: 0 auto;
     width: max-content;
+}
+
+
+@media screen and (max-width:720px) {
+    .filters-container{
+        padding-top: 0;
+        position: fixed;
+        transform:none;
+        right: 0px;
+        top:60px;
+        
+    }
+
+    .filters{
+        height: calc(100vh - 160px);
+        justify-content: space-between;
+        padding: 10vh 40px;
+    }
+}
+
+@media screen and (max-width:520px) {
+    .filters-container{
+        width: 100%;
+    }
+
+    .filters{
+        background-color: #1a202b;
+        width: 100%;
+        gap:0;
+    }
 }

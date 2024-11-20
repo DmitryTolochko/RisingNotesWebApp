@@ -1,20 +1,22 @@
 import './Clip.css';
 import viewsIcon from '../../Images/account-page/stats-icon.svg';
 import editIcon from '../../Images/account-page/edit-icon.svg';
-import { api, axiosUnauthorized } from '../App/App';
+import trashIcon from '../../Images/trash.svg'
+import { api } from '../App/App';
 import axios from 'axios';
 import { useEffect, useState, useRef } from 'react';
-import { NavLink } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import useSearchClean from '../../Hooks/useSearchClean/useSearchClean';
 import { handleVideoEnter, handleVideoHover, handleVideoLeave, handleVideoMove } from './handlers/ClipHandlers';
 import Skeleton from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
+import { useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { updateCurrentSongValue } from '../../Redux/slices/currentSongSlice';
 import { updateSongsValue } from '../../Redux/slices/songsSlice';
 import { updateVideoPlayerValue } from '../../Redux/slices/videoPlayerSlice';
-
 
 const statusType = {
     0: 'Неизвестно',
@@ -34,12 +36,17 @@ const statusColor = {
     5: 'red'
 }
 
-function Clip({key, clipId, authorId, songId, name, status, views, isArtist=false}) {
+function Clip({key, clipId, authorId, songId, name, deleteFunc=undefined, isArtist=false}) {
     const [videoLoaded, setVideoLoaded] = useState(false)
     const [authorName, setAuthorName] = useState('')
+    const [deletePopupVisible, setDeletePopupVisible] = useState(false)
+    const [searchParams, setSearchParams] = useSearchParams();
     const videoPreviewRef = useRef(undefined)
     const previewRef = useRef(undefined)
     const {cleanQuery} = useSearchClean()
+    const navigate = useNavigate()
+
+    let status = 0, views=0;
     
     const songs = useSelector((state)=>state.songs.value)
     const [clipLink, setClipLink] = useState(undefined);
@@ -94,6 +101,8 @@ function Clip({key, clipId, authorId, songId, name, status, views, isArtist=fals
     },[])
 
 
+    // () =>dispatch(updateVideoPlayerValue(api + `api/music-clip/${clipId}/file`))
+
     return ( 
         <div key={key} className="clip-wrapper">
             {videoLoaded ? <></>:  <>  
@@ -101,10 +110,8 @@ function Clip({key, clipId, authorId, songId, name, status, views, isArtist=fals
                 <Skeleton baseColor='#0F141D' highlightColor="#2C323D" count={2} />
             </>}
             <div className="cover-wrapper" style={videoLoaded?{display:'block'}:{display:'none'}}>
-                <div className="clip-video" onClick={() =>
-                    dispatch(
-                        updateVideoPlayerValue(clipLink)
-                    )} 
+
+                <div className="clip-video" onClick={()=>setSearchParams({'clip_view':clipId})} 
                         onMouseOver={() => handleVideoHover(videoPreviewRef, clipLink)}
                         onMouseEnter={() => handleVideoEnter(previewRef)}
                         onMouseMove={() => handleVideoMove(videoPreviewRef)}
@@ -145,7 +152,25 @@ function Clip({key, clipId, authorId, songId, name, status, views, isArtist=fals
                         <div className={'song-status-dot ' + statusColor[status]}></div>
                         {statusType[status]}
                     </p>
-                    <a href={`/uploadvideo`}><img alt='list' src={editIcon} /></a>
+                    <button title='Удалить клип' onClick={()=>setDeletePopupVisible(true)}>
+                        <img alt='list' src={trashIcon} />
+                    </button>
+
+                    {deletePopupVisible && 
+                        <div className="delete-popup">
+                            <p>Вы действительно хотите удалить этот клип?</p>
+                            <div className="popup-actions">
+                                <button onClick={() => {if(deleteFunc) deleteFunc(clipId)}}>
+                                    <img src={trashIcon} alt=""/>
+                                    <span>Да</span>
+                                </button>
+                                <button className='primary' onClick={()=>setDeletePopupVisible(false)}>
+                                    <span>Нет</span>
+                                </button>
+                            </div>
+                        </div>
+                    }
+
                 </div>
             ) : (<></>)}
         </div>
