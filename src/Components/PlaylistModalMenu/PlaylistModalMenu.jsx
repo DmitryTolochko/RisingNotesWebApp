@@ -20,9 +20,10 @@ function PlaylistModalMenu({songAuthor, songName, id}) {
            let arr = await Promise.all(playlists.map(async (el) => {
                 const response = await axiosAuthorized.get(`api/playlist/${el}`)
                 .catch(err => console.log(err));
-                let img = true;
-                await axiosPictures.get(api + `api/playlist/${el}/logo?width=10&height=10`)
-                .catch(err => {img = false});
+                let img = thumb;
+                await axiosPictures.get(api + `api/playlist/${el}/logo/link`)
+                .then(response => img = response?.data?.presignedLink)
+                .catch(err => img = thumb);
 
                 let isSongInPlaylist = false;
 
@@ -94,7 +95,7 @@ function PlaylistModalMenu({songAuthor, songName, id}) {
                                     el.isSongInPlaylist ? () => excludeFromPlaylist(el.id) : () => addToPlaylist(el.id)}>
                                     {el.isSongInPlaylist ? <img className='song-modal__playlist-thumb-selected' src={check} alt=""/> : <></>}
                                     <img className='song-modal__playlist-thumb'draggable='false' 
-                                        src={el.img ? api + `api/playlist/${el.id}/logo?width=10&height=10` : thumb}/>
+                                        src={el.img}/>
                                     <span className='song-modal__playlist-name'>{el.name}</span>
                                 </li>
                             )

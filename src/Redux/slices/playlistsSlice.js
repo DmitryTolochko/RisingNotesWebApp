@@ -1,7 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit'
 
-const saved = localStorage.getItem('PLAYLISTS')
-const valid = saved ? JSON.parse(saved) : []
+let saved = localStorage.getItem('PLAYLISTS')
+let valid = []
+if (saved !== "undefined") {
+    valid = JSON.parse(saved) 
+}
 const initialState = {
     value:valid
 }

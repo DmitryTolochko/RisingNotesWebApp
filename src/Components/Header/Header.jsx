@@ -16,7 +16,7 @@ import './Header.css';
 function Header() {
     const [logo, setLogo] = useState(logotype);
     const [isMenuOpened, setIsMenuOpened] = useState(false);
-    const [isImageExist, setIsImageExist] = useState(false);
+    const [avatar, setAvatar] = useState(defaultAvatar);
     const [cookies, setCookies] = useCookies(['accessToken', 'refreshToken', 'authorId', 'role', 'subscriptions', 'userId']);
     const [isUserAuthorized, setIsUserAuthorized] = useState(false);
     
@@ -28,12 +28,12 @@ function Header() {
         // проверка картинки
         if (cookies.userId) {
             setIsUserAuthorized(true);
-            axiosPictures.get(api + `api/user/${cookies.userId}/logo?width=400&height=400`)
-            .then(() => {
-                setIsImageExist(true);
+            axiosPictures.get(api + `api/user/${cookies.userId}/logo/link`)
+            .then((response) => {
+                setAvatar(response?.data?.presignedLink);
             })
             .catch(err => {
-                setIsImageExist(false);
+                setAvatar(defaultAvatar);
             });
         }
     }, []);
@@ -58,8 +58,7 @@ function Header() {
                             </span>
                         ) : (
                         <></>)}
-                        <img draggable='false' className="pfp_image" src={isImageExist ? 
-                            api + `api/user/${cookies.userId}/logo?width=400&height=400` : defaultAvatar} alt="avatar"  
+                        <img draggable='false' className="pfp_image" src={avatar} alt="avatar"  
                             onClick={() => setIsMenuOpened(!isMenuOpened)}/>
                     </div>
                     {isMenuOpened ? <FallDownMenu callback={setIsMenuOpened}/> : <></>}

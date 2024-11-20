@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import heart from '../../Images/controller/heart.svg';
 import redHeart from '../../Images/red-heart.svg';
@@ -6,9 +6,8 @@ import message from '../../Images/controller/Chat_Dots.png';
 import dislike from '../../Images/controller/thumbs-down.svg';
 import redDislike from '../../Images/controller/dislike-red.svg';
 import list from '../../Images/list.svg';
+import placeholder from '../../Images/main-placeholder.png';
 import { api, axiosAuthorized, axiosPictures, axiosUnauthorized } from '../App/App';
-import thumb from '../../Images/main-placeholder.png';
-import check from '../../Images/check_big.svg';
 import useSearchClean from '../../Hooks/useSearchClean/useSearchClean';
 
 import { useSelector, useDispatch } from 'react-redux';
@@ -17,31 +16,29 @@ import { updateFeaturedValue } from '../../Redux/slices/featuredSlice';
 import { updateCurrentSongValue } from '../../Redux/slices/currentSongSlice';
 import { updateSongsValue } from '../../Redux/slices/songsSlice';
 import './Song.css';
-import { updatePlaylistsValue } from '../../Redux/slices/playlistsSlice';
 import { updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlice';
 import PlaylistModalMenu from '../PlaylistModalMenu/PlaylistModalMenu';
 
 function Song({id, onClick=undefined, duration, artist, genres, name}) {
     const [modalIsHidden, setModalIsHidden] = useState(true);
     const [formatedDuration, setDuration] = useState(0);
-    const {cleanQuery} = useSearchClean()
+    const [avatar, setAvatar] = useState(placeholder);
+    const {cleanQuery} = useSearchClean();
 
-    const dispatch = useDispatch()
-    const excluded = useSelector((state)=>state.excluded.value)
-    const resize = useSelector((state)=> state.resize.value)
-    const featured = useSelector((state)=>state.featured.value)
-    const songs = useSelector((state)=>state.songs.value)
-    const [playlistsInfo, setPlaylistsInfo] = useState([]);
-    const playlists = useSelector((state)=>state.playlists.value);
+    const dispatch = useDispatch();
+    const excluded = useSelector((state)=>state.excluded.value);
+    const resize = useSelector((state)=> state.resize.value);
+    const featured = useSelector((state)=>state.featured.value);
+    const songs = useSelector((state)=>state.songs.value);
 
     function addSongsToPlayableList() {
         onClick(id);
-    }
+    };
 
     async function changeModalState () {
         // показать/скрыть окно с плейлистами
         setModalIsHidden(modalIsHidden => modalIsHidden = !modalIsHidden);
-    }
+    };
 
     const formatTime = (miliseconds) => {
         // форматировать длительность песни
@@ -57,7 +54,8 @@ function Song({id, onClick=undefined, duration, artist, genres, name}) {
 
     useEffect(() => {
         // установить длительность песни в правильном формате
-        setDuration(formatTime(duration))
+        setDuration(formatTime(duration));
+        getAvatar();
     }, []);
 
     async function handleToFavorite() {
@@ -99,10 +97,16 @@ function Song({id, onClick=undefined, duration, artist, genres, name}) {
         dispatch(updateMusicIsPlayingValue(true));
     };
 
+    async function getAvatar() {
+        await axiosPictures.get(api + `api/song/${id}/logo/link`)
+        .then(resp => {setAvatar(resp?.data?.presignedLink)})
+        .catch(err => {setAvatar(placeholder)});
+    };
+
     return (
         <>
             <div className='track'>
-                <img onClick={handleAddToSongs} alt='cover' src={api + `api/song/${id}/logo?width=100&height=100`} draggable='false'/>
+                <img onClick={handleAddToSongs} alt='cover' src={avatar} draggable='false'/>
                 <p onClick={handleAddToSongs} className='song-title-t'>{name}
                     <p className='songAuthor'>{artist}</p>
                 </p>

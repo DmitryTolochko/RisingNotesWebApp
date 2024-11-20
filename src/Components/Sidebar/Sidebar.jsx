@@ -41,7 +41,8 @@ function Sidebar(props) {
    },[searchQuery]);
 
    useEffect(() => {
-      getPlaylistsInfo();
+      if (playlists !== undefined)
+         getPlaylistsInfo();
    }, [playlists])
 
    useEffect(() => {

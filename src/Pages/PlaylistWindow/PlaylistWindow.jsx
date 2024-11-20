@@ -22,27 +22,27 @@ function PlaylistWindow(){
     let params = useParams();
     const [isEditing, setIsEditing] = useState(false);
     const navigate = useNavigate();
-    const [logofile, setLogofile] = useState(undefined);
+    const [logofile, setLogofile] = useState(SongCover);
     const [isPrivate, setIsPrivate] = useState(false);
 
     const playlists = useSelector((state)=>state.playlists.value)
     const dispatch = useDispatch();
     
 
-    function reviewAvatar() {
+    async function reviewAvatar() {
         // проверка на наличие картинки
-        axiosPictures.get(api + `api/playlist/${params.id}/logo?width=400&height=400`)
-        .then (
-            setReviewSkin(true)
-        )
-        .catch (
-            error => {setReviewSkin(false)}
-        )
+        await axiosPictures.get(api + `api/playlist/${params.id}/logo/link`)
+        .then ( resp => {
+            setLogofile(resp?.data?.presignedLink);
+        })
+        .catch (error => {
+            setLogofile(SongCover);
+        })
     }
 
     useEffect(() => {
         getPlaylistInfo();
-    }, [params]);
+    }, [params.id]);
 
     async function getPlaylistInfo() {
         // подгрузка информации о плейлисте
@@ -51,10 +51,11 @@ function PlaylistWindow(){
             response => {
                 setNamePlaylist(response.data.name);
                 setIsPrivate(response.data.isPrivate);
-                reviewAvatar();
             }
         )
         .catch(err => {navigate(-1)});
+
+        await reviewAvatar();
 
         await axiosAuthorized.get(`api/playlist/` + params.id +`/song/list`)
         .then(
@@ -68,7 +69,7 @@ function PlaylistWindow(){
         try {
             await axiosAuthorized.delete(`api/playlist/${params.id}`);
                 dispatch(
-                    updatePlaylistsValue(prevPlaylists => prevPlaylists.filter(id => id !== params.id))
+                    updatePlaylistsValue(playlists.filter(id => id !== params.id))
                 )
             navigate(`/featured`)
         } 
@@ -83,9 +84,6 @@ function PlaylistWindow(){
 
     async function uploadLogo(event) {
         // обновление картинки
-        dispatch(
-            updatePlaylistsValue(arr => arr.filter(el => el != params.id))
-        )
         const reader = new FileReader();
         reader.onload = (event) => {
             setLogofile(event.target.result);
@@ -101,16 +99,13 @@ function PlaylistWindow(){
         .then ( () => {
             setReviewSkin(true)
         });
-        dispatch(
-            updatePlaylistsValue([...playlists, params.id])
-        )
     };
    
     const toggleEditMode = () => {
         // переход в режим редактирования и удаление текущего плейлиста из списка
         setIsEditing(!isEditing);
         dispatch(
-            updatePlaylistsValue(arr => arr.filter(el => el != params.id))
+            updatePlaylistsValue(playlists.filter(el => el != params.id))
         )
     };
 
@@ -163,30 +158,32 @@ function PlaylistWindow(){
                     <div className='playlist-image-wrapper' onClick={handleImageInput}>
                         <div className='playlist-image-change'><img draggable='false' src={bigEdit}/></div>
                         <img draggable='false' className='playlist-image' alt='playlist cover' 
-                            src={isreviewSkin ? (logofile ?? api + `api/playlist/${params.id}/logo?width=400&height=400`) : SongCover}/>
+                            src={logofile}/>
                     </div>
                     <div className='nameplaylist-and-buttons'>
                         {isEditing ? (
                             <input
-                            className='input-name-playlist'
-                            type="text"
-                            value={namePlaylist}
-                            placeholder={'Введите название...'}
-                            onChange={handleInputChange}
-                            onBlur={handleBlur}
+                                className='input-name-playlist'
+                                type="text"
+                                value={namePlaylist}
+                                placeholder={'Введите название...'}
+                                onChange={handleInputChange}
+                                onBlur={handleBlur}
                             />
                             ) : (
                             <p className='playlistname' onClick={toggleEditMode}>{namePlaylist}</p>
                         )}
-                        <div className='playlist-edit'>
-                            <div className="private-checkbox">
-                                <input type="checkbox" className='checkbox' checked={isPrivate}/>
-                                <span className="checkbox-icon"></span>
-                                <label className='private-playlist' onClick={handleCheckboxChange}>Приватный</label>
+                        {playlists.filter(el => el === params.id).length > 0 ? (
+                            <div className='playlist-edit'>
+                                <div className="private-checkbox">
+                                    <input type="checkbox" className='checkbox' checked={isPrivate}/>
+                                    <span className="checkbox-icon"></span>
+                                    <label className='private-playlist' onClick={handleCheckboxChange}>Приватный</label>
+                                </div>
+                                {/* <p className='rename-playlist'><img className='pencil-icon' alt='pencil' src={pencil} /> Переименовать</p> */}
+                                <p className='delete-playlist' onClick={() => deletePlaylist()}><img className='pencil-icon' alt='pencil' src={trash}/>Удалить плейлист</p>
                             </div>
-                            {/* <p className='rename-playlist'><img className='pencil-icon' alt='pencil' src={pencil} /> Переименовать</p> */}
-                            <p className='delete-playlist' onClick={() => deletePlaylist()}><img className='pencil-icon' alt='pencil' src={trash}/>Удалить плейлист</p>
-                        </div>
+                        ): (<></>)} 
                     </div>
                 </div>
                 <div className='tracks'>
@@ -202,7 +199,7 @@ function PlaylistWindow(){
                     ))}
                 </div>
             </div>
-            <img className="playlist-bg-image" src={isreviewSkin ? (logofile ?? api + `api/playlist/${params.id}/logo?width=400&height=400`) : ''} alt="" />
+            <img className="playlist-bg-image" src={logofile} alt="" />
             <input type='file' accept=".jpg,.png" className='input-file' ref={imageSetterRef} onChange={uploadLogo}></input>
         </div>
     )

@@ -14,22 +14,19 @@ export default function AccountHead (props) {
     const navigate = useNavigate();
     const fileRef = useRef(null);
     const imgRef = useRef(null);
+    const [avatar, setAvatar] = useState(defaultAvatar);
     const [subsCount, setSubsCount] = useState(0);
     const [auditionsCount, setAuditions] = useState(0);
-    const [isImageExist, setIsImageExist] = useState(false);
     const [cookies, setCookies] = useCookies(['accessToken', 'refreshToken', 'authorId', 'role', 'subscriptions', 'userId']);
     
     const resize = useSelector((state)=> state.resize.value)
 
     useEffect(() => {
         // получение аватарки и количества прослушиваний музыканта, количество подписчиков
-        axiosPictures.get(api + `api/user/${cookies.userId}/logo?width=400&height=400`)
-        .then(setIsImageExist(true))
-        .catch(err => {
-            console.log(err);
-            setIsImageExist(false)
-        });
-        
+        axiosPictures.get(api + `api/user/${cookies.userId}/logo/link`)
+        .then(response => {setAvatar(response?.data?.presignedLink)})
+        .catch(err => {setAvatar(defaultAvatar)});
+         
         if (props.role === 'author' && props.authorId !== undefined) {
             axiosUnauthorized.get(api + `api/subscription/${props.authorId}/count`)
             .then(response => {
@@ -52,7 +49,6 @@ export default function AccountHead (props) {
         if (event.target.files.length > 0) {
             let file = event.target.files[0];
             if (file.size <= 5*1024*1024) {
-                setIsImageExist(false);
                 const formData = new FormData();
                 formData.append('File', file);
                 formData.append('type', 'image/jpeg');
@@ -73,8 +69,7 @@ export default function AccountHead (props) {
         <div className="account-page-head">
             <button className="account-page-avatar-button" onClick={handleFileInput}>
                 <div className='account-page-avatar-change'><img draggable='false' src={bigEdit}/></div>
-                <img alt='avatar' ref={imgRef} src={isImageExist ? 
-                api + `api/user/${cookies.userId}/logo?width=400&height=400` : defaultAvatar}/>
+                <img alt='avatar' ref={imgRef} src={avatar}/>
             </button>
             <span>
                 <h1 className="account-page-username">{props.userName}</h1>
