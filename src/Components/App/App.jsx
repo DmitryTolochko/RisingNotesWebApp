@@ -75,14 +75,14 @@ function App() {
     const [searchParams, setSearchParams] = useSearchParams();
 
     useEffect(()=>{
-        const clipId = searchParams.get('clip_view')
+        const clip = searchParams.get('clip_view')
         const shortId = searchParams.get('short_view')
 
-        if(clipId){
-            dispatch(updateVideoPlayerValue(api + `api/music-clip/${clipId}/file`))
+        if(clip){
+            dispatch(updateVideoPlayerValue(clip))
         }
         if(shortId){
-            dispatch(updateVideoPlayerValue(api + `api/music-clip/${clipId}/file`))
+            dispatch(updateVideoPlayerValue(api + `api/music-clip/${shortId}/file`))
         }
     },[location])
 
