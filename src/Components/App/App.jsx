@@ -7,7 +7,7 @@ import Player from "../Player/Player";
 
 import ArtistCard from '../../Pages/ArtistCard/ArtistCard.jsx'
 import { Routes, Route, useNavigate, useSearchParams} from 'react-router-dom';
-import React, { createContext } from "react";
+import React from "react";
 import Featured from '../../Pages/Featured/Featured';
 import Excluded from '../../Pages/Excluded/Excluded';
 import Subscriptions from '../../Pages/Subsriptions/Subscriptions';
@@ -76,13 +76,15 @@ function App() {
 
     useEffect(()=>{
         const clipId = searchParams.get('clip_view')
+        const shortId = searchParams.get('short_view')
+
         if(clipId){
             dispatch(updateVideoPlayerValue(api + `api/music-clip/${clipId}/file`))
         }
+        if(shortId){
+            dispatch(updateVideoPlayerValue(api + `api/music-clip/${clipId}/file`))
+        }
     },[location])
-
-
-
 
     //Redux Dispatcher
     const dispatch = useDispatch()
