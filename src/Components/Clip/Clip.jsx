@@ -111,7 +111,7 @@ function Clip({key, clipId, authorId, songId, name, deleteFunc=undefined, isArti
             </>}
             <div className="cover-wrapper" style={videoLoaded?{display:'block'}:{display:'none'}}>
 
-                <div className="clip-video" onClick={()=>setSearchParams({'clip_view':clipId})} 
+                <div className="clip-video" onClick={()=>setSearchParams({'clip_view':clipLink})} 
                         onMouseOver={() => handleVideoHover(videoPreviewRef, clipLink)}
                         onMouseEnter={() => handleVideoEnter(previewRef)}
                         onMouseMove={() => handleVideoMove(videoPreviewRef)}
