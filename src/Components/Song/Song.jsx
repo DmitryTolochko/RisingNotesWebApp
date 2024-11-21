@@ -5,7 +5,7 @@ import redHeart from '../../Images/red-heart.svg';
 import message from '../../Images/controller/Chat_Dots.png';
 import dislike from '../../Images/controller/thumbs-down.svg';
 import redDislike from '../../Images/controller/dislike-red.svg';
-import list from '../../Images/list.svg';
+import list from '../../Images/player/plus.svg';
 import placeholder from '../../Images/main-placeholder.png';
 import { api, axiosAuthorized, axiosPictures, axiosUnauthorized } from '../App/App';
 import useSearchClean from '../../Hooks/useSearchClean/useSearchClean';

@@ -54,13 +54,11 @@ function Sidebar(props) {
       // Получить или обновить информацию о плейлистах
       try {
          const arr = await Promise.all(playlists.map(async (el) => {
-            const response = await axiosAuthorized.get(`api/playlist/${el}`)
+            let response = await axiosAuthorized.get(`api/playlist/${el}`)
             .catch(err => console.log(err));
-            let img = true;
-            await axiosPictures.get(api + `api/playlist/${el}/logo?width=400&height=400`)
-            .catch(err => {
-               img = false;
-            });
+            let img = await axiosPictures.get(api + `api/playlist/${el}/logo/link`)
+            .then(resp => {return resp?.data?.presignedLink})
+            .catch(err => {return placeholder});
 
             return {
                name: response?.data?.name,
@@ -174,7 +172,7 @@ function Sidebar(props) {
                   <li className='sidebar-playlist' key={pl.id}>
                      <NavLink onClick={()=>sidebarClickHandler()} draggable='false' to={`/playlist/${pl.id}`} className='sidebar-playlist-name' 
                         style={({ isActive }) => (isActive ? {color: '#FE1170'} : {color: '#787885'})}>
-                           <img draggable='false' src={pl.img ? api + `api/playlist/${pl.id}/logo?width=400&height=400` : placeholder}/>
+                           <img draggable='false' src={pl.img}/>
                            {pl.name}
                      </NavLink>
                   </li>

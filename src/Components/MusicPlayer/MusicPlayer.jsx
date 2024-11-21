@@ -14,6 +14,7 @@ import cover from '../../Images/main-placeholder.png';
 import vol from '../../Images/controller/volume-2.svg';
 import filtersImg from '../../Images/player/FilterBtn.svg';
 import listIcon from '../../Images/list.svg';
+import playlistIcon from '../../Images/player/plus.svg';
 
 import { api } from '../App/App';
 import { axiosAuthorized, axiosUnauthorized } from '../App/App';
@@ -296,7 +297,7 @@ const MusicPlayer = () => {
                     <Link to={currentSong === '' ? '' : `/commentaries/${currentSong}`} onClick={cleanQuery}>
                         <img alt='comment' src={message} draggable='false'/>
                     </Link>
-                    <a onClick={changePlaylistModalState}><img src={listIcon} draggable='false'/></a>
+                    <a onClick={changePlaylistModalState}><img src={playlistIcon} draggable='false'/></a>
                     <a onClick={handleToFavorite}><img alt='like' draggable='false' src={featured.includes(currentSong) ? redHeart : heart}/></a>
                 </div>
                 {!modalIsHidden ? <div className='playlist-modal-wrapper'><PlaylistModalMenu songAuthor={songAuthor} songName={songName} id={currentSong}/></div> : <></>}
@@ -309,11 +310,15 @@ const MusicPlayer = () => {
                     <span className="header-text header__track-duration">{formatTime(trackDuration)}</span>
                 </div>
 
-                <div className="volume-container" onMouseLeave={hideVolumeModal}>
-                    <div id='volume-modal' className="volume-modal volume-modal-hidden" >
-                        <input type="range" className='track-range-input' min="0" max="100" onChange={handleVolumeChange} value={volume*100}/>
+                <div className='music-player-buttons'>
+                    <a><img alt='like' draggable='false' src={listIcon}/></a>
+
+                    <div className="volume-container" onMouseLeave={hideVolumeModal}>
+                        <div id='volume-modal' className="volume-modal volume-modal-hidden" >
+                            <input type="range" className='track-range-input' min="0" max="100" onChange={handleVolumeChange} value={volume*100}/>
+                        </div>
+                        <img className="header-volume-btn" src={vol} onMouseOver={showVolumeModal} draggable='false'></img>
                     </div>
-                    <img className="header-volume-btn" src={vol} onMouseOver={showVolumeModal} draggable='false'></img>
                 </div>
             </div>
         </div>)
@@ -341,7 +346,7 @@ const MusicPlayer = () => {
                         <Link to={currentSong === '' ? '' : `/commentaries/${currentSong}`}>
                             <img alt='comment' src={message} draggable='false'/>
                         </Link>
-                        <a onClick={changePlaylistModalState}><img src={listIcon} draggable='false'/></a>
+                        <a onClick={changePlaylistModalState}><img src={playlistIcon} draggable='false'/></a>
                         <a onClick={handleToFavorite}><img alt='like' draggable='false' src={featured.includes(currentSong) ? redHeart : heart}/></a>
                     </div>
                     {!modalIsHidden ? <div className='playlist-modal-wrapper-mobile'><PlaylistModalMenu songAuthor={songAuthor} songName={songName} id={currentSong}/></div> : <></>}

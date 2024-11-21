@@ -40,6 +40,7 @@ import { updateVideoPlayerValue } from '../../Redux/slices/videoPlayerSlice.js';
 import { updateVertVideoPlayerValue } from '../../Redux/slices/vertVideoPlayerSlice.js';
 
 export const api = 'http://81.31.247.227/';
+axios.defaults.headers.post['Access-Control-Allow-Origin'] = 'rn-api-storage.s3.yandexcloud.net';
 
 export const axiosAuthorized = axios.create({
     baseURL: api,

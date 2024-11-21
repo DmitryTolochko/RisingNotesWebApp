@@ -44,20 +44,20 @@ function VerticalClip(props) {
         .catch(err => Promise.reject(err));
         let result = response.data;
 
-        response = await axiosPictures.get(api + 'api/author/' + result.uploaderId + '/logo')
+        response = await axiosPictures.get(api + 'api/author/' + result.uploaderId + '/logo/link')
         .catch(err => console.log(err));
 
         if (response?.status === 200) {
-            result.authorAvatar = api + 'api/author/' + result.uploaderId + '/logo';
+            result.authorAvatar = response?.data?.presignedLink;
         } else {
             result.authorAvatar = defaultAvatar;
         }
 
-        response = await axiosPictures.get(api + 'api/song/' + result.relatedSongId + '/logo')
+        response = await axiosPictures.get(api + 'api/song/' + result.relatedSongId + '/logo/link')
         .catch(err => console.log(err));
 
         if (response?.status === 200) {
-            result.songLogo = api + 'api/song/' + result.relatedSongId + '/logo';
+            result.songLogo = response?.data?.presignedLink;
         } else {
             result.songLogo = defaultAvatar;
         }

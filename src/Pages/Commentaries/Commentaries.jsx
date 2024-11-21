@@ -15,7 +15,7 @@ import heartIcon from '../../Images/controller/heart.svg';
 import redHeart from '../../Images/red-heart.svg';
 import playFilledIcon from '../../Images/play.svg';
 import pauseIcon from '../../Images/Pause.svg';
-import listIcon from '../../Images/list.svg';
+import listIcon from '../../Images/player/plus.svg';
 import { useDispatch, useSelector } from 'react-redux';
 
 import './Commentaries.css';
@@ -106,14 +106,9 @@ const Commentaries = (props) => {
                 setClipId(undefined);
             })
 
-        let response = await axiosPictures.get(api + `api/song/${params.id}/logo?width=500&height=500`)
-        .catch(err => console.log(err));
-
-        if (response?.status === 200) {
-            setSongLogo(api + `api/song/${params.id}/logo?width=500&height=500`);
-        } else {
-            setSongLogo(placeholder);
-        }
+        setSongLogo(await axiosPictures.get(api + `api/song/${params.id}/logo/link`)
+        .then(resp => {return resp?.data?.presignedLink})
+        .catch(err => {return placeholder}));
     }
 
     const handleSendComment = () => {

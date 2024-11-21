@@ -190,7 +190,7 @@ function VertVideoPlayer() {
                     <button className='player-exit-button' onClick={() => {
                         dispatch(updateVertVideoPlayerValue(false))
                         }}><img src={closeButton}/></button>
-                    <video className='vertvideo-player' src={vertvideo} type="video/mp4" loop autoPlay/>
+                    <video className='vertvideo-player' src={vertvideo} autoPlay={false} type="video/mp4" loop/>
                 </div>
                 : <></>
             }

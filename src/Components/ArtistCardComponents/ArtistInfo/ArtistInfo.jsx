@@ -24,15 +24,13 @@ function ArtistInfo(props) {
 
     const params = useParams();
     const [isSubscribed, setIsSubscribed] = useState(subscriptions.includes(params.id));
-    const [isImageExist, setIsImageExist] = useState(false);
+    const [avatar, setAavatar] = useState(false);
 
     useEffect(() => {
         // проверка наличия картинки и подписки
-        axiosPictures.get(api + `api/user/${userId}/logo?width=400&height=400`)
-        .then(setIsImageExist(true))
-        .catch(err => {
-            setIsImageExist(false)
-        });
+        axiosPictures.get(api + `api/user/${userId}/logo/link`)
+        .then(response => setAavatar(response?.data?.presignedLink))
+        .catch(err => {setAavatar(defaultAvatar)});
 
         setIsSubscribed(subscriptions.includes(params.id));
         setSubscribersCount(props.artist.subscribersCount);
@@ -40,7 +38,7 @@ function ArtistInfo(props) {
 
     return(
         <div className="info-container">
-            <img src={isImageExist ? api + `api/user/${userId}/logo?width=400&height=400` : defaultAvatar} alt="" className="artist-img" draggable='false'/>
+            <img src={avatar} alt="" className="artist-img" draggable='false'/>
             <div className="artist-info">
                 <div className="row-top">
                     <span className="artist-name">{artistName}</span>

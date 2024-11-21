@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import placeholder from '../Images/image-placeholder/user_logo_small_placeholder.png';
 import { useCookies, withCookies } from 'react-cookie';
@@ -19,13 +19,8 @@ const Comment = (props) => {
     const [avatar, setAvatar] = useState(placeholder);
 
     useEffect(() => {
-        axiosPictures.get(api + 'api/user/' + props.data.authorId + '/logo?width=400&height=400').then(response => {
-            setAvatar(api + 'api/user/' + props.data.authorId + '/logo?width=400&height=400');
-        })
-        .catch(err => {
-            console.log(err);
-        })
-    }, [props]);
+        getAavatar();
+    }, []);
 
     const handleDeleteComment = () => {
         axiosAuthorized.delete(`api/song/comment/${props.data.id}`);
@@ -43,6 +38,16 @@ const Comment = (props) => {
                 throw err;
             })
     }
+
+    const getAavatar = useCallback(() => {
+        axiosPictures.get(api + 'api/user/' + props.data.authorId + '/logo/link')
+        .then(response => {
+            setAvatar(response?.data?.presignedLink);
+        })
+        .catch(err => {
+            setAvatar(placeholder);
+        })
+    }, [])
 
     return (
         <>

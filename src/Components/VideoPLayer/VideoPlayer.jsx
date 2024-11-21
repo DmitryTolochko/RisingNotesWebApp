@@ -82,7 +82,7 @@ function VideoPlayer() {
                             )}
                     }>
                     <img src={closeButton} /></button>
-                    <video className='video-player' ref={videoRef} type="video/mp4" preload="auto" autoPlay={false} controls/>
+                    <video className='video-player' ref={videoRef} type="video/mp4" preload="auto" autoPlay={true} controls/>
                 </div>
                 : <></>
             }

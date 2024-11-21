@@ -91,6 +91,8 @@ function InstallVerticalVideo(){
         let formData= new FormData();
         let clipId = undefined;
         let uploadId = undefined;
+        let fileExtension = '.' + videoFile.type.split('/')[1];
+
         // загрузка видео
         formData.append('Title', title);
         formData.append('Description', description);
@@ -105,16 +107,19 @@ function InstallVerticalVideo(){
         .catch(err => {return Promise.reject(err)});
 
         formData= new FormData();
-        formData.append('File', imageFile);
+        formData.append('PreviewFile', imageFile);
+        formData.append('ShortVideoId', clipId);
 
-        await axiosAuthorized.patch('api/short-video/' + clipId + '/preview', formData, {
+        await axiosAuthorized.patch('api/short-video/logo', formData, {
             headers: {
                 "Content-Type": "multipart/form-data",
             }
         })
         .catch(err => {return Promise.reject(err)});
 
-        await axiosAuthorized.post('api/short-video/' + clipId + '/file/start-upload')
+        await axiosAuthorized.post('api/short-video/' + clipId + '/file/start-upload', {
+            fileExtension: fileExtension
+        })
         .then(response => uploadId = response.data.uploadId)
         .catch(err => {return Promise.reject(err)});
 
