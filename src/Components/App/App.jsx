@@ -37,6 +37,7 @@ import Messenger from '../../Pages/Messenger/Messenger.jsx';
 
 import { useLocation } from 'react-router-dom';
 import { updateVideoPlayerValue } from '../../Redux/slices/videoPlayerSlice.js';
+import { updateVertVideoPlayerValue } from '../../Redux/slices/vertVideoPlayerSlice.js';
 
 export const api = 'http://81.31.247.227/';
 
@@ -76,13 +77,13 @@ function App() {
 
     useEffect(()=>{
         const clip = searchParams.get('clip_view')
-        const shortId = searchParams.get('short_view')
+        const short = searchParams.get('short_view')
 
         if(clip){
             dispatch(updateVideoPlayerValue(clip))
         }
-        if(shortId){
-            dispatch(updateVideoPlayerValue(api + `api/music-clip/${shortId}/file`))
+        if(short){
+            dispatch(updateVertVideoPlayerValue(short))
         }
     },[location])
 

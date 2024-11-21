@@ -10,12 +10,14 @@ import redHeart from '../../Images/red-heart.svg';
 import Comment from '../Comment';
 import sendIcon from '../../Images/controller/sendIcon.svg';
 import CustomButton from '../CustomButton/CustomButton';
+import { useSearchParams } from 'react-router-dom';
 
 function VertVideoPlayer() {
     const videoRef = useRef();
     const placeholderVideoRef = useRef();
     const [isPlaying, setIsPlaying] = useState(false);
     const [isDataUpdated, setIsDataUpdated] = useState(false);
+    const [searchParams, setSearchParams] = useSearchParams()
     
     const resize = useSelector((state)=> state.resize.value)
     const vertVideoInfo = useSelector((state)=> state.vertVideoInfo.value)
@@ -48,11 +50,20 @@ function VertVideoPlayer() {
             setIsPlaying(true);
         }
         else {
-            const url = URL.createObjectURL(vertvideo);
-            videoRef.current.src = url;
+            videoRef.current.src = vertvideo;
+            placeholderVideoRef.current.src = vertvideo;
+
             await videoRef.current.play();
-            placeholderVideoRef.current.src = url;
             await placeholderVideoRef.current.play();
+            
+            // try {
+            //     await videoRef.current.play();
+            //     await placeholderVideoRef.current.play();
+            // } 
+            // catch (err) {
+            //     console.log(err)
+            // }
+
             setIsPlaying(true);
         }
     }
@@ -83,7 +94,7 @@ function VertVideoPlayer() {
 
     async function getComments() {
         await axiosUnauthorized.get('api/short-video/' + vertVideoInfo.id + '/comment/list').then(resp =>{
-            setComments(resp.data.commentList);
+            setComments(resp?.data.commentList);
         })
         .catch(err => Promise.reject(err));
     }
@@ -104,19 +115,35 @@ function VertVideoPlayer() {
         }
     };
 
+
     if (resize === 'standart')
     return (
         <>
             {vertvideo ?
                 <div className="blog-video-wrapper">
-                    <video alt='background' className='placeholder-vert-video' ref={placeholderVideoRef} src={api + `api/short-video/${vertvideo.name}/file`} muted loop/>
+                    <video alt='background' 
+                        className='placeholder-vert-video' 
+                        ref={placeholderVideoRef} 
+                        src={vertvideo} 
+                        muted 
+                        loop
+                    />
                     <div className="blog-video">
                         <div className='vertical-wrapper'>
-                            <video className='vertvideo-player' ref={videoRef} src={api + `api/short-video/${vertvideo.name}/file`} type="video/mp4" onClick={handlePlayVideo} loop/>
+                            <video className='vertvideo-player' 
+                            ref={videoRef} 
+                            src={vertvideo} 
+                            type="video/mp4" onClick={handlePlayVideo}
+                            loop/>
                         </div>
 
                         <div className='blog-text'>
-                            <button onClick={() => dispatch(updateVertVideoPlayerValue(false))} className='blog-close'><img alt='x' src={closeButton}/></button>
+                            <button onClick={() =>{
+                                setSearchParams({})
+                                dispatch(updateVertVideoPlayerValue(false))
+                            }} className='blog-close'>
+                                <img alt='x' src={closeButton}/>
+                            </button>
                             <button onClick={handleClickOnAuthor} className='blog-author'>
                                 <img  alt='avatar' src={vertVideoInfo.authorAvatar} />
                                 <p>{vertVideoInfo.authorName}</p>
@@ -144,7 +171,7 @@ function VertVideoPlayer() {
                             </div>
 
                             <div className='blog-comments'>
-                                {comments.map(e => (<div key={e.id} className='comment-wrapper'><Comment data={e} songId={vertVideoInfo.relatedSongId} setIsDataUpdated={setIsDataUpdated} isDataUpdated={isDataUpdated}/></div>))}
+                                {comments?.map(e => (<div key={e.id} className='comment-wrapper'><Comment data={e} songId={vertVideoInfo.relatedSongId} setIsDataUpdated={setIsDataUpdated} isDataUpdated={isDataUpdated}/></div>))}
                             </div>
                             
                         </div>
@@ -160,7 +187,9 @@ function VertVideoPlayer() {
             <>
             { vertvideo ?
                 <div className='video-player-wrapper'>
-                    <button className='player-exit-button' onClick={() => dispatch(updateVertVideoPlayerValue(false))}><img src={closeButton}/></button>
+                    <button className='player-exit-button' onClick={() => {
+                        dispatch(updateVertVideoPlayerValue(false))
+                        }}><img src={closeButton}/></button>
                     <video className='vertvideo-player' src={vertvideo} type="video/mp4" loop autoPlay/>
                 </div>
                 : <></>
