@@ -17,6 +17,7 @@ import { useDispatch } from 'react-redux';
 import { updateVertVideoInfoValue } from '../../Redux/slices/vertVideoInfoSlice';
 import { updateVertVideoPlayerValue } from '../../Redux/slices/vertVideoPlayerSlice';
 import CustomInput from '../../Components/CustomInput/CustomInput';
+import { showError } from '../../Redux/slices/errorMessageSlice';
 
 function InstallVerticalVideo(){
     const vertskinSetterRef = useRef(null);
@@ -78,6 +79,9 @@ function InstallVerticalVideo(){
                     setImage(event.target.result);
                 };
                 reader.readAsDataURL(file);
+            }
+            else {
+                dispatch(showError({errorText: 'Изображение должно быть не больше 5 Мб'}))
             }
         }
     }

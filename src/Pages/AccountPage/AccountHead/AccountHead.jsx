@@ -8,9 +8,11 @@ import { useEffect, useRef, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import {  api, axiosAuthorized, axiosPictures, axiosUnauthorized } from '../../../Components/App/App';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { showError } from '../../../Redux/slices/errorMessageSlice';
 
 export default function AccountHead (props) {
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     const fileRef = useRef(null);
     const imgRef = useRef(null);
@@ -61,6 +63,9 @@ export default function AccountHead (props) {
                 .then(response => {
                     window.location.reload();
                 });
+            }
+            else {
+                dispatch(showError({errorText: 'Изображение должно быть не больше 5 Мб'}))
             }
         }
     }

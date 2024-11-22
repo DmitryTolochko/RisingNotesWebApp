@@ -17,6 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { updateVideoPlayerValue } from '../../Redux/slices/videoPlayerSlice';
 import CustomInput from '../../Components/CustomInput/CustomInput';
+import { showError } from '../../Redux/slices/errorMessageSlice';
 
 function UploadVideo(){
     const dispatch = useDispatch()
@@ -176,6 +177,9 @@ function UploadVideo(){
                     setImage(event.target.result);
                 };
                 reader.readAsDataURL(file);
+            }
+            else {
+                dispatch(showError({errorText: 'Изображение должно быть не больше 5 Мб'}))
             }
         }
     }

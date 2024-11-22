@@ -18,6 +18,8 @@ import trashImg from '../../Images/trash.svg';
 import './UploadMusic.css';
 import CustomButton from '../../Components/CustomButton/CustomButton';
 import CustomInput from '../../Components/CustomInput/CustomInput';
+import { useDispatch, useSelector } from 'react-redux';
+import { showError, showErrorWithTimeout, updateErrorMessageValue } from '../../Redux/slices/errorMessageSlice';
 
 function UploadMusic(){
     const navigate = useNavigate()
@@ -48,6 +50,9 @@ function UploadMusic(){
     const [title, setTitle] = useState('Новый трек');
 
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+    const dispatch = useDispatch();
+    const errorText = useSelector((state) => state.errorMessage.errorText);
+    const errorVisibility = useSelector((state) =>  state.errorMessage.errorVisibility);
 
     const formData = new FormData();
 
@@ -140,6 +145,9 @@ function UploadMusic(){
                     setCurrentImage(event.target.result);
                 };
                 reader.readAsDataURL(file);
+            }
+            else {
+                dispatch(showError({errorText: 'Изображение должно быть не больше 5 Мб и иметь соотношение 1 к 1'}))
             }
         }
     }

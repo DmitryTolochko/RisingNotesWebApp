@@ -13,6 +13,7 @@ import { api, axiosAuthorized, axiosPictures, axiosUnauthorized} from '../../Com
 import './PlaylistWindow.css';
 import { updateSongsValue } from '../../Redux/slices/songsSlice';
 import { updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlice';
+import { showError } from '../../Redux/slices/errorMessageSlice';
 
 function PlaylistWindow(){
     const imageSetterRef = useRef(null);
@@ -84,21 +85,30 @@ function PlaylistWindow(){
 
     async function uploadLogo(event) {
         // обновление картинки
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            setLogofile(event.target.result);
-        };
-        reader.readAsDataURL(event.target.files[0]);
-        const formData = new FormData();
-        formData.append('LogoFile.File', event.target.files[0])
-        await axiosAuthorized.patch(`/api/playlist/${params.id}/logo`, formData, { 
-            headers: { 
-                'Content-Type': 'multipart/form-data' 
+        event.preventDefault();
+        if (event.target.files.length > 0) {
+            let file = event.target.files[0];
+            if (file.size <= 5*1024*1024) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    setLogofile(event.target.result);
+                };
+                reader.readAsDataURL(event.target.files[0]);
+                const formData = new FormData();
+                formData.append('LogoFile.File', event.target.files[0])
+                await axiosAuthorized.patch(`/api/playlist/${params.id}/logo`, formData, { 
+                    headers: { 
+                        'Content-Type': 'multipart/form-data' 
+                    }
+                })
+                .then ( () => {
+                    setReviewSkin(true)
+                });
             }
-        })
-        .then ( () => {
-            setReviewSkin(true)
-        });
+            else {
+                dispatch(showError({errorText: 'Изображение должно быть не больше 5 Мб'}))
+            }
+        }
     };
    
     const toggleEditMode = () => {

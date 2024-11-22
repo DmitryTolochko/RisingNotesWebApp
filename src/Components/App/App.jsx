@@ -38,6 +38,7 @@ import Messenger from '../../Pages/Messenger/Messenger.jsx';
 import { useLocation } from 'react-router-dom';
 import { updateVideoPlayerValue } from '../../Redux/slices/videoPlayerSlice.js';
 import { updateVertVideoPlayerValue } from '../../Redux/slices/vertVideoPlayerSlice.js';
+import { showError } from '../../Redux/slices/errorMessageSlice.js';
 
 export const api = 'http://81.31.247.227/';
 axios.defaults.headers.post['Access-Control-Allow-Origin'] = 'rn-api-storage.s3.yandexcloud.net';
@@ -99,10 +100,6 @@ function App() {
     const subscriptions_ = useSelector((state) => state.subscriptions.value)
     const currentSong_ = useSelector((state) => state.currentSong.value)
     const songs_ = useSelector((state) => state.songs.value)
-    
-    //State hooks
-    const [errorVisibility, setErrorVisibility] = useState(false);
-    const [errorText, setErrorText] = useState('');
     
     const navigate = useNavigate();
     const [cookies, setCookies] = useCookies(['accessToken', 'refreshToken', 'authorId', 'role', 'userId']);
@@ -190,40 +187,32 @@ function App() {
         },
         error => {
             if (error.response === undefined) {
-                setErrorText('Нет сети');
-                setErrorVisibility(true);
+                dispatch(showError({errorText: 'Нет сети'}))
             }
             else if (error.response?.status === 404) {
-                setErrorText('Указанного объекта не существует');
-                setErrorVisibility(true);
+                dispatch(showError({errorText: 'Указанного объекта не существует'}))
                 // window.location.replace('/404');
                 // return Promise.reject(error.response);
             }
             else if (error.response?.status === 413) {
-                setErrorText('Слишком большой файл');
-                setErrorVisibility(true);
+                dispatch(showError({errorText: 'Слишком большой файл'}))
                 return Promise.reject(error.response);
             }
             else if (error.response?.status === 500) {
-                console.log("Ошибка на сервере");
-                setErrorText('Ошибка 500 на сервере');
-                setErrorVisibility(true);
+                dispatch(showError({errorText: 'Ошибка 500 на сервере'}))
                 return Promise.reject(error.response);
             }
             else if (error.response?.status === 401) {
-                setErrorText('Вы не авторизированы');
-                setErrorVisibility(true);
+                dispatch(showError({errorText: 'Вы не авторизированы'}))
                 window.location.replace('/login');
                 return Promise.reject(error.response);
             }
             else if (error.response?.status === 400) {
-                setErrorText(error.message);
-                setErrorVisibility(true);
+                dispatch(showError({errorText: error.message}))
                 return Promise.reject(error.response);
             }
             else {
-                setErrorText(error.message);
-                setErrorVisibility(true);
+                dispatch(showError({errorText: error.message}))
                 return Promise.reject(error);
             }
         }
@@ -235,51 +224,36 @@ function App() {
         },
         error => {
             if (error.response === undefined) {
-                setErrorText('Нет сети');
-                setErrorVisibility(true);
+                dispatch(showError({errorText: 'Нет сети'}))
             }
             else if (error.response?.status === 404) {
-                setErrorText('Указанного объекта не существует');
-                setErrorVisibility(true);
+                dispatch(showError({errorText: 'Указанного объекта не существует'}))
                 // window.location.replace('/404');
                 // return Promise.reject(error.response);
             }
+            else if (error.response?.status === 413) {
+                dispatch(showError({errorText: 'Слишком большой файл'}))
+                return Promise.reject(error.response);
+            }
             else if (error.response?.status === 500) {
-                setErrorText('Ошибка 500 на сервере');
-                setErrorVisibility(true);
-                console.log("Ошибка на сервере");
+                dispatch(showError({errorText: 'Ошибка 500 на сервере'}))
                 return Promise.reject(error.response);
             }
             else if (error.response?.status === 401) {
-                setErrorText('Вы не авторизированы');
-                setErrorVisibility(true);
+                dispatch(showError({errorText: 'Вы не авторизированы'}))
                 window.location.replace('/login');
                 return Promise.reject(error.response);
             }
             else if (error.response?.status === 400) {
-                setErrorText(error.message);
-                setErrorVisibility(true);
+                dispatch(showError({errorText: error.message}))
                 return Promise.reject(error.response);
             }
             else {
-                setErrorText(error.message);
-                setErrorVisibility(true);
+                dispatch(showError({errorText: error.message}))
                 return Promise.reject(error);
             }
         }
     )
-
-    useEffect(() => {
-        // логика появления ошибки
-        if (errorVisibility) {
-            const timer = setTimeout(() => {
-                setErrorText('');
-                setErrorVisibility(false);
-            }, 5000);
-
-            return () => clearTimeout(timer);
-        }
-    }, [errorVisibility])
 
     useEffect(() => {
         // обновление переменных в браузере, только тогда когда чет поменялось
@@ -297,7 +271,7 @@ function App() {
             <Header/>
             {cookies.role === 'admin' ? <></> : <Sidebar></Sidebar>}
             <SearchResults/>
-            <ErrorMessage text={errorText} visibility={errorVisibility}/>
+            <ErrorMessage/>
             <Players/>
             <Routes>
                 <Route path={'/login'} element={<Login/>}/>
