@@ -18,6 +18,7 @@ import { updateSongsValue } from '../../Redux/slices/songsSlice';
 import './Song.css';
 import { updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlice';
 import PlaylistModalMenu from '../PlaylistModalMenu/PlaylistModalMenu';
+import { updatePlayerQueueVisibility } from '../../Redux/slices/playerQueueSlice';
 
 function Song({id, onClick=undefined, duration, artist, genres, name}) {
     const [modalIsHidden, setModalIsHidden] = useState(true);
@@ -103,6 +104,11 @@ function Song({id, onClick=undefined, duration, artist, genres, name}) {
         .catch(err => {setAvatar(placeholder)});
     };
 
+    function hideAllModals() {
+        dispatch(updatePlayerQueueVisibility(false));
+        cleanQuery();
+    };
+
     return (
         <>
             <div className='track'>
@@ -125,7 +131,7 @@ function Song({id, onClick=undefined, duration, artist, genres, name}) {
                         <a><img alt='list' src={list} onClick={changeModalState}/></a>
                         <a onClick={handleToExcluded}><img alt='dislike' src={excluded.includes(id) ? redDislike : dislike}/></a>
                         <a onClick={handleToFavorite}><img alt='like' src={featured.includes(id) ? redHeart : heart}/></a>
-                        <Link to={`/commentaries/${id}`} onClick={cleanQuery}><img alt='comment' src={message}/></Link>
+                        <Link to={`/commentaries/${id}`} onClick={hideAllModals}><img alt='comment' src={message}/></Link>
                     </div>
                 ): (
                     <a onClick={handleToFavorite}><img alt='like' src={featured.includes(id) ? redHeart : heart}/></a>

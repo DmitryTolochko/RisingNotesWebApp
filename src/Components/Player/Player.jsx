@@ -50,9 +50,9 @@ function Player() {
         })
         .catch(err => {console.log(err)});
 
-        await axiosPictures.get(`api/author/` + info.authorId + `/logo`)
+        await axiosPictures.get(`api/author/` + info.authorId + `/logo/link`)
         .then(response => {
-            info.authorLogo = api + `api/author/` + info.authorId + `/logo`
+            info.authorLogo = response.data.presignedLink
         })
         .catch(err => {
             info.authorLogo = songCoverTemplate

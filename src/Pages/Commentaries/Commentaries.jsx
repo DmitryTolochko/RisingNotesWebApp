@@ -90,9 +90,9 @@ const Commentaries = (props) => {
                 throw err;
             });
 
-        await axiosPictures.get('api/author/' + authorId + '/logo')
+        await axiosPictures.get('api/author/' + authorId + '/logo/link')
             .then(response => {
-                setArtistAvatar(api + `api/author/` + authorId + `/logo`)
+                setArtistAvatar(response?.data?.presignedLink)
             })
             .catch(err => {
                 setArtistAvatar(defaultAvatar);

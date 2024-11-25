@@ -16,37 +16,32 @@ function PlaylistModalMenu({songAuthor, songName, id}) {
 
     async function getPlaylistsInfo() {
         // Получить или обновить информацию о плейлистах
-        try {
-           let arr = await Promise.all(playlists.map(async (el) => {
-                const response = await axiosAuthorized.get(`api/playlist/${el}`)
-                .catch(err => console.log(err));
-                let img = thumb;
-                await axiosPictures.get(api + `api/playlist/${el}/logo/link`)
-                .then(response => img = response?.data?.presignedLink)
-                .catch(err => img = thumb);
+        let arr = await Promise.all(playlists.map(async (el) => {
+            const response = await axiosAuthorized.get(`api/playlist/${el}`)
+            .catch(err => console.log(err));
+            let img = thumb;
+            await axiosPictures.get(api + `api/playlist/${el}/logo/link`)
+            .then(response => img = response?.data?.presignedLink)
+            .catch(err => img = thumb);
 
-                let isSongInPlaylist = false;
+            let isSongInPlaylist = false;
 
-                await axiosUnauthorized.get(`api/playlist/` + el +`/song/list`)
-                .then(resp => {
-                    if (resp.data.songList.filter(el => el.id === id).length > 0)
-                    {
-                        isSongInPlaylist = true;
-                    }
-                })
+            await axiosUnauthorized.get(`api/playlist/` + el +`/song/list`)
+            .then(resp => {
+                if (resp.data.songList.filter(el => el.id === id).length > 0)
+                {
+                    isSongInPlaylist = true;
+                }
+            })
 
-                return {
-                    name: response?.data?.name,
-                    id: el,
-                    img: img,
-                    isSongInPlaylist: isSongInPlaylist
-                };
-           }));
-           setPlaylistsInfo(arr);
-        }
-        catch (err) {
-           console.log(err);
-        }
+            return {
+                name: response?.data?.name,
+                id: el,
+                img: img,
+                isSongInPlaylist: isSongInPlaylist
+            };
+        }));
+        setPlaylistsInfo(arr);
     }  
 
     async function addToPlaylist(playlistId) {

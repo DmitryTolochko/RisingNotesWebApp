@@ -26,6 +26,7 @@ function UploadMusic(){
     const params = useParams();
     const imageSetterRef = useRef(null);
     const songSetterRef = useRef(null);
+
     const [name, setName] = useState(undefined);
     const [isLyricsExist, setIsLyricsExist] = useState(false);
     const [lyrics, setLyrics] = useState(undefined);
@@ -48,11 +49,10 @@ function UploadMusic(){
     const [vibeList, setVibeList] = useState([]);
     const [languageList, setLanguageList] = useState([]);
     const [title, setTitle] = useState('Новый трек');
+    const [duration, setDuration] = useState(0);
 
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
     const dispatch = useDispatch();
-    const errorText = useSelector((state) => state.errorMessage.errorText);
-    const errorVisibility = useSelector((state) =>  state.errorMessage.errorVisibility);
 
     const formData = new FormData();
 
@@ -81,25 +81,30 @@ function UploadMusic(){
         // Отправка на модерацию
 
         let id = undefined;
-        formData.append('Name', name)
-        formData.append('Lyrics', lyrics)
-        formData.append('Instrumental', isLyricsExist)
+        formData.append('Name', name);
+        formData.append('Lyrics', lyrics);
+        formData.append('Instrumental', isLyricsExist);
+        formData.append('DurationMsec', duration);
+
         vibe.forEach((item, index) => {
             formData.append(`VibeList[${index}]`, item);
         });
+
+        if (isLyricsExist)
         language.forEach((item, index) => {
             formData.append(`LanguageList[${index}]`, item);
         });
+        
         genre.forEach((item, index) => {
             formData.append(`GenreList[${index}]`, item);
         });
-        formData.append('VocalGenderList', gender)
+        formData.append('VocalGenderList', gender);
 
         if (!(role === "authoredit" && typeof songfile === 'string')) {
-            formData.append('SongFile.File', songfile)
+            formData.append('SongFile.File', songfile);
         }
 
-        formData.append('LogoFile.File', logofile)
+        formData.append('LogoFile.File', logofile);
 
         if (role === 'author') {
             // новая песня
@@ -298,6 +303,7 @@ function UploadMusic(){
             setSongFileName(response?.data?.songName);
             setCurrentImage(response?.data?.logoFileLink);
             setSongfile(response?.data?.songFileLink);
+            setDuration(response?.data?.durationMs);
             
             if (cookies?.role !== 'admin'){
                 setRole('authoredit');
@@ -319,6 +325,13 @@ function UploadMusic(){
             if (acceptedFiles.length > 0) {
                 setSongFileName(acceptedFiles[0].name);
                 setSongfile(acceptedFiles[0]);
+
+                const audio = new Audio();
+                audio.addEventListener('loadedmetadata', function() {
+                    setDuration(audio.duration * 1000);
+                });
+                
+                audio.src = URL.createObjectURL(acceptedFiles[0]);
             }
         },
     });   

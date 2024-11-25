@@ -6,6 +6,7 @@ import '../TopTracks/TopTracks.css';
 import { useDispatch } from "react-redux";
 import { updateSongsValue } from "../../../Redux/slices/songsSlice";
 import { updateMusicIsPlayingValue } from "../../../Redux/slices/musicIsPlayingSlice";
+import { updatePlayerQueueName } from "../../../Redux/slices/playerQueueSlice";
 
 function Songs({artist, count=0, offset=0}) {
     const params = useParams();
@@ -32,6 +33,7 @@ function Songs({artist, count=0, offset=0}) {
         let arr = songsList.slice(songsList.findIndex(e => e === startId));
         dispatch(updateSongsValue(arr));
         dispatch(updateMusicIsPlayingValue(true));
+        dispatch(updatePlayerQueueName('Дискография ' + artist.artistName));
     }
 
     return (

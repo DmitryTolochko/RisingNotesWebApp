@@ -4,11 +4,12 @@ import settingsIcon from '../../Images/account-page/settings-icon.svg';
 import exitIcon from '../../Images/account-page/exit-icon.svg';
 import { useCookies } from "react-cookie";
 import useSearchClean from "../../Hooks/useSearchClean/useSearchClean";
-
 import './FallDownMenu.css';
-import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { updatePlayerQueueVisibility } from "../../Redux/slices/playerQueueSlice";
 
 export default function FallDownMenu ({callback}) {
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     const [cookies, setCookies] = useCookies(['accessToken', 'refreshToken', 'authorId', 'role', 'subscriptions', 'userId']);
     const {cleanQuery} = useSearchClean()
@@ -25,7 +26,7 @@ export default function FallDownMenu ({callback}) {
     }
 
     return (
-        <div className="fall-down-menu">
+        <div className="fall-down-menu" onClick={() => dispatch(updatePlayerQueueVisibility(false))}>
             
             {cookies.role === 'admin' ? (
                 <NavLink draggable='false' to='/' className={'fall-down-menu-ref'} onClick={() => {cleanQuery(); callback(false)}}

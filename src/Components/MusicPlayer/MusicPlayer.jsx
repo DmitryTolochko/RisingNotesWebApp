@@ -30,9 +30,10 @@ import { updateSongsValue } from '../../Redux/slices/songsSlice';
 import { updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlice';
 import PlaylistModalMenu from '../PlaylistModalMenu/PlaylistModalMenu';
 import filtersToggle from '../../Hooks/filtersToggle';
+import { updatePlayerQueueVisibility } from '../../Redux/slices/playerQueueSlice';
 
 const MusicPlayer = () => {
-    const [nextSongIndex, setNextSongIndex] = useState(0);
+    const [currSongIndex, setCurrSongIndex] = useState(0);
     const audioRef = useRef(null);
     const [trackCurrentDuration, setTrackCurrentDuration] = useState(0);
     const [trackDuration, setTrackDuration] = useState(0);
@@ -58,6 +59,7 @@ const MusicPlayer = () => {
     const currentSong = useSelector((state)=> state.currentSong.value)
     const songs = useSelector((state)=> state.songs.value)
     const isPlaying = useSelector((state) => state.musicIsPlaying.value)
+    const isPlayerQueueVisible = useSelector((state) => state.playerQueue.isVisible);
 
     useEffect(() => {
         // скрытие плеера
@@ -151,14 +153,16 @@ const MusicPlayer = () => {
         // следующая песня или первая в очереди
         clearInterval(handleRef.current);
         const songsCount = songs.length;
-        if (nextSongIndex + 1 == songsCount) 
-            setNextSongIndex(0);
-        else {
-            setNextSongIndex(nextSongIndex => nextSongIndex + 1);
+        if (currSongIndex + 1 >= songsCount) {
+            setCurrSongIndex(0);
+            dispatch(updateCurrentSongValue(songs[0]))
         }
-        audioRef.current.currentTime = 0;
+        else {
+            setCurrSongIndex(currSongIndex => currSongIndex + 1);
+            dispatch(updateCurrentSongValue(songs[currSongIndex + 1]))
+        }
 
-        dispatch(updateCurrentSongValue(songs[nextSongIndex]))
+        audioRef.current.currentTime = 0;
 
         handleRef.current = setInterval(() => {
             setTrackCurrentDuration(t => t = audioRef.current.currentTime);
@@ -169,14 +173,16 @@ const MusicPlayer = () => {
     const handlePrevSong = () => {
         // предыдущая песня или последняя в очереди
         clearInterval(handleRef.current);
-        if (nextSongIndex - 1 == -1)
-            setNextSongIndex(songs.length - 1);
-        else
-            setNextSongIndex(nextSongIndex => nextSongIndex - 1);
+        if (currSongIndex - 1 <= -1) {
+            setCurrSongIndex(songs.length - 1);
+            dispatch(updateCurrentSongValue(songs[songs.length - 1]))
+        }
+        else {
+            setCurrSongIndex(nextSongIndex => nextSongIndex - 1);
+            dispatch(updateCurrentSongValue(songs[currSongIndex - 1]))
+        }
 
         audioRef.current.currentTime = 0;
-
-        dispatch(updateCurrentSongValue(songs[nextSongIndex]))
 
         handleRef.current = setInterval(() => {
             setTrackCurrentDuration(t => t = audioRef.current.currentTime);
@@ -270,6 +276,11 @@ const MusicPlayer = () => {
         }
     };
 
+    function hideAllModals() {
+        dispatch(updatePlayerQueueVisibility(false));
+        cleanQuery();
+    }
+
 
     if (resize === 'standart') {
         return (<div className={"music-player-wrapper " + hiddenTag}>
@@ -278,8 +289,8 @@ const MusicPlayer = () => {
             <div className={`music-player-1 ` + hiddenTag}>
                 <img className={isPlaying ? 'music-player-cover rotate' : 'music-player-cover'} draggable='false' src={coverLink} alt='cover'/>
 
-                <span className='music-player-head'>
-                    <p className='music-player-head-song'>{songName}</p>
+                <span className='music-player-head' onClick={hideAllModals}>
+                    <Link to={currentSong === '' ? '' : `/commentaries/${currentSong}`} className='music-player-head-song'>{songName}</Link>
                     <Link to={`/artist/${authorId}`} className='music-player-head-author'>{songAuthor}</Link>
                 </span>
 
@@ -294,9 +305,9 @@ const MusicPlayer = () => {
 
                 <div className='music-player-buttons'>
                     <a onClick={handleToExcluded}><img alt='dislike' draggable='false' src={excluded.includes(currentSong) ? redDislike : dislike}/></a>
-                    <Link to={currentSong === '' ? '' : `/commentaries/${currentSong}`} onClick={cleanQuery}>
+                    {/* <Link to={currentSong === '' ? '' : `/commentaries/${currentSong}`} onClick={hideAllModals}>
                         <img alt='comment' src={message} draggable='false'/>
-                    </Link>
+                    </Link> */}
                     <a onClick={changePlaylistModalState}><img src={playlistIcon} draggable='false'/></a>
                     <a onClick={handleToFavorite}><img alt='like' draggable='false' src={featured.includes(currentSong) ? redHeart : heart}/></a>
                 </div>
@@ -311,7 +322,7 @@ const MusicPlayer = () => {
                 </div>
 
                 <div className='music-player-buttons'>
-                    <a><img alt='like' draggable='false' src={listIcon}/></a>
+                    <a onClick={() => dispatch(updatePlayerQueueVisibility(!isPlayerQueueVisible))}><img alt='like' draggable='false' src={listIcon}/></a>
 
                     <div className="volume-container" onMouseLeave={hideVolumeModal}>
                         <div id='volume-modal' className="volume-modal volume-modal-hidden" >

@@ -14,6 +14,7 @@ import './PlaylistWindow.css';
 import { updateSongsValue } from '../../Redux/slices/songsSlice';
 import { updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlice';
 import { showError } from '../../Redux/slices/errorMessageSlice';
+import { updatePlayerQueueName } from '../../Redux/slices/playerQueueSlice';
 
 function PlaylistWindow(){
     const imageSetterRef = useRef(null);
@@ -158,6 +159,7 @@ function PlaylistWindow(){
         let arr = songsList.slice(songsList.findIndex(e => e === startId));
         dispatch(updateSongsValue(arr));
         dispatch(updateMusicIsPlayingValue(true));
+        dispatch(updatePlayerQueueName(namePlaylist));
     }
 
     return (

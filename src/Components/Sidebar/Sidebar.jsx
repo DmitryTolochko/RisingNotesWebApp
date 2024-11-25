@@ -20,6 +20,7 @@ import useSearchClean from '../../Hooks/useSearchClean/useSearchClean';
 import useMenuToggle from '../../Hooks/useMenuToggle/useMenuToggle';
 
 import './Sidebar.css';
+import { updatePlayerQueueVisibility } from '../../Redux/slices/playerQueueSlice'
 
 
 function Sidebar(props) {
@@ -128,7 +129,7 @@ function Sidebar(props) {
          <div className="music-container">
             <span className="section_title">Музыка</span>
             <nav className='music-nav'>
-               <ul className="nav-links">
+               <ul className="nav-links" onClick={() => dispatch(updatePlayerQueueVisibility(false))}>
                   <li>
                      <NavLink draggable='false' onClick={sidebarClickHandler} className ={({ isActive }) => (isActive ? 'nav-link wave active' : 'nav-link wave' )} 
                      to={'/'} 
@@ -147,14 +148,6 @@ function Sidebar(props) {
                   </li>
                   <li> 
                      <NavLink draggable='false' onClick={sidebarClickHandler} className ={({ isActive }) => (isActive ? 'nav-link remove active' : 'nav-link remove ' )}
-                     to={'/excluded'} 
-                     style={({ isActive }) => (isActive ? {color: '#FE1170'} : {color: '#787885'})}>
-                        <img src={warning} alt="" className="nav-icon" draggable='false' />
-                        <span >Исключенное</span>
-                     </NavLink>
-                  </li>
-                  <li> 
-                     <NavLink draggable='false' onClick={sidebarClickHandler} className ={({ isActive }) => (isActive ? 'nav-link remove active' : 'nav-link remove ' )}
                      to={'/messenger'} 
                      style={({ isActive }) => (isActive ? {color: '#FE1170'} : {color: '#787885'})}>
                         <img src={messengerIcon} alt="" className="nav-icon" draggable='false' />
@@ -167,7 +160,7 @@ function Sidebar(props) {
          {cookies.accessToken !== undefined || cookies.role !== undefined || cookies.userId !== undefined ? 
             <div className="playlists-container">
             <span className="section-title">Плейлисты</span>
-            <ul className="sidebar-playlists">
+            <ul className="sidebar-playlists" onClick={() => dispatch(updatePlayerQueueVisibility(false))}>
                {playlistsInfo.map((pl => 
                   <li className='sidebar-playlist' key={pl.id}>
                      <NavLink onClick={()=>sidebarClickHandler()} draggable='false' to={`/playlist/${pl.id}`} className='sidebar-playlist-name' 

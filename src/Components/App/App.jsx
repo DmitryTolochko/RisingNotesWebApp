@@ -9,7 +9,7 @@ import ArtistCard from '../../Pages/ArtistCard/ArtistCard.jsx'
 import { Routes, Route, useNavigate, useSearchParams} from 'react-router-dom';
 import React from "react";
 import Featured from '../../Pages/Featured/Featured';
-import Excluded from '../../Pages/Excluded/Excluded';
+// import Excluded from '../../Pages/Excluded/Excluded';
 import Subscriptions from '../../Pages/Subsriptions/Subscriptions';
 import Commentaries from '../../Pages/Commentaries/Commentaries';
 import AdminPanel from '../../Pages/AdminPanel/AdminPanel';
@@ -39,6 +39,7 @@ import { useLocation } from 'react-router-dom';
 import { updateVideoPlayerValue } from '../../Redux/slices/videoPlayerSlice.js';
 import { updateVertVideoPlayerValue } from '../../Redux/slices/vertVideoPlayerSlice.js';
 import { showError } from '../../Redux/slices/errorMessageSlice.js';
+import PlayerQueue from '../../Pages/PlayerQueue/PlayerQueue.jsx';
 
 export const api = 'http://81.31.247.227/';
 axios.defaults.headers.post['Access-Control-Allow-Origin'] = 'rn-api-storage.s3.yandexcloud.net';
@@ -100,6 +101,7 @@ function App() {
     const subscriptions_ = useSelector((state) => state.subscriptions.value)
     const currentSong_ = useSelector((state) => state.currentSong.value)
     const songs_ = useSelector((state) => state.songs.value)
+    const playerQueueName_ = useSelector((state) =>  state.playerQueue.currentQueue)
     
     const navigate = useNavigate();
     const [cookies, setCookies] = useCookies(['accessToken', 'refreshToken', 'authorId', 'role', 'userId']);
@@ -120,35 +122,82 @@ function App() {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    function invokeErrorMessage(error) {
+        if (error.response === undefined) {
+            dispatch(showError({errorText: 'Нет сети'}))
+        }
+        else if (error.response?.status === 404) {
+            dispatch(showError({errorText: 'Указанного объекта не существует'}))
+        }
+        else if (error.response?.status === 413) {
+            dispatch(showError({errorText: 'Слишком большой файл'}))
+            return Promise.reject(error.response);
+        }
+        else if (error.response?.status === 500) {
+            dispatch(showError({errorText: 'Ошибка 500 на сервере'}))
+            return Promise.reject(error.response);
+        }
+        else if (error.response?.status === 401) {
+            dispatch(showError({errorText: 'Вы не авторизированы'}))
+            window.location.replace('/login');
+            return Promise.reject(error.response);
+        }
+        else if (error.response?.status === 400) {
+            dispatch(showError({errorText: error.message}))
+            return Promise.reject(error.response);
+        }
+        else {
+            dispatch(showError({errorText: error.message}))
+            return Promise.reject(error);
+        }
+    }
+
+    let isRefreshing = false;
+    let token = undefined;
+
     //обновление токена
     async function refreshTokens(config) {
-        await axiosRefresh.post('connect/token', {
-            client_id: 'Api',
-            client_secret: 'megaclientsecret',
-            grant_type: 'refresh_token',
-            refresh_token: cookies.refreshToken
-        })
-            .then(response => {
-                setCookies('accessToken', response.data.access_token, { path: '/' });
-                setCookies('refreshToken', response.data.refresh_token, { path: '/' });
+        while (isRefreshing) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
 
-                let decoded = jwtDecode(response.data.access_token);
-                setCookies('authorId', decoded?.authorId, { path: '/' });
+        if (token !== undefined) {
+            return token;
+        }
 
-                const userId = jwtDecode(response.data.access_token)["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
-                setCookies('userId', userId, { path: '/' });
-                setCookies('role', decoded.role, { path: '/' });
+        isRefreshing = true;
 
-                config.headers['Authorization'] = 'Bearer ' + response.data.access_token;
+        try {
+            let response = await axiosRefresh.post('connect/token', {
+                client_id: 'Api',
+                client_secret: 'megaclientsecret',
+                grant_type: 'refresh_token',
+                refresh_token: cookies.refreshToken
             })
-            .catch(err => {
-                document.cookie = 'accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
-                document.cookie = 'refreshToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
-                document.cookie = 'authorId=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
-                document.cookie = 'role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
-                document.cookie = 'userId=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
-                navigate("/login");
-            })
+
+            setCookies('accessToken', response.data.access_token, { path: '/' });
+            setCookies('refreshToken', response.data.refresh_token, { path: '/' });
+
+            let decoded = jwtDecode(response.data.access_token);
+            setCookies('authorId', decoded?.authorId, { path: '/' });
+
+            const userId = jwtDecode(response.data.access_token)["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
+            setCookies('userId', userId, { path: '/' });
+            setCookies('role', decoded.role, { path: '/' });
+
+            token = response.data.access_token;
+            return 'Bearer ' + response.data.access_token;                
+        } catch (err) {
+            // Очищаем куки и перенаправляем на страницу логина
+            document.cookie = 'accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
+            document.cookie = 'refreshToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
+            document.cookie = 'authorId=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
+            document.cookie = 'role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
+            document.cookie = 'userId=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
+            navigate("/login");
+        } finally {
+            isRefreshing = false;
+        }
     }
 
     //Вставка токена в запрос и его проверка
@@ -164,11 +213,11 @@ function App() {
                 if (decoded.exp > new Date().getTime() / 1000)
                     config.headers['Authorization'] = 'Bearer ' + accessToken;
                 else {
-                    await refreshTokens(config);
+                    config.headers['Authorization'] = await refreshTokens(config);
                 }
             }
             else if (refreshToken) {
-                await refreshTokens(config);
+                config.headers['Authorization'] = await refreshTokens(config);
             }
             else {
                 navigate("/login");
@@ -186,35 +235,7 @@ function App() {
             return config;
         },
         error => {
-            if (error.response === undefined) {
-                dispatch(showError({errorText: 'Нет сети'}))
-            }
-            else if (error.response?.status === 404) {
-                dispatch(showError({errorText: 'Указанного объекта не существует'}))
-                // window.location.replace('/404');
-                // return Promise.reject(error.response);
-            }
-            else if (error.response?.status === 413) {
-                dispatch(showError({errorText: 'Слишком большой файл'}))
-                return Promise.reject(error.response);
-            }
-            else if (error.response?.status === 500) {
-                dispatch(showError({errorText: 'Ошибка 500 на сервере'}))
-                return Promise.reject(error.response);
-            }
-            else if (error.response?.status === 401) {
-                dispatch(showError({errorText: 'Вы не авторизированы'}))
-                window.location.replace('/login');
-                return Promise.reject(error.response);
-            }
-            else if (error.response?.status === 400) {
-                dispatch(showError({errorText: error.message}))
-                return Promise.reject(error.response);
-            }
-            else {
-                dispatch(showError({errorText: error.message}))
-                return Promise.reject(error);
-            }
+            return invokeErrorMessage(error);
         }
     );
 
@@ -223,35 +244,7 @@ function App() {
             return config;
         },
         error => {
-            if (error.response === undefined) {
-                dispatch(showError({errorText: 'Нет сети'}))
-            }
-            else if (error.response?.status === 404) {
-                dispatch(showError({errorText: 'Указанного объекта не существует'}))
-                // window.location.replace('/404');
-                // return Promise.reject(error.response);
-            }
-            else if (error.response?.status === 413) {
-                dispatch(showError({errorText: 'Слишком большой файл'}))
-                return Promise.reject(error.response);
-            }
-            else if (error.response?.status === 500) {
-                dispatch(showError({errorText: 'Ошибка 500 на сервере'}))
-                return Promise.reject(error.response);
-            }
-            else if (error.response?.status === 401) {
-                dispatch(showError({errorText: 'Вы не авторизированы'}))
-                window.location.replace('/login');
-                return Promise.reject(error.response);
-            }
-            else if (error.response?.status === 400) {
-                dispatch(showError({errorText: error.message}))
-                return Promise.reject(error.response);
-            }
-            else {
-                dispatch(showError({errorText: error.message}))
-                return Promise.reject(error);
-            }
+            return invokeErrorMessage(error);
         }
     )
 
@@ -264,7 +257,8 @@ function App() {
         localStorage.setItem('EXCLUDED', JSON.stringify(excluded_));
         localStorage.setItem('PLAYLISTS', JSON.stringify(playlists_));
         localStorage.setItem('RESIZE', JSON.stringify(resize_));
-    }, [songs_, currentSong_, subscriptions_, featured_, excluded_, playlists_, resize_]);
+        localStorage.setItem('CURR_QUEUE', JSON.stringify(playerQueueName_));
+    }, [songs_, currentSong_, subscriptions_, featured_, excluded_, playlists_, resize_, playerQueueName_]);
 
     return (
         <div className="App">
@@ -273,6 +267,7 @@ function App() {
             <SearchResults/>
             <ErrorMessage/>
             <Players/>
+            <PlayerQueue/>
             <Routes>
                 <Route path={'/login'} element={<Login/>}/>
                 <Route path={'/registration'} element={<Registration/>}/>
@@ -288,7 +283,6 @@ function App() {
                 <>
                     <Route path={'/'} element={<Player/>}/>
                     <Route path={'/featured'} element={<Featured/>}/>
-                    <Route path={'/excluded'} element={<Excluded/>}/>
                     <Route path={'/account'} element={<AccountPage/>}/>
                     <Route path={'/uploadmusic'} element={<UploadMusic/>}/>
                     <Route path={'/uploadvideo'} element={<UploadVideo/>}/>

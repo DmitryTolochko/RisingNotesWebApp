@@ -21,6 +21,7 @@ import Loader from '../../Components/Loader/Loader';
 import { updateSongsValue } from '../../Redux/slices/songsSlice';
 import { updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlice';
 import arrowRight from '../../Images/artist-card/Chevron_Right.svg'
+import { updatePlayerQueueName } from '../../Redux/slices/playerQueueSlice';
 
 export default function Featured() {
     const navigate = useNavigate();
@@ -75,6 +76,7 @@ export default function Featured() {
         let arr = featured.slice(featured.findIndex(e => e === startId));
         dispatch(updateSongsValue(arr));
         dispatch(updateMusicIsPlayingValue(true));
+        dispatch(updatePlayerQueueName('Избранные треки'));
     }
 
     const tabs = [

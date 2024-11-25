@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { updateValue } from '../../../Redux/slices/searchSlice';
 
 import './SidebarCollapser.css';
+import { updatePlayerQueueVisibility } from '../../../Redux/slices/playerQueueSlice';
 
 function SidebarCollapser(props){
    
@@ -38,7 +39,7 @@ function SidebarCollapser(props){
          {!props.collapsed? <button onClick={handleToggle}>&#x2039;</button> :<button onClick={handleToggle}>&#x203A;</button> }
          
          <nav className={!props.collapsed?'music-nav-collapser-colapsed':'music-nav-collapser'} >
-            <ul className="nav-links-collapser">
+            <ul className="nav-links-collapser" onClick={() => dispatch(updatePlayerQueueVisibility(false))}>
                <li>
                   <NavLink onClick={clearQuery} className ={({ isActive }) => (isActive ? 'nav-link wave active' : 'nav-link wave' )} 
                   to={'/'} 
@@ -51,13 +52,6 @@ function SidebarCollapser(props){
                   to={'/featured'} 
                   style={({ isActive }) => (isActive ? {color: '#FE1170'} : {color: '#787885'})}>
                      <img src={like} alt="" className="nav_icon" />
-                  </NavLink>
-               </li>
-               <li> 
-                  <NavLink onClick={clearQuery} className ={({ isActive }) => (isActive ? 'nav-link remove active' : 'nav-link remove ' )}
-                  to={'/excluded'} 
-                  style={({ isActive }) => (isActive ? {color: '#FE1170'} : {color: '#787885'})}>
-                     <img src={warning} alt="" className="nav-icon" />
                   </NavLink>
                </li>
                <li> 

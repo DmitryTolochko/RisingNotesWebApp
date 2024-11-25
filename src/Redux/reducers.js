@@ -13,6 +13,7 @@ import videoPlayerReducer from './slices/videoPlayerSlice.js'
 import vertVideoPlayerReducer from './slices/vertVideoPlayerSlice.js'
 import musicIsPlayingReducer from './slices/musicIsPlayingSlice.js'
 import errorMessageReducer from './slices/errorMessageSlice.js'
+import playerQueueReducer from './slices/playerQueueSlice.js'
 
 const reducers = {
     searchInput: searchReducer,
@@ -29,7 +30,8 @@ const reducers = {
     videoPlayer: videoPlayerReducer,
     vertVideoPlayer: vertVideoPlayerReducer,
     musicIsPlaying: musicIsPlayingReducer,
-    errorMessage: errorMessageReducer
+    errorMessage: errorMessageReducer,
+    playerQueue: playerQueueReducer
 }
 
 export default reducers
