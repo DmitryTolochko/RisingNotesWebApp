@@ -185,7 +185,7 @@ function App() {
             setCookies('userId', userId, { path: '/' });
             setCookies('role', decoded.role, { path: '/' });
 
-            token = response.data.access_token;
+            token = 'Bearer ' + response.data.access_token;
             return 'Bearer ' + response.data.access_token;                
         } catch (err) {
             // Очищаем куки и перенаправляем на страницу логина

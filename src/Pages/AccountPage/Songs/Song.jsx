@@ -68,7 +68,7 @@ export default function Song (props) {
 
     return (
         <div className='track'>
-            <img draggable='false'alt='cover' src={coverLink}/>
+            <img draggable='false' className='song-img' alt='cover' src={coverLink}/>
             <p className='song-title-t'>{songName}<p className='songAuthor'>{props.artist}</p></p>
             <p className='track-statistic'><img alt='stats' src={statsIcon}/>{auditionCount}</p>
             <p className='song-status'>

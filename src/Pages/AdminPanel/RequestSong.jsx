@@ -29,7 +29,7 @@ export default function RequestSong ({info}) {
     return (
         <Link to={'/uploadmusic/' + info.id}>
             <div className='track'>
-                <img alt='cover' src={info.logo} draggable='false'/>
+                <img alt='cover' className='song-img' src={info.logo} draggable='false'/>
                 <p className='song-title-t'>{info.name}
                     <p className='songAuthor'>{info.authorName}</p>
                 </p>
