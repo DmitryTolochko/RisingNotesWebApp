@@ -50,7 +50,7 @@ export default function Song (props) {
             setSongId(response.data.publishedSongId);
             getCoverLink();
             if (response.data.publishedSongId) {
-                axiosUnauthorized.get(`api/song/${response.data.publishedSongId}`)
+                axiosUnauthorized.get(`api/song/${response.data.publishedSongId}/audition/count`)
                 .then(response => {
                     setAuditionCount(response.data.auditionCount);
                 })

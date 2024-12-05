@@ -31,12 +31,14 @@ import { updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlic
 import PlaylistModalMenu from '../PlaylistModalMenu/PlaylistModalMenu';
 import filtersToggle from '../../Hooks/filtersToggle';
 import { updatePlayerQueueVisibility } from '../../Redux/slices/playerQueueSlice';
+import usePrevious from '../../Hooks/usePrevious/usePrevious';
 
 const MusicPlayer = () => {
     const [currSongIndex, setCurrSongIndex] = useState(0);
     const audioRef = useRef(null);
     const [trackCurrentDuration, setTrackCurrentDuration] = useState(0);
     const [trackDuration, setTrackDuration] = useState(0);
+    const [auditionTimer, setAuditionTimer] = useState(null);
     const handleRef = useRef(0);
     const [songName, setSongName] = useState('');
     const [songAuthor, setSongAuthor] = useState('');
@@ -84,6 +86,7 @@ const MusicPlayer = () => {
         if(currentSong !== '' && currentSong !== null){
             getSongLink();
             getCoverLink();
+            stopAuditionTimer();
             axiosUnauthorized.get(`api/song/${currentSong}`)
             .then(response => {
                 setSongName(response.data.name);
@@ -110,6 +113,10 @@ const MusicPlayer = () => {
 
     }, [songs, currentSong]);
 
+    const [remainingAuditionTimerTime, setRemainingTime] = useState(20000);
+    const [startTime, setStartTime] = useState(null);
+    const [isSongAuditionAppended, setIsAuditionAppended] = useState(null);
+
     useEffect(() => {
         //реагирование на флаг паузы плеера
         let audio = audioRef.current;
@@ -120,14 +127,57 @@ const MusicPlayer = () => {
                 setTrackCurrentDuration(t => t = audioRef.current.currentTime);
                 setTrackDuration(t => t = audioRef.current.duration);
             }, 1);
+
+            if (!isSongAuditionAppended)
+                startAuditionTimer();
           
             return () => {
                 clearInterval(intervalId);
             };
         } else if (audioRef.current) {
-            audio.pause()
+            audio.pause();
+            pauseAuditionTimer();
         }
-    }, [isPlaying]);
+    }, [isPlaying, currentSong]);
+
+    
+
+    function startAuditionTimer() {
+        if (auditionTimer) {
+            clearTimeout(auditionTimer);
+        }
+        let time = remainingAuditionTimerTime;
+        if (startTime == null || time > 20000) {
+            setStartTime(Date.now());
+            time = 20000;
+            setRemainingTime(20000);
+        }
+        const newTimerId = setTimeout(appendAudition, time);
+        setAuditionTimer(newTimerId);
+    }
+
+    function stopAuditionTimer() {
+        setStartTime(Date.now());
+        setRemainingTime(20000);
+        setIsAuditionAppended(false);
+        if (auditionTimer) {
+            clearTimeout(auditionTimer);
+            setAuditionTimer(null);
+        }
+    }
+
+    function pauseAuditionTimer() {
+        setRemainingTime(Date.now() - startTime);
+        if (auditionTimer) {
+            clearTimeout(auditionTimer);
+            setAuditionTimer(null);
+        }
+    }
+
+    async function appendAudition() {
+        await axiosUnauthorized.patch('api/song/' + currentSong + '/audition/count');
+        setIsAuditionAppended(true);
+    }
 
     const handlePlayPause = async (e) => { 
         e.preventDefault();
