@@ -24,7 +24,7 @@ function ArtistInfo(props) {
 
     const params = useParams();
     const [isSubscribed, setIsSubscribed] = useState(subscriptions.includes(params.id));
-    const [avatar, setAavatar] = useState(false);
+    const [avatar, setAavatar] = useState(defaultAvatar);
 
     useEffect(() => {
         // проверка наличия картинки и подписки

@@ -121,7 +121,7 @@ function ArtistCard(){
                             <img src={arrowRight} alt="" />
                         </button>
                         </p>
-                        <Songs artist={artist} count={2}/> 
+                        <Songs artist={artist} count={3}/> 
                         <p className='top-tracks-title'>Клипы
                         <button className='search-show-more' onClick={() => handleChangePage(2)}>
                             <span>Смотреть все</span>

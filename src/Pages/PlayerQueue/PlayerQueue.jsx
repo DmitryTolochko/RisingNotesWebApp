@@ -35,7 +35,7 @@ export default function PlayerQueue () {
             .catch(err => {console.log(err)});
         }
         setSongsInfo(array);
-    }
+    };
 
     const handleChangePage = (id) => {
         // смена страницы в лк
@@ -67,7 +67,14 @@ export default function PlayerQueue () {
                         <h2 className='queue-name'>Сейчас играет <p>«{queueName}»</p></h2>
                         <div className='tracks'>
                             {songsInfo.map(el => (
-                                <Song key={el.id} id={el.id} name={el.name} duration={el.durationMs} artist={el.authorName} genres={el.genreList}/>
+                                <Song 
+                                    key={el.id} 
+                                    id={el.id} 
+                                    name={el.name} 
+                                    duration={el.durationMs} 
+                                    artist={el.authorName} 
+                                    genres={el.genreList}
+                                    onClick={() => (console.log('1'))}/>
                             ))}
                             {songs.length === 0 ? <p style={{color: '#FE1170'}}>Список пуст</p> : <></>}
                         </div>

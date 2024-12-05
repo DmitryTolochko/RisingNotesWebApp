@@ -7,6 +7,9 @@ import dislike from '../../Images/controller/thumbs-down.svg';
 import redDislike from '../../Images/controller/dislike-red.svg';
 import list from '../../Images/player/plus.svg';
 import placeholder from '../../Images/main-placeholder.png';
+import selectedIcon from '../../Images/song/Volume.svg';
+import hoverIcon from '../../Images/song/Play.svg';
+
 import { api, axiosAuthorized, axiosPictures, axiosUnauthorized } from '../App/App';
 import useSearchClean from '../../Hooks/useSearchClean/useSearchClean';
 
@@ -31,8 +34,10 @@ function Song({id, onClick=undefined, duration, artist, genres, name}) {
     const resize = useSelector((state)=> state.resize.value);
     const featured = useSelector((state)=>state.featured.value);
     const songs = useSelector((state)=>state.songs.value);
+    const currentSong = useSelector((state)=> state.currentSong.value);
+    const [isHoverOn, setIsHoverOn] = useState(false);
 
-    function addSongsToPlayableList() {
+    function runDelegate() {
         onClick(id);
     };
 
@@ -89,7 +94,7 @@ function Song({id, onClick=undefined, duration, artist, genres, name}) {
 
     const handleAddToSongs = () => {
         if (onClick !== undefined) {
-            addSongsToPlayableList();
+            runDelegate();
         } else {
             dispatch(updateSongsValue([...songs, id]));
         }
@@ -111,11 +116,20 @@ function Song({id, onClick=undefined, duration, artist, genres, name}) {
 
     return (
         <>
-            <div className='track'>
-                <img onClick={handleAddToSongs} alt='cover' src={avatar} draggable='false'/>
-                <p onClick={handleAddToSongs} className='song-title-t'>{name}
+            <div className={currentSong === id ? 'track selected-track' : 'track'}>
+                <div className='song-img' onMouseOver={() => setIsHoverOn(true)}
+                onMouseLeave={() => setIsHoverOn(false)}>
+                    {isHoverOn || currentSong === id ? (
+                        <>
+                            <img onClick={handleAddToSongs} className='song-img-icon' alt='cover' src={currentSong === id ? selectedIcon : hoverIcon} draggable='false'/>
+                            <div className='song-img hover'></div>
+                        </>
+                    ) : (<></>)}
+                    <img onClick={handleAddToSongs} className='song-img' alt='cover' src={avatar} draggable='false'/>
+                </div>
+                <Link to={`/commentaries/${id}`} onClick={hideAllModals} className='song-title-t'>{name}
                     <p className='songAuthor'>{artist}</p>
-                </p>
+                </Link>
                 
                 {resize === 'standart' ? (
                     <>
@@ -128,10 +142,10 @@ function Song({id, onClick=undefined, duration, artist, genres, name}) {
                 
                 {resize === 'standart' ? (
                     <div className='track-buttons'>
+                        <a onClick={handleToFavorite}><img alt='like' src={featured.includes(id) ? redHeart : heart}/></a>
                         <a><img alt='list' src={list} onClick={changeModalState}/></a>
                         <a onClick={handleToExcluded}><img alt='dislike' src={excluded.includes(id) ? redDislike : dislike}/></a>
-                        <a onClick={handleToFavorite}><img alt='like' src={featured.includes(id) ? redHeart : heart}/></a>
-                        <Link to={`/commentaries/${id}`} onClick={hideAllModals}><img alt='comment' src={message}/></Link>
+                        {/* <Link to={`/commentaries/${id}`} onClick={hideAllModals}><img alt='comment' src={message}/></Link> */}
                     </div>
                 ): (
                     <a onClick={handleToFavorite}><img alt='like' src={featured.includes(id) ? redHeart : heart}/></a>

@@ -201,14 +201,6 @@
     line-height: normal;
 }
 
-.track-buttons {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 5px;
-    margin-top: 5px;
-}
-
 .song-title:hover {
     cursor: pointer;
 }
@@ -227,17 +219,6 @@
     font-style: normal;
     font-weight: 400;
     line-height: normal;
-}
-
-.track > a {
-    display: flex;
-    padding-right: 10px;
-}
-
-.track > a:hover, .track-buttons > a:hover {
-    cursor: pointer;
-    transition: all .1s ease;
-    transform: scale(0.95);
 }
 
 .link:hover {
