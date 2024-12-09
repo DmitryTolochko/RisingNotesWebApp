@@ -8,10 +8,12 @@ import Commentaries from "../Commentaries/Commentaries";
 import './ClipPage.css'
 import { axiosUnauthorized } from "../../Components/App/App"
 import { api } from "../../Components/App/App";
+import CustomControls from "./CustomControl/CustomControls";
 
 function ClipPage() {
     const [searchParams, setSearchParams] = useSearchParams();
     const videoRef = useRef(null)
+    const videoWrapperRef = useRef(null)
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const [link, setLink] = useState(null)
@@ -54,11 +56,9 @@ function ClipPage() {
                         <img src={backIcon} alt=""/> Назад
                     </button>
                 </div>
-                <div className="video-wrapper">
-                    <video className='video-player' ref={videoRef} type="video/mp4" preload="auto" autoPlay={true} controls />
-                    <div className="custom-controls">
-                        Custom 
-                    </div>
+                <div ref={videoWrapperRef} className="video-wrapper">
+                    <video className='video-player' ref={videoRef} type="video/mp4" preload="auto" autoPlay={false}/>
+                    <CustomControls video={videoRef} wrapper={videoWrapperRef}/>
                     <h2 className="clip-page-song-name">{name}</h2>
                     <span className="clip-page-author-name">{author}</span>
                 </div>
