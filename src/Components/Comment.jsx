@@ -14,6 +14,7 @@ const Comment = (props) => {
     const [isDeleted, setIsDeleted] = useState(false);
     const [comment, setComment] = useState(props.data.text);
     const [cookies, setCookies] = useCookies(['userId']);
+    const clipId = props.clipId
 
     const resize = useSelector((state)=> state.resize.value)
     const [avatar, setAvatar] = useState(placeholder);
@@ -23,20 +24,37 @@ const Comment = (props) => {
     }, []);
 
     const handleDeleteComment = () => {
-        axiosAuthorized.delete(`api/song/comment/${props.data.id}`);
+        if(clipId)
+            axiosAuthorized.delete(`api/music-clip/comment/${props.data.id}`);
+        else
+            axiosAuthorized.delete(`api/song/comment/${props.data.id}`);
+
         setIsDeleted(true);
     }
 
     const handleSendComment = () => {
-        axiosAuthorized.post(`api/song/${props.songId}/comment`, {text: comment})
-            .then(response => {
-                setIsDeleted(false);
-                props.setIsDataUpdated(!props.isDataUpdated);
-            })
-            .catch(err => {
-                console.log(err);
-                throw err;
-            })
+        if(clipId){
+            axiosAuthorized.post(`api/music-clip/${clipId}/comment`, {text: comment})
+                .then(response => {
+                    setIsDeleted(false);
+                    props.setIsDataUpdated(!props.isDataUpdated);
+                })
+                .catch(err => {
+                    console.log(err);
+                    throw err;
+                })
+        }
+        else{
+            axiosAuthorized.post(`api/song/${props.songId}/comment`, {text: comment})
+                .then(response => {
+                    setIsDeleted(false);
+                    props.setIsDataUpdated(!props.isDataUpdated);
+                })
+                .catch(err => {
+                    console.log(err);
+                    throw err;
+                })
+        }
     }
 
     const getAavatar = useCallback(() => {

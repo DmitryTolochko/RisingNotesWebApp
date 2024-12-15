@@ -1,0 +1,59 @@
+.clip-page-wrapper{
+    width: 100%;
+    margin: 78px auto 0 auto;
+    padding-inline: 40px;
+    max-width: 1220px;
+}
+.video-wrapper{
+    position: relative;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+}
+.clip-page-top{
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    padding: 80px 0 40px 0;
+}
+.clip-back-btn{
+    display: flex;
+    color:#787885;
+}
+.clip-back-btn > img{
+    transform: translateY(-8px);
+    opacity: .5;
+}
+.video-player{
+    display: block;
+    width: 100%;
+    background-color: black;
+}
+
+
+.clip-page-song-name{
+    font-size: 40px;
+    margin-block: 12px;
+}
+.clip-page-author-name{
+    font-size: 28px;
+    color:#C5C5C5;
+}
+
+.clip-page-wrapper > .comment-page-wrapper{
+    margin: 0;
+    padding: 0;
+}
+
+
+.clip-hr{
+    height: 1px;
+    color: #2C323D;
+    margin-block: 40px;
+}
+.clip-comment-title{
+    font-size: 24px;
+}

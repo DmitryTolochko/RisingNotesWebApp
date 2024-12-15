@@ -111,8 +111,10 @@ function Clip({key, clipId, authorId, songId, name, deleteFunc=undefined, isArti
                 <Skeleton baseColor='#0F141D' highlightColor="#2C323D" count={2} />
             </>}
             <div className="cover-wrapper" style={videoLoaded?{display:'block'}:{display:'none'}}>
-
-                <div className="clip-video" onClick={()=>setSearchParams({'clip_view':clipLink})} 
+                <div className="clip-video" onClick={()=>{
+                    cleanQuery()
+                    navigate(`/clipview?clip_name=${name}&author_name=${authorName}&clip_id=${clipId}`)
+                }} 
                         onMouseOver={() => handleVideoHover(videoPreviewRef, clipLink)}
                         onMouseEnter={() => handleVideoEnter(previewRef)}
                         onMouseMove={() => handleVideoMove(videoPreviewRef)}

@@ -19,7 +19,6 @@ import SearchResults from '../SearchResults/SearchResults';
 import UploadMusic from '../../Pages/UploadMusic/UploadMusic.jsx';
 import UploadVideo from '../../Pages/UploadVideo/UploadVideo.jsx';
 import InstallVerticalVideo from '../../Pages/UploadVerticalVideo/UploadVertVideo.jsx';
-import ClipView from '../ClipView/ClipView.jsx';
 import ErrorPage from '../../Pages/404Page/404Page';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
@@ -40,6 +39,7 @@ import { updateVideoPlayerValue } from '../../Redux/slices/videoPlayerSlice.js';
 import { updateVertVideoPlayerValue } from '../../Redux/slices/vertVideoPlayerSlice.js';
 import { showError } from '../../Redux/slices/errorMessageSlice.js';
 import PlayerQueue from '../../Pages/PlayerQueue/PlayerQueue.jsx';
+import ClipPage from '../../Pages/ClipPage/ClipPage.jsx';
 
 export const api = 'http://81.31.247.227/';
 axios.defaults.headers.post['Access-Control-Allow-Origin'] = 'rn-api-storage.s3.yandexcloud.net';
@@ -78,18 +78,6 @@ function App() {
     const location = useLocation()
     const [searchParams, setSearchParams] = useSearchParams();
 
-    useEffect(()=>{
-        const clip = searchParams.get('clip_view')
-        const short = searchParams.get('short_view')
-
-        if(clip){
-            dispatch(updateVideoPlayerValue(clip))
-        }
-        if(short){
-            dispatch(updateVertVideoPlayerValue(short))
-        }
-    },[location])
-
     //Redux Dispatcher
     const dispatch = useDispatch()
 
@@ -121,6 +109,17 @@ function App() {
 
         return () => window.removeEventListener('resize', handleResize);
     }, []);
+
+    
+    useEffect(()=>{
+        const short = searchParams.get('short_view')
+
+        if(short){
+            dispatch(
+                updateVertVideoPlayerValue(short)
+            )
+        }
+    },[location])
 
     function invokeErrorMessage(error) {
         if (error.response === undefined) {
@@ -275,7 +274,7 @@ function App() {
                 <Route path={'/commentaries/:id'} element={<Commentaries/>}/>
                 <Route path={'/playlist/:id'} element={<PlaylistWindow/>}/>
                 <Route path={'/uploadmusic/:id'} element={<UploadMusic/>}/>
-                <Route path={'/clipview/:id'} element={<ClipView/>}/>
+                <Route path={'/clipview'} element={<ClipPage/>}/>
                 <Route path={'*'} element={<ErrorPage/>}/>
                 {cookies.role === 'admin' ? (<>
                     <Route path={'/'} element={<AdminPanel/>}/>

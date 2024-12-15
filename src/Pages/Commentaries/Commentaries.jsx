@@ -26,7 +26,7 @@ import { updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlic
 import { updateFeaturedValue } from '../../Redux/slices/featuredSlice';
 import PlaylistModalMenu from '../../Components/PlaylistModalMenu/PlaylistModalMenu';
 
-const Commentaries = (props) => {
+const Commentaries = ({clip}) => {
     const params = useParams();
     const [comments, setComments] = useState([]);
     const [comment, setComment] = useState('');
@@ -35,7 +35,7 @@ const Commentaries = (props) => {
     const [songAuthor, setSongAuthor] = useState('');
     const [authorId, setAuthorId] = useState('');
     const [genres, setGenres] = useState([]);
-    const [clipId, setClipId] = useState(undefined);
+    const [clipId, setClipId] = useState(clip ? clip : undefined);
 
     const [currPage, setCurrPage] = useState(0);
     const [songText, setText] = useState('');
@@ -66,65 +66,96 @@ const Commentaries = (props) => {
         // получить всю информацию
         let authorId = undefined;
 
-        await axiosUnauthorized.get(`api/song/${params.id}/comment/list`)
-            .then(response => {
-                let arr = response.data.commentList;
-                arr.reverse();
-                setComments(arr);
-            })
-            .catch(err=>{
-                console.log(err);
-            });
+        if(clip){
+            await axiosUnauthorized.get(`/api/music-clip/${clipId}/comment/list`)
+                .then(response => {
+                    let arr = response.data.commentList;
+                    arr.reverse();
+                    setComments(arr);
+                })
+                .catch(err=>{
+                    console.log(err);
+                });
+        }
+        else{
+            await axiosUnauthorized.get(`api/song/${params.id}/comment/list`)
+                .then(response => {
+                    let arr = response.data.commentList;
+                    arr.reverse();
+                    setComments(arr);
+                })
+                .catch(err=>{
+                    console.log(err);
+                });
+            
+            await axiosUnauthorized.get(`api/song/${params.id}`)
+                .then(response => {
+                    setSongName(response.data.name);
+                    setGenres(response.data.genreList);
+                    setSongAuthor(response.data.authorName);
+                    setText(response.data.lyrics ? response.data.lyrics : 'Мы не знаем текст этой песни :(');
+                    authorId = response.data.authorId;
+                    setAuthorId(authorId);
+                })
+                .catch(err => {
+                    console.log(err);
+                    throw err;
+                });
 
-        await axiosUnauthorized.get(`api/song/${params.id}`)
-            .then(response => {
-                setSongName(response.data.name);
-                setGenres(response.data.genreList);
-                setSongAuthor(response.data.authorName);
-                setText(response.data.lyrics ? response.data.lyrics : 'Мы не знаем текст этой песни :(');
-                authorId = response.data.authorId;
-                setAuthorId(authorId);
-            })
-            .catch(err => {
-                console.log(err);
-                throw err;
-            });
+            await axiosPictures.get('api/author/' + authorId + '/logo/link')
+                .then(response => {
+                    setArtistAvatar(response?.data?.presignedLink)
+                })
+                .catch(err => {
+                    setArtistAvatar(defaultAvatar);
+                });
 
-        await axiosPictures.get('api/author/' + authorId + '/logo/link')
-            .then(response => {
-                setArtistAvatar(response?.data?.presignedLink)
-            })
-            .catch(err => {
-                setArtistAvatar(defaultAvatar);
-            });
+            await axiosPictures.get(api + 'api/music-clip/by-song/' + params.id)
+                .then(response => {
+                    setClipId(response?.data.clipId);
+                })
+                .catch(err => {
+                    setClipId(undefined);
+                })
 
-        await axiosPictures.get(api + 'api/music-clip/by-song/' + params.id)
-            .then(response => {
-                setClipId(response?.data.clipId);
-            })
-            .catch(err => {
-                setClipId(undefined);
-            })
-
-        setSongLogo(await axiosPictures.get(api + `api/song/${params.id}/logo/link`)
-        .then(resp => {return resp?.data?.presignedLink})
-        .catch(err => {return placeholder}));
+            setSongLogo(await axiosPictures.get(api + `api/song/${params.id}/logo/link`)
+            .then(resp => {return resp?.data?.presignedLink})
+            .catch(err => {return placeholder}));
+        }
     }
 
     const handleSendComment = () => {
         // отправить комментарий
-        if (comment !== '') {
-            axiosAuthorized.post(`api/song/${params.id}/comment`, {text: comment})
-            .then(response => {
-                setIsDataUpdated(!isDataUpdated);
-                setComment('');
-            })
-            .catch(err => {
-                console.log(err);
-            })
+        
+        if(clip){
+            if (comment !== '') {
+                axiosAuthorized.post(`/api/music-clip/${clipId}/comment`, {text: comment})
+                .then(response => {
+                    setIsDataUpdated(!isDataUpdated);
+                    setComment('');
+                })
+                .catch(err => {
+                    console.log(err);
+                })
+            }
+            else {
+                return Promise.reject(Error);
+            }
         }
-        else {
-            return Promise.reject(Error);
+        else{
+            if (comment !== '') {
+                axiosAuthorized.post(`api/song/${params.id}/comment`, {text: comment})
+                .then(response => {
+                    setIsDataUpdated(!isDataUpdated);
+                    setComment('');
+                })
+                .catch(err => {
+                    console.log(err);
+                })
+            }
+            else {
+                return Promise.reject(Error);
+            }
         }
     };
 
@@ -169,59 +200,67 @@ const Commentaries = (props) => {
     return (
         <div className='comment-page-wrapper'>
             <div className='comment-page'>
-                <BackButton/>
-
-                <div className='comm-head'>
-                    <div className='comm-img-hover'>
-                        <a onClick={handleToFavorite}><img draggable='false' src={featured.includes(currentSong) ? redHeart : heartIcon}/></a>
-                        <a onClick={handlePlaySong}><img src={playButtonIcon} draggable='false'/></a>
-                        <a onClick={changeModalState}><img src={listIcon} draggable='false'/></a>
-                        {!modalIsHidden ? (<PlaylistModalMenu songAuthor={songAuthor} songName={songName} id={params.id}/>) : (<></>)}
-                    </div>
-                    <img alt='cover' src={songLogo} draggable='false'/>
-                    <span className='comm-page-text'>
-                        <h2 className='comm-page-h2'>{songName}</h2>
-                        <Link to={`/artist/${authorId}`} className='comm-page-author'><img src={artistAvatar} alt='avatar'/>{songAuthor}</Link>
-                        <div className='comm-head-buttons'>
-                            {genres.map(el => <span key={el} className='song-tag'>{el}</span>)}
+                {!clip &&
+                <>
+                    <BackButton/>
+                    <div className='comm-head'>
+                        <div className='comm-img-hover'>
+                            <a onClick={handleToFavorite}><img draggable='false' src={featured.includes(currentSong) ? redHeart : heartIcon}/></a>
+                            <a onClick={handlePlaySong}><img src={playButtonIcon} draggable='false'/></a>
+                            <a onClick={changeModalState}><img src={listIcon} draggable='false'/></a>
+                            {!modalIsHidden ? (<PlaylistModalMenu songAuthor={songAuthor} songName={songName} id={params.id}/>) : (<></>)}
                         </div>
-                        {clipId && resize === 'mobile' ? (
-                            <CustomButton text={'Смотреть клип'} icon={playIcon} func={() => dispatch(updateVideoPlayerValue(api + `api/music-clip/${clipId}/file`))} success={'Смотреть клип'}/>
+                        <img alt='cover' src={songLogo} draggable='false'/>
+                        <span className='comm-page-text'>
+                            <h2 className='comm-page-h2'>{songName}</h2>
+                            <Link to={`/artist/${authorId}`} className='comm-page-author'><img src={artistAvatar} alt='avatar'/>{songAuthor}</Link>
+                            <div className='comm-head-buttons'>
+                                {genres.map(el => <span key={el} className='song-tag'>{el}</span>)}
+                            </div>
+                            {clipId && resize === 'mobile' ? (
+                                <CustomButton text={'Смотреть клип'} icon={playIcon} func={() => dispatch(updateVideoPlayerValue(api + `api/music-clip/${clipId}/file`))} success={'Смотреть клип'}/>
+                            ) : 
+                            (<></>)}
+                        </span>
+                        {clipId && resize === 'standart' ? (
+                            <div className='comm-head-button'>
+                                <CustomButton text={'Смотреть клип'} icon={playIcon} func={() => dispatch(updateVideoPlayerValue(api + `api/music-clip/${clipId}/file`))} success={'Смотреть клип'}/>
+                            </div>
                         ) : 
                         (<></>)}
-                    </span>
-                    {clipId && resize === 'standart' ? (
-                        <div className='comm-head-button'>
-                            <CustomButton text={'Смотреть клип'} icon={playIcon} func={() => dispatch(updateVideoPlayerValue(api + `api/music-clip/${clipId}/file`))} success={'Смотреть клип'}/>
-                        </div>
-                    ) : 
-                    (<></>)}
-                    
-                </div>
+                        
+                    </div>
 
-                <div className="artist-card-menu">
-                    <a onClick={() => handleChangePage(0)} 
-                        className={currPage === 0 ? 'artist-card-menu-item account-page-active' : 'artist-card-menu-item'}>
-                        <img src={commentsIcon}/>
-                        Обсуждение
-                    </a>
-                    <a onClick={() => handleChangePage(1)} 
-                        className={currPage === 1 ? 'artist-card-menu-item account-page-active' : 'artist-card-menu-item'}>
-                        <img src={burgerIcon}/>
-                        Текст
-                    </a>
-                </div>
+                    <div className="artist-card-menu">
+                        <a onClick={() => handleChangePage(0)} 
+                            className={currPage === 0 ? 'artist-card-menu-item account-page-active' : 'artist-card-menu-item'}>
+                            <img src={commentsIcon}/>
+                            Обсуждение
+                        </a>
+                        <a onClick={() => handleChangePage(1)} 
+                            className={currPage === 1 ? 'artist-card-menu-item account-page-active' : 'artist-card-menu-item'}>
+                            <img src={burgerIcon}/>
+                            Текст
+                        </a>
+                    </div>
+                </>
+                }
+
+                {clip && <span className='clip-comment-title'>Комментарии</span>}
+                
 
                 {currPage === 0 ? (
                     <>
-                        <div className='comment-input-wrapper'>
+                        <div className='comment-input-wrapper' style={{marginTop: clip? 24 : 0}}>
                             <textarea placeholder='Введите текст комментария здесь...' className='comment-input' 
                                 onChange={(e) => setComment(e.target.value)} value={comment}></textarea>
                                 {resize === 'mobile' ? <button className='comment-btn-offset' onClick={handleSendComment}><img src={sendIcon}/></button> : <></>}
                                 {resize === 'standart' ? <CustomButton text={'Отправить'} func={handleSendComment} icon={sendIcon} errorText='Ошибка' success={'Отправить'}/> : <></>}
                         </div>
                         <div className='song-comments'>
-                            {comments.map(e => (<div key={e.id} className='comment-wrapper'><Comment data={e} songId={params.id} setIsDataUpdated={setIsDataUpdated} isDataUpdated={isDataUpdated}/></div>))}
+                            {comments.map(e => (<div key={e.id} className='comment-wrapper'>
+                                <Comment data={e} clipId={clipId} songId={params.id} setIsDataUpdated={setIsDataUpdated} isDataUpdated={isDataUpdated}/>
+                            </div>))}
                         </div>
                     </>
                 ) : 

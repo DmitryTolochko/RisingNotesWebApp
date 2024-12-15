@@ -9,70 +9,71 @@ import { useSearchParams } from 'react-router-dom';
 
 
 function VideoPlayer() {
-    const videoRef = useRef();
-    const video = useSelector((state)=>state.videoPlayer.value);
-    const dispatch = useDispatch();
-    const [searchParams, setSearchParams] = useSearchParams();
+    // const videoRef = useRef();
+    // const video = useSelector((state)=>state.videoPlayer.value);
+    // const dispatch = useDispatch();
+    // const [searchParams, setSearchParams] = useSearchParams();
 
-    useEffect(() => {
-        handlePlayVideo();
-    }, [video])
+    // useEffect(() => {
+    //     handlePlayVideo();
+    // }, [video])
 
-    function handlePlayVideo() {
-        // плеер видео
-        if (!video) {
-            videoRef?.current?.pause();
-        }
-        else if (typeof video === "string" && video.includes('api/music-clip')) {
-            // playFunc(video);
-            videoRef.current.src = video;
-            // videoRef.current.play();
-            dispatch(updateMusicIsPlayingValue(false));
-        }
-        else {
-            // const url = URL.createObjectURL(video);
-            // playFunc(url);
-            videoRef.current.src = video;
-            // videoRef.current.play();
-            dispatch(updateMusicIsPlayingValue(false));
-        }
-    }
+    // function handlePlayVideo() {
+    //     // плеер видео
+    //     if (!video) {
+    //         videoRef?.current?.pause();
+    //     }
+    //     else if (typeof video === "string" && video.includes('api/music-clip')) {
+    //         // playFunc(video);
+    //         videoRef.current.src = video;
+    //         // videoRef.current.play();
+    //         dispatch(updateMusicIsPlayingValue(false));
+    //     }
+    //     else {
+    //         // const url = URL.createObjectURL(video);
+    //         // playFunc(url);
+    //         videoRef.current.src = video;
+    //         // videoRef.current.play();
+    //         dispatch(updateMusicIsPlayingValue(false));
+    //     }
+    // }
 
-    function playFunc(url) {
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', url, true);
-        xhr.responseType = 'blob';
-        xhr.onload = function() {
-        if (this.status === 200) {
-            // Создание низкопроигрышного потока
-            const mediaSource = new MediaSource();
-            videoRef.current.src = URL.createObjectURL(mediaSource);
-            mediaSource.addEventListener('sourceopen', () => {
-            const sourceBuffer = mediaSource.addSourceBuffer('video/mp4; codecs="avc1.42E01E"');
-            sourceBuffer.mode = 'sequence'; // Поддержка низкой задержки
-            const chunkSize = 4096;
-            let start = 0;
-            let end = Math.min(start + chunkSize, this.readyState >= MediaSource.HAS_QUINTIC_PTS? this.duration : Infinity);
+    // function playFunc(url) {
+    //     const xhr = new XMLHttpRequest();
+    //     xhr.open('GET', url, true);
+    //     xhr.responseType = 'blob';
+    //     xhr.onload = function() {
+    //     if (this.status === 200) {
+    //         // Создание низкопроигрышного потока
+    //         const mediaSource = new MediaSource();
+    //         videoRef.current.src = URL.createObjectURL(mediaSource);
+    //         mediaSource.addEventListener('sourceopen', () => {
+    //         const sourceBuffer = mediaSource.addSourceBuffer('video/mp4; codecs="avc1.42E01E"');
+    //         sourceBuffer.mode = 'sequence'; // Поддержка низкой задержки
+    //         const chunkSize = 4096;
+    //         let start = 0;
+    //         let end = Math.min(start + chunkSize, this.readyState >= MediaSource.HAS_QUINTIC_PTS? this.duration : Infinity);
 
-            // Функция для загрузки следующего блока
-            const loadNextChunk = () => {
-                if (start >= this.duration) return;
-                sourceBuffer.appendBuffer(xhr.response.slice(start, end));
-                start += chunkSize;
-                end = Math.min(start + chunkSize, this.readyState >= MediaSource.HAS_QUINTIC_PTS? this.duration : Infinity);
-                requestAnimationFrame(loadNextChunk);
-            };
+    //         // Функция для загрузки следующего блока
+    //         const loadNextChunk = () => {
+    //             if (start >= this.duration) return;
+    //             sourceBuffer.appendBuffer(xhr.response.slice(start, end));
+    //             start += chunkSize;
+    //             end = Math.min(start + chunkSize, this.readyState >= MediaSource.HAS_QUINTIC_PTS? this.duration : Infinity);
+    //             requestAnimationFrame(loadNextChunk);
+    //         };
 
-            loadNextChunk();
-            });
-        }
-        };
-        xhr.send();
-    }
+    //         loadNextChunk();
+    //         });
+    //     }
+    //     };
+    //     xhr.send();
+    // }
+
 
     return (
         <>
-            {video ?
+            {/* {video ? 
                 <div className='video-player-wrapper'>
                     <img className="rising-notes-forplayer" src={risingnotes}></img>
                     <button className='player-exit-button' onClick={() => {
@@ -83,9 +84,9 @@ function VideoPlayer() {
                     }>
                     <img src={closeButton} /></button>
                     <video className='video-player' ref={videoRef} type="video/mp4" preload="auto" autoPlay={true} controls/>
-                </div>
-                : <></>
-            }
+                </div>: <></>
+                
+            } */}
         </>
     )
 }
