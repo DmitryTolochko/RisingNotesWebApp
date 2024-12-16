@@ -16,10 +16,13 @@ function ClipPage() {
     const videoWrapperRef = useRef(null)
     const navigate = useNavigate()
     const dispatch = useDispatch()
+
     const [link, setLink] = useState(null)
     const [name, setName] = useState(searchParams.get('clip_name'))
     const [author, setAuthor] = useState(searchParams.get('author_name'))
     const [clipId, setClipId] = useState(searchParams.get('clip_id'))
+    const [canPlay, setCanPlay] = useState(false)
+    const [isPlaying, setIsPlaying] = useState((videoRef.current?.currentTime >= 0 && !videoRef.current?.paused && !videoRef.current?.ended && videoRef.current?.readyState > 2))
 
 
     const getClipLink = async () =>{
@@ -48,6 +51,11 @@ function ClipPage() {
         }
     }
 
+    function handleVideoClick(){
+        if(videoRef.current)
+           return 
+    }
+
     return (
         <>
             <div className="clip-page-wrapper">
@@ -57,8 +65,23 @@ function ClipPage() {
                     </button>
                 </div>
                 <div ref={videoWrapperRef} className="video-wrapper">
-                    <video className='video-player' ref={videoRef} type="video/mp4" preload="auto" autoPlay={false}/>
-                    <CustomControls video={videoRef} wrapper={videoWrapperRef}/>
+                    <video 
+                        className='video-player' 
+                        ref={videoRef} 
+                        type="video/mp4" 
+                        preload="auto" 
+                        autoPlay={false}
+
+                        onCanPlay={()=>setCanPlay(true)} 
+                        onClick={handleVideoClick}
+                    />
+                    <CustomControls 
+                        video={videoRef.current} 
+                        wrapper={videoWrapperRef} 
+                        canPlay={canPlay}
+                        isPlaying={isPlaying}
+                        setIsPlaying={setIsPlaying}
+                    />
                     <h2 className="clip-page-song-name">{name}</h2>
                     <span className="clip-page-author-name">{author}</span>
                 </div>
@@ -70,7 +93,6 @@ function ClipPage() {
                 <Commentaries clip={clipId}/>
             </div>
         </>
-        
 
     );
 }
