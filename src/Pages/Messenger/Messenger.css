@@ -30,13 +30,21 @@
     
     width: 320px;
     cursor: pointer;
+    transition: all .1s ease-in-out;
 }
 
-.contact:hover {
+.contact > img {
+    border-radius: 100px;
+    width: 48px;
+    height: 48px;
+}
+
+.contact:hover, .contact-active {
     background-color: #2C323D;
     padding-left: 12px;
     width: 360px;
     padding-right: 40px;
+    transition: all .1s ease-in-out;
 }
 
 .contact-info {
@@ -107,7 +115,13 @@
     font-style:normal;
     font-weight: 400;
     line-height: normal;
-    z-index: 100;
+    z-index: 95;
+}
+
+.chat-header > img {
+    width: 48px;
+    height: 48px;
+    border-radius: 100px;
 }
 
 .chat-container {

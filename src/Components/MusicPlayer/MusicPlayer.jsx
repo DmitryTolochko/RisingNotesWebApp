@@ -122,7 +122,10 @@ const MusicPlayer = () => {
         let audio = audioRef.current;
       
         if (isPlaying && audioRef.current) {
-            audio.play()
+            audio.play();
+            audio.onerror = function() {
+                console.error('Error loading audio');
+            };
             const intervalId = setInterval(() => {
                 setTrackCurrentDuration(t => t = audioRef.current.currentTime);
                 setTrackDuration(t => t = audioRef.current.duration);
