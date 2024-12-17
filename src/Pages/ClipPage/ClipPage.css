@@ -57,3 +57,18 @@
 .clip-comment-title{
     font-size: 24px;
 }
+
+.clip-page-author-wrapper{
+    cursor: pointer;
+}
+
+.clip-page-author-avatar{
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+}
+.clip-page-author-wrapper{
+    display: flex;
+    align-items: center;
+    gap:10px;
+}

@@ -113,7 +113,7 @@ function Clip({key, clipId, authorId, songId, name, deleteFunc=undefined, isArti
             <div className="cover-wrapper" style={videoLoaded?{display:'block'}:{display:'none'}}>
                 <div className="clip-video" onClick={()=>{
                     cleanQuery()
-                    navigate(`/clipview?clip_name=${name}&author_name=${authorName}&clip_id=${clipId}`)
+                    navigate(`/clipview?clip_id=${clipId}`)
                 }} 
                         onMouseOver={() => handleVideoHover(videoPreviewRef, clipLink)}
                         onMouseEnter={() => handleVideoEnter(previewRef)}

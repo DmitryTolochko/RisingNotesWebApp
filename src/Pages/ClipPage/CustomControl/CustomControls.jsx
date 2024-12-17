@@ -80,10 +80,7 @@ function CustomControls({video, wrapper, canPlay, isPlaying, setIsPlaying}) {
     },[fullscreen])
 
     const onPlayButtonClick = () =>{
-        if(isPlaying)
-            video?.pause()
-        else
-            video?.play()
+        isPlaying ? video?.pause() : video?.play()
         setIsPlaying(!isPlaying)
     }
 
@@ -130,7 +127,7 @@ function CustomControls({video, wrapper, canPlay, isPlaying, setIsPlaying}) {
                 <div className="controls-wrapper">
                     <div className="controls-group-wrapper group-wide">
                         <button className="cc-play" onClick={onPlayButtonClick}>
-                            <img src={!isPlaying? playIcon: pauseIcon} alt="" /> 
+                            <img src={!isPlaying? playIcon : pauseIcon} alt="" /> 
                         </button>
                         <div className="cc-volume-changer">
                             <img className='cc-volume-icon' src={volumeIcon} alt="" />
