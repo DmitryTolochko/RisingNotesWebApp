@@ -66,7 +66,7 @@ const MusicPlayer = () => {
     useEffect(() => {
         // скрытие плеера
         if (location.pathname.includes('login') || location.pathname.includes('registration') ||
-            location.pathname.includes('uploadmusic') || cookies.role === 'admin') {
+            location.pathname.includes('uploadmusic') || cookies.role === 'admin' || (resize === 'mobile' && location.pathname.includes('messenger'))) {
             setHiddenTag('hidden');
         } 
         else {

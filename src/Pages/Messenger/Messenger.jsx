@@ -9,7 +9,8 @@ import { useEffect, useState } from "react";
 import {  api, axiosAuthorized, axiosUnauthorized } from '../../Components/App/App';
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
-import usePrevious from "../../Hooks/usePrevious/usePrevious";
+import { useSelector } from "react-redux";
+import Chevron from '../../Images/controller/chevron-left.svg';
 
 const ChatTypes = {
     public: 1,
@@ -17,36 +18,13 @@ const ChatTypes = {
 }
 
 const Month = (number) => {
-    switch (number) {
-        case 1:
-            return 'Января'
-        case 2:
-            return 'Февраля'
-        case 3:
-            return 'Марта'
-        case 4:
-            return 'Апреля'
-        case 5:
-            return 'Мая'
-        case 6:
-            return 'Июня'
-        case 7:
-            return 'Июля'
-        case 8:
-            return 'Августа'
-        case 9:
-            return 'Сентября'
-        case 10:
-            return 'Октября'
-        case 11:
-            return 'Ноября'
-        default:
-            return 'Декабря';
-    }
+    let months = ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'];
+    return months[number - 1];
 }
 
 function Messenger(params) {
     const navigate = useNavigate();
+    const resize = useSelector((state)=> state.resize.value);
     const [searchValue, setSearchValue] = useState(undefined);
     const [recentChats, setRecentChats] = useState([]);
     const [recentChatsFiltered, setRecentChatsFiltered] = useState([]);
@@ -180,6 +158,7 @@ function Messenger(params) {
             setUserId(id);
             setChatId(thisChatId);
             setMessages([]);
+            setChatInfo(undefined);
             await getChatInfo(thisChatId);
         }
     }
@@ -203,7 +182,7 @@ function Messenger(params) {
         switch (id) {
             case cookies.userId:
                 return (
-                    <span className="my-message">
+                    <span className="my-message" key={id}>
                         {text}
                         <p>{formatTime(sentAt)}</p>
                     </span>
@@ -211,7 +190,7 @@ function Messenger(params) {
         
             default:
                 return (
-                    <span className="opponent-message">
+                    <span className="opponent-message" key={id}>
                         {text}
                         <p>{formatTime(sentAt)}</p>
                     </span>
@@ -246,13 +225,63 @@ function Messenger(params) {
         }
     }
 
-    return (
-        <section className='comment-page-wrapper'>
-            <div className='featured messenger'>
-                <BackButton/>
+    const Chat = () => {
+        if (userName !== undefined || chatInfo !== undefined) {
+            return (
+                <div className="chat">
+                    <div className="chat-header">
+                        <a onClick={() => setUser(undefined, defaultAvatar, undefined, undefined)}><img src={Chevron}/></a>
+                        <img src={userLogo !== null ? userLogo : defaultAvatar}/>
+                        <p className="chat-name">{userName}</p>
+                    </div>
+
+                    <div className="chat-container">
+                        {messages.map(el => (
+                        <>
+                            <NewDate currentDate={el.sentAt}/>
+                            <Message key={el.id} id={el.senderId} text={el.text} sentAt={el.sentAt}/>
+                        </>))
+                        }
+                        <NewDate currentDate={-1}/>
+                    </div>
+
+                    <div className='message-input-wrapper'>
+                        <textarea 
+                            placeholder='Напишите сообщение...' 
+                            className='comment-input' 
+                            onChange={e => setCurrentText(e.target.value)}
+                            value={currentText}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter" && !e.shiftKey) {
+                                    e.preventDefault();
+                                    sendMessage(chatId, currentText);
+                                }
+                            }}/>
+                        {resize === 'mobile' ? 
+                            <button className='comment-btn-offset' 
+                                onClick={() => sendMessage(chatId, currentText)}
+                                style={{paddingTop: '10px', right: '55px'}}>
+                                    <img src={sendIcon}/>
+                            </button> : <></>}
+                        {resize === 'standart' ? <CustomButton icon={sendIcon} errorText='' func={() => sendMessage(chatId, currentText)} reusable={true}/> : <></>}
+                    </div>
+                </div>
+            )
+        } else if (resize === 'standart') {
+            return (
+                <div className='chat'>
+                    <img src={chatIcon}/>
+                    <p>Выберите чат</p>
+                </div>
+            )
+        }
+    }
+
+    const Contacts = () => {
+        if (resize === 'standart' || userName === undefined) {
+            return (
                 <div className="contacts">
-                    <div className="searchbar-container" 
-                        style={{marginBottom: '20px', width: '320px', marginTop: '0px'}}>
+                    <div className="searchbar-container search-messenger">
                         <div>
                             <button className='searchbar-submit' type='submit'>
                                 <SearchIcon/>
@@ -312,46 +341,16 @@ function Messenger(params) {
                     ) : (<></>)}
                 </div>                    
 
-                <div className="chat">
-                    {userName === undefined && chatInfo === undefined ? (
-                    <>
-                        <img src={chatIcon}/>
-                        <p>Выберите чат</p>
-                    </>
-                    ) : (
-                    <>
-                        <div className="chat-header">
-                            <img src={userLogo !== null ? userLogo : defaultAvatar}/>
-                            <p>{userName}</p>
-                        </div>
+            )
+        }
+    }
 
-                        <div className="chat-container">
-                            {messages.map(el => (
-                            <>
-                                <NewDate currentDate={el.sentAt}/>
-                                <Message key={el.id} id={el.senderId} text={el.text} sentAt={el.sentAt}/>
-                            </>))
-                            }
-                            <NewDate currentDate={-1}/>
-                        </div>
-
-                        <div className='message-input-wrapper'>
-                            <textarea 
-                                placeholder='Введите текст комментария здесь...' 
-                                className='comment-input' 
-                                onChange={e => setCurrentText(e.target.value)}
-                                value={currentText}
-                                onKeyDown={(e) => {
-                                    if (e.key === "Enter" && !e.shiftKey) {
-                                      e.preventDefault();
-                                      sendMessage(chatId, currentText);
-                                    }
-                                }}/>
-                            <CustomButton icon={sendIcon} errorText='' func={() => sendMessage(chatId, currentText)} reusable={true}/>
-                        </div>
-                    </>
-                    )}
-                </div>
+    return (
+        <section className='comment-page-wrapper'>
+            <div className='featured messenger'>
+                <BackButton/>
+                <Contacts/>
+                <Chat/>
             </div>
         </section>
     )

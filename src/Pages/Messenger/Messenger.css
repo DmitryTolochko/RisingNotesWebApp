@@ -16,6 +16,14 @@
     mask-image: linear-gradient(to top, transparent 0%, black 15%);
     mask-repeat: no-repeat;
     mask-position: center;
+
+    @media screen and (max-width: 1300px) and (min-width: 721px){ 
+        width: 29.5%;
+    }
+    @media screen and (max-width: 720px){ 
+        width:100%;
+        position: relative;
+    }
 }
 
 .contact {
@@ -31,6 +39,14 @@
     width: 320px;
     cursor: pointer;
     transition: all .1s ease-in-out;
+
+    @media screen and (max-width: 1300px) and (min-width: 721px){ 
+        width: 100%;
+        padding-right: 16px;
+    }
+    @media screen and (max-width: 720px){ 
+        width: 100%;
+    }
 }
 
 .contact > img {
@@ -45,6 +61,13 @@
     width: 360px;
     padding-right: 40px;
     transition: all .1s ease-in-out;
+    @media screen and (max-width: 1300px) and (min-width: 721px){ 
+        width: 100%;
+        padding-right: 8px;
+    }
+    @media screen and (max-width: 720px){ 
+        width: 100%;
+    }
 }
 
 .contact-info {
@@ -95,6 +118,17 @@
     font-style: normal;
     font-weight: 400;
     line-height: normal;
+
+    @media screen and (max-width: 1300px) and (min-width: 721px){ 
+        width: 60%;
+        margin-left: 29.5%;
+    }
+    @media screen and (max-width: 720px){ 
+        width:100%;
+        position:absolute;
+        margin: 0;
+        left: 0;
+    }
 }
 
 .chat-header {
@@ -108,20 +142,33 @@
     backdrop-filter: blur(5px);
     border-bottom: #2C323D solid 1px;
     padding: 18px 48px;
-
-    color: white;
-    font-family: Montserrat;
-    font-size: 24px;
-    font-style:normal;
-    font-weight: 400;
-    line-height: normal;
     z-index: 95;
+
+    @media screen and (max-width: 720px){ 
+        justify-content: center;
+        gap: 8px;
+    }
+}
+
+.chat-header > a {
+    display: none;
+    @media screen and (max-width: 720px){ 
+        display: flex;
+        position: absolute;
+        width: 100%;
+        margin-left: 16px;
+
+    }
 }
 
 .chat-header > img {
     width: 48px;
     height: 48px;
     border-radius: 100px;
+    @media screen and (max-width: 720px){ 
+        width: 32px;
+        height: 32px;
+    }
 }
 
 .chat-container {
@@ -149,6 +196,10 @@
     }
     @media screen and (max-height: 1100px){ 
         height:68%;
+    }
+    @media screen and (max-width: 720px){ 
+        padding: 0px 16px;;
+        height: 70%;
     }
 }
 
@@ -217,6 +268,9 @@
     gap: 24px;
     padding: 0px 40px 0px 40px;
     margin-bottom: 180px;
+    @media screen and (max-width: 720px){ 
+        margin-bottom: 0;
+    }
 }
 
 .opponent-message:first-child, 
@@ -240,6 +294,7 @@
 
     margin-top: 32px;
     margin-bottom: 8px;
+    width: 100%;
 }
 
 .no-contacts {
@@ -251,6 +306,10 @@
     width: 320px;
     margin-top: 20px;
     margin-bottom: 100px;
+
+    @media screen and (max-width: 720px){ 
+        width: 100%;
+    }
 }
 
 .no-contacts > p {
@@ -279,4 +338,30 @@
 .no-contacts > .search-icon{
     width: 48px;
     height: 48px;
+}
+
+.search-messenger {
+    margin-bottom: 20px;
+    width: 320px;
+    margin-top: 0px;
+    @media screen and (max-width: 1300px) and (min-width: 721px){ 
+        width: 100%;
+        padding-right: 16px;
+    }
+    @media screen and (max-width: 720px){ 
+        width: 100%;
+    }
+}
+
+.chat-name {
+    color: white;
+    font-family: Montserrat;
+    font-size: 24px;
+    font-style:normal;
+    font-weight: 400;
+    line-height: normal;
+    @media screen and (max-width: 720px){ 
+        font-size: 16px;
+        font-weight: 600;
+    }
 }
