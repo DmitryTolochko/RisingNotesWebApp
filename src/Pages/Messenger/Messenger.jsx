@@ -1,39 +1,31 @@
 import BackButton from "../../Components/BackButton";
 import './Messenger.css';
 import defaultAvatar from '../../Images/image-placeholder/user_logo_small_placeholder.png';
-import { ReactComponent as SearchIcon} from '../../Images/sidebar/Vector.svg';
-import chatIcon from '../../Images/chat.svg';
-import sendIcon from '../../Images/controller/sendIcon.svg';
-import CustomButton from "../../Components/CustomButton/CustomButton";
 import { useEffect, useState } from "react";
 import {  api, axiosAuthorized, axiosUnauthorized } from '../../Components/App/App';
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import Chevron from '../../Images/controller/chevron-left.svg';
+import Contacts from "../../Components/MessengerComponents/Contacts";
+import Chat from "../../Components/MessengerComponents/Chat";
+import Loader from "../../Components/Loader/Loader";
 
 const ChatTypes = {
     public: 1,
     private: 2
 }
 
-const Month = (number) => {
-    let months = ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'];
-    return months[number - 1];
-}
-
 function Messenger(params) {
     const navigate = useNavigate();
     const resize = useSelector((state)=> state.resize.value);
     const [searchValue, setSearchValue] = useState(undefined);
-    const [recentChats, setRecentChats] = useState([]);
+    const [recentChats, setRecentChats] = useState(undefined);
     const [recentChatsFiltered, setRecentChatsFiltered] = useState([]);
     const [users, setUsers] = useState([]);
     const [chatInfo, setChatInfo] = useState(undefined);
     const [chatId, setChatId] = useState(undefined);
     const [messages, setMessages] = useState([]);
     const [currentText, setCurrentText] = useState(undefined);
-    let prevMessageDateTime = 0;
 
     const [userName, setUserName] = useState(undefined);
     const [userLogo, setUserLogo] = useState(defaultAvatar);
@@ -177,180 +169,43 @@ function Messenger(params) {
         }
     }, [searchValue]);
 
-    const Message = ({id, text, sentAt}) => {
-        // сообщение
-        switch (id) {
-            case cookies.userId:
-                return (
-                    <span className="my-message" key={id}>
-                        {text}
-                        <p>{formatTime(sentAt)}</p>
-                    </span>
-                )
-        
-            default:
-                return (
-                    <span className="opponent-message" key={id}>
-                        {text}
-                        <p>{formatTime(sentAt)}</p>
-                    </span>
-                )
-        }
-    }
-
-    const NewDate = ({currentDate}) => {
-        // Линия даты
-        let formatTime = new Date(currentDate);
-        let day = formatTime.getDate();
-        let month = formatTime.getMonth();
-        let year = formatTime.getFullYear();
-        let prev = prevMessageDateTime;
-        prevMessageDateTime = formatTime;
-        if (prev !== 0 && (prev.getDate() !== day || prev.getMonth() !== month)) {
-            return (
-                <span className="chat-date">
-                    <div className="line"></div>
-                    { prev.getDate() +  ' ' + Month(prev.getMonth() + 1)}
-                    <div className="line"></div>
-                </span>
-            )
-        } else if (prev !== 0 && prev.getFullYear() !== year) {
-            return (
-                <span className="chat-date">
-                    <div className="line"></div>
-                    { prev.getDate() +  ' ' + Month(prev.getMonth() + 1) +  ' ' + prev.getFullYear()}
-                    <div className="line"></div>
-                </span>
-            )
-        }
-    }
-
-    const Chat = () => {
-        if (userName !== undefined || chatInfo !== undefined) {
-            return (
-                <div className="chat">
-                    <div className="chat-header">
-                        <a onClick={() => setUser(undefined, defaultAvatar, undefined, undefined)}><img src={Chevron}/></a>
-                        <img src={userLogo !== null ? userLogo : defaultAvatar}/>
-                        <p className="chat-name">{userName}</p>
-                    </div>
-
-                    <div className="chat-container">
-                        {messages.map(el => (
-                        <>
-                            <NewDate currentDate={el.sentAt}/>
-                            <Message key={el.id} id={el.senderId} text={el.text} sentAt={el.sentAt}/>
-                        </>))
-                        }
-                        <NewDate currentDate={-1}/>
-                    </div>
-
-                    <div className='message-input-wrapper'>
-                        <textarea 
-                            placeholder='Напишите сообщение...' 
-                            className='comment-input' 
-                            onChange={e => setCurrentText(e.target.value)}
-                            value={currentText}
-                            onKeyDown={(e) => {
-                                if (e.key === "Enter" && !e.shiftKey) {
-                                    e.preventDefault();
-                                    sendMessage(chatId, currentText);
-                                }
-                            }}/>
-                        {resize === 'mobile' ? 
-                            <button className='comment-btn-offset' 
-                                onClick={() => sendMessage(chatId, currentText)}
-                                style={{paddingTop: '10px', right: '55px'}}>
-                                    <img src={sendIcon}/>
-                            </button> : <></>}
-                        {resize === 'standart' ? <CustomButton icon={sendIcon} errorText='' func={() => sendMessage(chatId, currentText)} reusable={true}/> : <></>}
-                    </div>
-                </div>
-            )
-        } else if (resize === 'standart') {
-            return (
-                <div className='chat'>
-                    <img src={chatIcon}/>
-                    <p>Выберите чат</p>
-                </div>
-            )
-        }
-    }
-
-    const Contacts = () => {
-        if (resize === 'standart' || userName === undefined) {
-            return (
-                <div className="contacts">
-                    <div className="searchbar-container search-messenger">
-                        <div>
-                            <button className='searchbar-submit' type='submit'>
-                                <SearchIcon/>
-                            </button>
-                            <input 
-                                className='searchbar' 
-                                type="text" 
-                                placeholder='Найти пользователя'
-                                value={searchValue}
-                                onChange={e => setSearchValue(e.target.value)}
-                            />
-                        </div>
-                    </div>
-                    {recentChatsFiltered.length > 0 ? (
-                    <>
-                        <p className="contacts-h">Ваши чаты</p>
-                        {recentChatsFiltered.map(el => (
-                            <div className={el.chatName === userName ? 'contact contact-active' : 'contact'} key={el.id} onClick={() => setUser(el.chatName, el.logoFileLink, undefined, el.id)}>
-                                <img alt='avatar' src={el.logoFileLink !== null ? el.logoFileLink : defaultAvatar}/>
-                                <span className="contact-info">
-                                    <span>
-                                        <p className="contact-name">{el.chatName}</p>
-                                        <p>{formatTime(el?.lastMessage?.sentAt)}</p>
-                                    </span>
-                                    <p>{shortenLastMessage(el?.lastMessage?.text)}</p>
-                                </span>
-                            </div>
-                        ))}
-                        
-                    </>
-                    ) : (<></>)}
-                    
-                    {users.length > 0 ? (
-                    <>
-                        <p className="contacts-h">Пользователи</p>
-                        {users.map(el => (
-                            <div className={el.userName === userName ? 'contact contact-active' : 'contact'} key={el.id} onClick={() => setUser(el.userName, el.logoLink, el.id, undefined)}>
-                                <img alt='avatar' src={el.logoLink !== null ? el.logoLink : defaultAvatar}/>
-                                <span className="contact-info">
-                                    <span>
-                                        <p className="contact-name">{el.userName}</p>
-                                    </span>
-                                </span>
-                            </div>
-                        ))}
-                    </>
-                    ) : (<></>)}
-
-                    {users.length === 0 && recentChats.length === 0 ? (
-                    <>
-                         <div className="no-contacts">
-                            <SearchIcon className="search-icon"/>
-                            <p>Пользователи не найдены</p>
-                            <span>Для поиска можно использовать почту или логин пользователя</span>
-                        </div>
-                    </>
-                    ) : (<></>)}
-                </div>                    
-
-            )
-        }
-    }
-
+    if (recentChats === undefined) {
+        return (
+        <section className='comment-page-wrapper'>
+            <div className='featured messenger'>
+                <BackButton/>
+                <Loader/>
+            </div>
+        </section>
+        )
+    } else 
     return (
         <section className='comment-page-wrapper'>
             <div className='featured messenger'>
                 <BackButton/>
-                <Contacts/>
-                <Chat/>
+                <Contacts 
+                    userName={userName}
+                    searchValue={searchValue}
+                    setSearchValue={setSearchValue}
+                    resize={resize}
+                    recentChats={recentChats}
+                    recentChatsFiltered={recentChatsFiltered}
+                    setUser={setUser}
+                    formatTime={formatTime}
+                    shortenLastMessage={shortenLastMessage}
+                    users={users}/>
+                <Chat
+                    userName={userName}
+                    chatInfo={chatInfo}
+                    setUser={setUser}
+                    userLogo={userLogo}
+                    messages={messages}
+                    formatTime={formatTime}
+                    currentText={currentText}
+                    resize={resize}
+                    sendMessage={sendMessage}
+                    setCurrentText={setCurrentText}
+                    chatId={chatId}/>
             </div>
         </section>
     )
