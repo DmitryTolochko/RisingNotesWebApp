@@ -73,7 +73,7 @@ function CustomControls({video, wrapper, canPlay, isPlaying, setIsPlaying}) {
                 videoWrapper.msRequestFullScreen()
         }
         else{
-            if (!window.screenTop && !window.screenY)
+            if (document.fullscreenElement)
                 document.exitFullscreen();
         }
 

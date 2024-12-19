@@ -1,0 +1,12 @@
+.charts-wrapper{
+    display: flex;
+    flex-direction: column;
+    gap:40px;
+}
+.cw-top-chart{
+    display: flex;
+}
+.cw-bottom-charts{
+    display: flex;
+    gap:40px;
+}
