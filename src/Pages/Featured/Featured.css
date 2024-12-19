@@ -149,6 +149,11 @@
     gap:15px;
 }
 
+.featured-section__subscriptions-wrapper{
+    display: flex;
+    gap:40px 2%;
+}
+
 
 @media screen and (max-width: 720px){ 
     .featured-nav__tab-button{
