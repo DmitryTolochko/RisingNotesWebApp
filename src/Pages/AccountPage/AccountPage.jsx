@@ -16,11 +16,13 @@ import Loader from "../../Components/Loader/Loader";
 import blogIcon from '../../Images/account-page/blog.svg';
 import clipsIcon from '../../Images/account-page/clips.svg';
 import profileIcon from '../../Images/account-page/profile.svg';
+import chart from '../../Images/account-page/chart.svg'
 import { useSelector } from "react-redux";
 import './AccountPage.css';
 import Songs from "./Songs/Songs";
 import Clips from "./Clips/Clips";
 import Blog from "./Blog/Blog";
+import Analytics from "./Analytics/Analytics";
 
 export default function AccountPage () {
     const navigate = useNavigate();
@@ -138,6 +140,11 @@ export default function AccountPage () {
                                 </a>
                         {role === 'author' ? (
                             <>
+                                <a onClick={() => handleChangePage(7)} 
+                                    className={currPage === 7 ? 'account-page-menu-item account-page-active' : 'account-page-menu-item'}>
+                                    {resize === 'standart' ? <img alt='icon' src={chart}/> : <></>}
+                                    Аналитика
+                                </a>
                                 <a onClick={() => handleChangePage(4)} 
                                     className={currPage === 4 ? 'account-page-menu-item account-page-active' : 'account-page-menu-item'}>
                                     {resize === 'standart' ? <img alt='icon' src={musicIcon}/> : <></>}
@@ -158,6 +165,7 @@ export default function AccountPage () {
                                     {resize === 'standart' ? <img alt='icon' src={creditCard}/> : <></>}
                                     Оплата
                                 </a>
+                                
                             </>
                             
                         ) : (<></>)}
@@ -182,6 +190,7 @@ export default function AccountPage () {
                     {currPage === 4 ? <Songs/> : <></>}
                     {currPage === 5 ? <Clips/> : <></>}
                     {currPage === 6 ? <Blog/> : <></>}
+                    {currPage === 7 ? <Analytics/> : <></>}
                 </div>
             </div>
         )

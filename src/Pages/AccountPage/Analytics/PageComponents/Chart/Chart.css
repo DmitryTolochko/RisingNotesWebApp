@@ -1,0 +1,35 @@
+.MuiChartsAxis-line,
+.MuiChartsAxis-tick,
+.MuiChartsGrid-line{
+    stroke: #787885 !important;
+}
+.MuiChartsAxis-tickLabel{
+    fill:#787885 !important;
+}
+.MuiAreaElement-root{
+    fill: url(#MyGradient) !important;
+}
+
+
+.chart-wrapper{
+    padding: 32px 40px;
+    border-radius: 40px;
+    background-color: #191E28;
+    border: 1px solid #2C323D;
+    width: 100%;
+}
+
+.period-selector{
+    display: flex;
+    gap:16px;
+    margin-top: 30px;
+}
+.period-selector-btn{
+    padding: 8px 16px;
+    border-radius: 32px;
+    border: 2.5px solid #FE1170;
+    font-size: 14px;
+}
+.psb-active{
+    background-color: #FE1170;
+}

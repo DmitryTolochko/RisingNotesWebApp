@@ -29,6 +29,12 @@ export default function Featured() {
     const [cookies, setCookies] = useCookies(['accessToken', 'refreshToken', 'authorId', 'role', 'userId']);
     const [isLoaded, setIsLoaded] = useState(false);
     const [activeTab, setActiveTab] = useState('main')
+    const tabs = [
+        {id:'main', label: 'Главная', image: heartIcon},
+        {id:'playlists', label: 'Плейлисты', image: copyIcon},
+        {id:'tracks', label: 'Треки', image: tracksIcon},
+        {id:'subscriptions', label: 'Подписки', image: subsIcon}
+    ]
 
     const playlists = useSelector((state) => state.playlists.value);
     const featured = useSelector((state) => state.featured.value);
@@ -53,13 +59,6 @@ export default function Featured() {
         setSongs(array);
         setIsLoaded(true);
     }
-
-    const tabs = [
-        {id:'main', label: 'Главная', image: heartIcon},
-        {id:'playlists', label: 'Плейлисты', image: copyIcon},
-        {id:'tracks', label: 'Треки', image: tracksIcon},
-        {id:'subscriptions', label: 'Подписки', image: subsIcon}
-    ]
 
     const TabSelector = () =>{
         return(
