@@ -2,9 +2,8 @@ import { useEffect, useState } from "react";
 import ok from '../../Images/controller/ok.svg';
 import refresh from '../../Images/controller/refresh.svg';
 import './CustomButton.css';
-import { BsCloudArrowUp } from "react-icons/bs";
 
-function CustomButton({func, text, icon, success, errorText='Повторите попытку', disabled=false}) {
+function CustomButton({func, text, icon, success, errorText='Повторите попытку', disabled=false, reusable=false}) {
     const [verifiedText, setText] = useState(text);
     const [isSent, setIsSent] = useState(false);
     const [isSending, setIsSending] = useState(false);
@@ -14,7 +13,9 @@ function CustomButton({func, text, icon, success, errorText='Повторите 
         try {
             await func();
             setText(success);
-            setIsSent(true);
+            if (!reusable) {
+                setIsSent(true);
+            }
             setIsSending(false);
         }
         catch (err) {
