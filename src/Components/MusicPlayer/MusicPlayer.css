@@ -320,3 +320,8 @@
     left: 80%;
     bottom: 350%;
 }
+
+.mobile-music-player-song-name {
+    color: white;
+    padding: 0;
+}

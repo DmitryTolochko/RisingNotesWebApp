@@ -1,0 +1,45 @@
+.explorer-filters {
+    width: 349px;
+    background: linear-gradient(180deg, rgba(25, 30, 40, 1) 50%, rgba(15, 20, 29, 1) 100%);
+    display: flex;
+    align-items: end;
+    flex-direction: column;
+    z-index: 3;
+    border-left: 1px solid #2C323D;
+    position: fixed;
+    top:78px;
+    right: 0;
+    height: 100vh;
+    transition: all .2s ease-in-out;
+}
+
+.filters-h {
+    display: flex;
+    gap: 8px;
+    font-size: 24px;
+    font-weight: 500;
+
+    width: 100%;
+    padding: 25px 36px;
+}
+
+.close-explorer-filters {
+    margin-top: 27px;
+    margin-right: 27px;
+}
+
+.filters-settings {
+    border-top: 1px solid #2C323D;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    align-items: start;
+    justify-content: start;
+    width: 100%;
+    padding: 32px;
+}
+
+.hidden-filters {
+    right: -350px;
+    transition: all .2s ease-in-out;
+}

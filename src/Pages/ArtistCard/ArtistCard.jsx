@@ -55,6 +55,7 @@ function ArtistCard(){
             axiosUnauthorized.get(api + `api/author/${params.id}`)
             .then(response => {
                 setArtist({
+                    artistId: params.id,
                     userId: response.data.userId,
                     artistName: response.data.name,
                     artistImage: ArtistImage,

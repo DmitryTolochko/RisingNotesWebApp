@@ -5,13 +5,24 @@ import linkIcon from '../../../Images/artist-card/Link.svg'
 import vkIcon from '../../../Images/artist-card/Social Icons.svg'
 import yandexIcon from '../../../Images/artist-card/yandex.svg'
 import defaultAvatar from '../../../Images/main-placeholder.png'
+import messageIcon from '../../../Images/controller/message.png';
 import { useEffect, useState } from "react"
 import { api, axiosPictures } from "../../App/App"
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { useSelector } from "react-redux"
 
+function getSubsText(number) {
+    if (number % 10 > 4 || number === 0) {
+        return number + ' подписчиков';
+    } else if (number === 1) {
+        return number + ' подписчик';
+    } else {
+        return number + ' подписчика';
+    }
+}
+
 function ArtistInfo(props) {
-    const artistImage = props.artist.artistImage
+    const navigate = useNavigate();
     const artistName = props.artist.artistName
     const artistInfoText = props.artist.artistInfoText
     const resize = useSelector((state)=> state.resize.value)
@@ -32,7 +43,11 @@ function ArtistInfo(props) {
         .then(response => setAavatar(response?.data?.presignedLink))
         .catch(err => {setAavatar(defaultAvatar)});
 
-        setIsSubscribed(subscriptions.includes(params.id));
+        if (props.isSubscribed !== undefined) {
+            setIsSubscribed(props.isSubscribed);
+        } else {
+            setIsSubscribed(subscriptions.includes(params.id));
+        }
         setSubscribersCount(props.artist.subscribersCount);
     }, [subscriptions, props.artist]);
 
@@ -41,19 +56,29 @@ function ArtistInfo(props) {
             <img src={avatar} alt="" className="artist-img" draggable='false'/>
             <div className="artist-info">
                 <div className="row-top">
-                    <span className="artist-name">{artistName}</span>
+                    <a className="artist-name" onClick={() =>  navigate(`/artist/${props.artist.artistId}`)}>{artistName}</a>
+                    <div className="artist-btns">
+                    <button className="artist-message-btn" onClick={() =>  navigate(`/messenger?id=${userId}`)} >
+                        <img alt='message' src={messageIcon}/>
+                        <span>Сообщение</span>
+                    </button>
                     {isSubscribed ? (
                         <button className={"subscribe-btn"} onClick={props.handleUnsubscribe}>
-                            <img src={subscribeIcon} alt="" draggable='false'/>
+                            <img src={subscribeIcon} alt="unsubscribe" draggable='false'/>
                             <span>Отписаться</span>
                         </button>
                     ) : (
                         <button className={"subscribe-btn-red"} onClick={props.handleSubscribe}>
-                            <img src={subscribeIcon} alt="" draggable='false'/>
+                            <img src={subscribeIcon} alt="subscribe" draggable='false'/>
                             <span>Подписаться</span>
                         </button>
                     )}
+                    </div>
                     
+                </div>
+                <div className="artist-status">
+                    <img src={subsIcon} alt="" draggable='false'/>
+                    Готов к коллабу
                 </div>
                 <div className="row-md">
                     <p className="artist-info-p">
@@ -63,7 +88,7 @@ function ArtistInfo(props) {
                 <div className="row-bottom">
                     <div className="left">
                         <img src={subsIcon} alt="" draggable='false'/>
-                        <span>Подписчиков: {subcribersCount}</span>
+                        <span>{getSubsText(subcribersCount)}</span>
                     </div>
                     <div className="right">
                         {site.length > 0 ? 

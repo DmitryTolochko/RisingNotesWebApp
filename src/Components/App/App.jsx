@@ -40,6 +40,7 @@ import { updateVertVideoPlayerValue } from '../../Redux/slices/vertVideoPlayerSl
 import { showError } from '../../Redux/slices/errorMessageSlice.js';
 import PlayerQueue from '../../Pages/PlayerQueue/PlayerQueue.jsx';
 import ClipPage from '../../Pages/ClipPage/ClipPage.jsx';
+import MusicExplorer from '../../Pages/MusicExplorer/MusicExplorer.jsx';
 
 export const api = 'http://81.31.247.227/';
 axios.defaults.headers.post['Access-Control-Allow-Origin'] = 'rn-api-storage.s3.yandexcloud.net';
@@ -280,7 +281,7 @@ function App() {
                     <Route path={'/'} element={<AdminPanel/>}/>
                 </>) : (
                 <>
-                    <Route path={'/'} element={<Player/>}/>
+                    <Route path={'/'} element={<MusicExplorer/>}/>
                     <Route path={'/featured'} element={<Featured/>}/>
                     <Route path={'/account'} element={<AccountPage/>}/>
                     <Route path={'/uploadmusic'} element={<UploadMusic/>}/>

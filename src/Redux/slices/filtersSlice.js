@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit'
 
 const initialState ={
     value:{
+        visibility: false,
         genre : [],
         genreOrAnd: 'and',
         language : [],
@@ -65,10 +66,13 @@ export const filtersSlice = createSlice({
             state.value.duration = 'any';
             state.value.extra.explicit = "Disabled";
             state.value.extra.removed = "Disabled";
+        },
+        setFilterVisibility: (state, action) => {
+            state.value.visibility = action.payload;
         }
     }
 })
 
-export const {updateFilterValue, setDefaultFilterValue} = filtersSlice.actions
+export const {updateFilterValue, setDefaultFilterValue, setFilterVisibility} = filtersSlice.actions
 
 export default filtersSlice.reducer

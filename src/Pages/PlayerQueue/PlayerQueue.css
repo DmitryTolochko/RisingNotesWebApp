@@ -34,10 +34,14 @@
 
     display: flex;
     gap: 10px;
+    flex-wrap: wrap;
 }
 
 .queue-name > p {
     color: #FE1170;
+    @media screen and (max-width: 720px){ 
+        font-size: 24px;
+    }
 }
 
 .invisible {
@@ -53,3 +57,23 @@
     34%, 66% { }
     67%, 100% { z-index: -20; }
   }
+
+.scroll-tracks {
+    overflow-y: scroll;
+    max-height: 600px;
+    min-height: 0;
+
+    mask-image: linear-gradient(to top, transparent 0%, black 15%);
+    mask-repeat: no-repeat;
+    mask-position: center;
+
+    @media screen and (max-height: 1300px) and (min-height: 1061px){ 
+        max-height: 550px;
+    }
+    @media screen and (max-height: 1060px){ 
+        max-height: 450px;
+    }
+    @media screen and (max-height: 720px){ 
+        max-height: 300px;
+    }
+}

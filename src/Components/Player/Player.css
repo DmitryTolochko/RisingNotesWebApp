@@ -33,6 +33,7 @@
     left:0;
     width: 100%;
     height: max(100%, 100vh);
+    z-index: 0;
     
 
     object-fit: cover;
@@ -264,6 +265,7 @@
 }
 .player-track-tags{
     display: flex;
+    justify-content: center;
     gap:16px;
     max-width: 370px;
     flex-wrap: wrap;

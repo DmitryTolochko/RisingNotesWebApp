@@ -5,6 +5,7 @@
     gap:40px;
     width: 100%;
     justify-content: space-between;
+    z-index: 2;
 
     @media screen and (max-width: 720px){ 
         flex-direction: column;
@@ -25,8 +26,13 @@
     flex-direction: row;
     justify-content: space-between;
     gap: 20px;
+    flex-wrap: wrap;
 }
 .artist-name{
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset:4px;
     font-size: 36px;
     @media screen and (max-width: 720px){ 
         font-size: 24px;
@@ -35,21 +41,23 @@
 .subscribe-btn, .subscribe-btn-red{
     display: flex;
     align-items: center;
+    justify-content: center;
     gap:10px;
 
     background: none;
     border: 1px solid #FE1170;
-    border-radius: 15px;
+    border-radius: 8px;
 
     color:#fff;
     font-family: var(--text-font);
     font-size: 16px;
-    padding: 5px 20px;
+    padding: 10px 32px;
 
     transition: all .2s ease;
 
     @media screen and (max-width: 720px){ 
         padding: 1px 9px;
+        width: 50%;
     }
 }
 .subscribe-btn:hover, .subscribe-btn-red:hover{
@@ -62,6 +70,7 @@
 }
 
 .artist-info-p{
+    height: 100%;
     font-family: var(--text-font);
     font-size: 16px;
     font-weight: 300;
@@ -70,6 +79,11 @@
     @media screen and (max-width: 720px){ 
         font-size: 12px;
     }
+}
+
+.row-md {
+    height: 100%;
+    margin-top: 12px;
 }
 
 .row-bottom{
@@ -128,4 +142,56 @@
         max-height: 165px;
         border-radius: 12px;
     }
+}
+
+.artist-message-btn {
+    padding: 10px 32px;
+    border-radius: 8px;
+    background-color: #FE1170;
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+    transition: all .2s ease;
+
+    @media screen and (max-width: 720px){ 
+        padding: 1px 9px;
+        width: 50%;
+    }
+}
+
+.artist-message-btn:hover {
+    transition: all .2s ease;
+    background-color: #ff3f8c;
+}
+
+.artist-btns {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+
+    @media screen and (max-width: 720px){ 
+        width: 100%;
+        flex-wrap: nowrap;
+    }
+}
+
+.artist-status {
+    color:#FE1170;
+    border: #FE1170 1px solid;
+    border-radius: 8px;
+    background-color: #0F141D;
+    padding: 4px 12px;
+    width: fit-content;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+}
+
+.artist-status > img {
+    width: 12px;
+    height: 12px;
 }

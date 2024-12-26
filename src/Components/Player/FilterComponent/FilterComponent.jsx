@@ -13,6 +13,10 @@ import { songsByFiltersGetter, extractSongsIdsList } from './FIlters/Filters'
 import filtersToggle from '../../../Hooks/filtersToggle'
 
 import './FilterComponent.css';
+import CustomInputWithTags from '../../CustomInput/CustomInputWithTags'
+import filterIcon from '../../../Images/player/FilterBtn.svg';
+import closeIcon from '../../../Images/music-explorer/close.svg';
+import CustomButton from '../../CustomButton/CustomButton'
 
 function FilterComponent(){
     const [genreFilters,setGenreFilters] = useState(null)
@@ -89,16 +93,23 @@ function FilterComponent(){
 
     if(!isLoading)
         return(
-            <div id='filters-container-id' className="filters-container"> 
-                <div className="filters">
-                    <span className="filters-title">Фильтры</span>
+            <div className="explorer-filters">
+                <button className='close-explorer-filters'><img alt='close' src={closeIcon}/></button>
+                <span className='filters-h'>
+                    <img alt='icon' src={filterIcon}/>
+                    Фильтры
+                </span>
+                <div className="filters-settings">
                     <FilterElement name="Жанр" id="genre" options={genreFilters} updater = {filtersUpdateFunction}/>
                     <FilterElement name="Язык" id="language" options={langFilters} updater = {filtersUpdateFunction}/>
-                    <FilterElement name="На что похоже?" id="similar" options={[]}  updater = {filtersUpdateFunction}/>
+                    {/* <FilterElement name="На что похоже?" id="similar" options={[]}  updater = {filtersUpdateFunction}/> */}
                     <FilterElement name="Настроение" id="mood" options={moodFilters} updater = {filtersUpdateFunction}/>
                     <FilterTimeElement  name="Длительность" id="duration" updater = {filtersUpdateFunction}/>
                     <FilterChckboxElement name="Дополнительно" id="extra"  updater = {filtersUpdateFunction}/>
-                    <button className='filters-apply-btn' disabled={filtersDisabled} onClick={updateSongs}>Применить фильтры</button>
+                    {/* <button className='filters-apply-btn' disabled={filtersDisabled} onClick={updateSongs}>Применить фильтры</button> */}
+                </div>
+                <div className="filters-settings">
+                    <CustomButton text={'Применить фильтры'} success={'Изменить фильтры'} reusable={true} func={updateSongs}/>
                 </div>
             </div>
     )    
