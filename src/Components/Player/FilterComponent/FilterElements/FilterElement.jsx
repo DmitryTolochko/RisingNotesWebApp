@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useSelector } from "react-redux";
+import CustomInputWithTags from "../../../CustomInput/CustomInputWithTags";
 
 function FilterElement({
     name,
@@ -7,9 +8,11 @@ function FilterElement({
     options,
     updater
 }){
+    const select = useRef();
+    const [currentTag, setCurrentTag] = useState(undefined);
     const [tags, setTags] = useState([]);
-    const [predicate, setPredicate] = useState('and')
-    const filters = useSelector((state)=>state.filters.value)
+    const [predicate, setPredicate] = useState('and');
+    const filters = useSelector((state)=>state.filters.value);
 
     useEffect(()=>{
         switch(id){
@@ -31,9 +34,11 @@ function FilterElement({
                 break
         }
 
-    },[filters])
+    },[filters]);
 
-
+    function handleMouseLeave() {
+        setCurrentTag(undefined);
+    };
 
     const handleInputClick = (e) =>{
         e.preventDefault()
@@ -75,12 +80,12 @@ function FilterElement({
                 </div>
                 <form className="filters-form">
                     <input className="filters-input" id={id + "-input"} list={id+'-options'} type="text"  placeholder={'Начните вводить'}/>
+                    <button className="submit-tag-input-track" onClick={handleInputClick}>&#10010;</button>
                     <datalist id={id+'-options'}>
                     {options?.map(
                         (opt, i) => <option key = {i}>{opt}</option>
                     )}
                     </datalist>
-                    <button className="submit-tag-input" type="submit" onClick={handleInputClick}>&#10010;</button>
                 </form>
                 <div className="filter-tags">
                     {tags.map((tag, index) => (

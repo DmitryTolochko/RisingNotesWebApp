@@ -12,8 +12,7 @@ import dislike from '../../Images/controller/thumbs-down.svg';
 import redDislike from '../../Images/controller/dislike-red.svg';
 import cover from '../../Images/main-placeholder.png';
 import vol from '../../Images/controller/volume-2.svg';
-import filtersImg from '../../Images/player/FilterBtn.svg';
-import listIcon from '../../Images/list.svg';
+import { ReactComponent as ListIcon } from '../../Images/list.svg';
 import playlistIcon from '../../Images/player/plus.svg';
 
 import { api } from '../App/App';
@@ -34,6 +33,7 @@ import { updatePlayerQueueVisibility } from '../../Redux/slices/playerQueueSlice
 import usePrevious from '../../Hooks/usePrevious/usePrevious';
 
 const MusicPlayer = () => {
+    const [playerQueueButtonColor, setPlayerQueueButtonColor] = useState('#FFFFFF');
     const [currSongIndex, setCurrSongIndex] = useState(0);
     const audioRef = useRef(null);
     const [trackCurrentDuration, setTrackCurrentDuration] = useState(0);
@@ -66,13 +66,15 @@ const MusicPlayer = () => {
     useEffect(() => {
         // скрытие плеера
         if (location.pathname.includes('login') || location.pathname.includes('registration') ||
-            location.pathname.includes('uploadmusic') || cookies.role === 'admin' || (resize === 'mobile' && location.pathname.includes('messenger'))) {
+            location.pathname.includes('uploadmusic') || cookies.role === 'admin' || 
+            (resize === 'mobile' && location.pathname.includes('messenger')) ||
+            songs.length === 0) {
             setHiddenTag('hidden');
         } 
         else {
             setHiddenTag('');
         }
-    }, [location]);
+    }, [location, songs]);
 
     useEffect(() => {
         // сохранение громкости плеера 
@@ -356,14 +358,14 @@ const MusicPlayer = () => {
                         <img alt='next track' src={rewind_forwrad} draggable='false'/></button>
                 </div>
 
-                <div className='music-player-buttons'>
+                {cookies.role ? (
+                    <div className='music-player-buttons'>
                     <a onClick={handleToExcluded}><img alt='dislike' draggable='false' src={excluded.includes(currentSong) ? redDislike : dislike}/></a>
-                    {/* <Link to={currentSong === '' ? '' : `/commentaries/${currentSong}`} onClick={hideAllModals}>
-                        <img alt='comment' src={message} draggable='false'/>
-                    </Link> */}
                     <a onClick={changePlaylistModalState}><img src={playlistIcon} draggable='false'/></a>
                     <a onClick={handleToFavorite}><img alt='like' draggable='false' src={featured.includes(currentSong) ? redHeart : heart}/></a>
                 </div>
+                ) : (<></>)}
+                
                 {!modalIsHidden ? <div className='playlist-modal-wrapper'><PlaylistModalMenu songAuthor={songAuthor} songName={songName} id={currentSong}/></div> : <></>}
                 
                 <div className="track-range">
@@ -375,7 +377,12 @@ const MusicPlayer = () => {
                 </div>
 
                 <div className='music-player-buttons'>
-                    <a onClick={() => dispatch(updatePlayerQueueVisibility(!isPlayerQueueVisible))}><img alt='like' draggable='false' src={listIcon}/></a>
+                    <a onClick={() => {
+                        dispatch(updatePlayerQueueVisibility(!isPlayerQueueVisible));
+                        setPlayerQueueButtonColor(playerQueueButtonColor === '#FFFFFF' ? '#FE1170' : '#FFFFFF');
+                    }}>
+                        <ListIcon stroke={playerQueueButtonColor}/>
+                    </a>
 
                     <div className="volume-container" onMouseLeave={hideVolumeModal}>
                         <div id='volume-modal' className="volume-modal volume-modal-hidden" >
@@ -398,21 +405,26 @@ const MusicPlayer = () => {
                 <div className='mobile-music-player-song'>
                     <img className={isPlaying ? 'mobile-music-player-img rotate' : 'mobile-music-player-img'} draggable='false' src={coverLink} alt='cover'/>
                     <span>
-                        <p>{songName}</p>
+                        <Link to={currentSong === '' ? '' : `/commentaries/${currentSong}`} className='mobile-music-player-song-name'>{songName}</Link>
                         <Link to={`/artist/${authorId}`} className='mobile-music-player-author'>{songAuthor}</Link>
                     </span>
-                    <button className='mobile-filters-button' onClick={filtersToggle}><img src={filtersImg}/></button>
+                    <a onClick={() => {
+                        dispatch(updatePlayerQueueVisibility(!isPlayerQueueVisible));
+                        setPlayerQueueButtonColor(playerQueueButtonColor === '#FFFFFF' ? '#FE1170' : '#FFFFFF');
+                    }}>
+                        <ListIcon stroke={playerQueueButtonColor}/>
+                    </a>
                 </div>
                 <div className='mobile-music-player-buttons'>
                     
+                    {cookies.role ? (
                     <div className='music-player-buttons'>
                         <a onClick={handleToExcluded}><img alt='dislike' draggable='false' src={excluded.includes(currentSong) ? redDislike : dislike}/></a>
-                        <Link to={currentSong === '' ? '' : `/commentaries/${currentSong}`}>
-                            <img alt='comment' src={message} draggable='false'/>
-                        </Link>
                         <a onClick={changePlaylistModalState}><img src={playlistIcon} draggable='false'/></a>
                         <a onClick={handleToFavorite}><img alt='like' draggable='false' src={featured.includes(currentSong) ? redHeart : heart}/></a>
                     </div>
+                    ) : (<></>)}
+                    
                     {!modalIsHidden ? <div className='playlist-modal-wrapper-mobile'><PlaylistModalMenu songAuthor={songAuthor} songName={songName} id={currentSong}/></div> : <></>}
 
                     <div className='music-player-buttons'>

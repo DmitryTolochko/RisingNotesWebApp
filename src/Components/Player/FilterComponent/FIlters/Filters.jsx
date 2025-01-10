@@ -1,5 +1,6 @@
 import axios from "axios"
-import { api } from "../../../App/App"
+import { api, axiosAuthorized, axiosUnauthorized } from "../../../App/App"
+import { useCookies } from "react-cookie";
 
 export const filtersInitial = {
     genre : [],
@@ -91,25 +92,41 @@ const timeFormatters = {
  * @param {any} filters - текущие фильтры
  * @return {string} текущие фильтры, преобразованные в JSON строку
  */
-export function filtersFormatter(filters){
-    const result = {
-        'GenreList.ValueList': filters.genre,
-        'GenreList.OrPredicate': filters.genreOrAnd == 'and' ? false : true,
+// export function filtersFormatter(filters){
+//     const result = {
+//         'GenreList.ValueList': filters.genre,
+//         'GenreList.OrPredicate': filters.genreOrAnd == 'and' ? false : true,
 
-        'LanguageList.ValueList': filters.language,
-        'LanguageList.OrPredicate': filters.languageOrAnd == 'and' ? false : true,
+//         'LanguageList.ValueList': filters.language,
+//         'LanguageList.OrPredicate': filters.languageOrAnd == 'and' ? false : true,
 
-        'VibeList.ValueList': filters.mood,
-        'VibeList.OrPredicate': filters.moodOrAnd == 'and' ? false : true,
+//         'VibeList.ValueList': filters.mood,
+//         'VibeList.OrPredicate': filters.moodOrAnd == 'and' ? false : true,
 
-        'Gender':0,
+//         'Gender':0,
 
-        'TrackDurationRange.Start': timeFormatters[filters.duration][0],
-        'TrackDurationRange.End':timeFormatters[filters.duration][1],
+//         'TrackDurationRange.Start': timeFormatters[filters.duration][0],
+//         'TrackDurationRange.End':timeFormatters[filters.duration][1],
 
-        'instrumental':null
-    }
-    return(JSON.stringify(result, null, 1))
+//         'instrumental':null
+//     }
+//     return(JSON.stringify(result, null, 1))
+// }
+
+export function buildQueryString(params) {
+    const queryString = Object.entries(params)
+        .map(([key, value]) => {
+            // Для правильного кодирования используем функцию encodeURIComponent
+            const encodedKey = encodeURIComponent(key);
+            // Если value является массивом, преобразуем
+            if (Array.isArray(value)) {
+                return value.map(val => `${encodedKey}=${encodeURIComponent(val)}`).join('&');
+            }
+            const encodedValue = encodeURIComponent(value);
+            return `${encodedKey}=${encodedValue}`;
+        })
+        .join('&');
+    return queryString;
 }
 
 /**
@@ -118,29 +135,35 @@ export function filtersFormatter(filters){
  * @param {any} filters - текущие фильтры
  * @return список песен по фильтрам
  */
-export async function songsByFiltersGetter(filters){
 
-    const query =  `${buildGenreQuery(filters.genre)}
-                    GenreList.OrPredicate=${filters.genreOrAnd == 'and' ? false : true}&
-                    ${buildLanguageQuery(filters.language)}
-                    LanguageList.OrPredicate=${filters.languageOrAnd == 'and' ? false : true}&
-                    ${buildVibesQuery(filters.mood)}
-                    VibeList.OrPredicate=${filters.moodOrAnd == 'and' ? false : true}&
-                    Gender=${1}&
-                    TrackDurationRange.Start=${timeFormatters[filters.duration][0]}&
-                    TrackDurationRange.End=${timeFormatters[filters.duration][1]}&
-                    instrumental=${true}`
-    try{
-        const response = await axios({
-            method:'GET',
-            url: api + 'api/song/list?' + query,
-            responseType: 'text/plain'
-        })
-        let result = JSON.parse(response.data)
-        return result.songList
+
+export async function songsByFiltersGetter(filters, isAuthorized=false){
+    const formatFilters = {
+        'GenreList.ValueList': filters.genre,
+        'GenreList.OrPredicate': filters.genreOrAnd !== 'and' ? true : false,
+        'LanguageList.ValueList': filters.language,
+        'LanguageList.OrPredicate': filters.languageOrAnd !== 'and' ? true : false,
+        'VibeList.ValueList': filters.mood,
+        'VibeList.OrPredicate': filters.moodOrAnd !== 'and' ? true : false,
+        'Instrumental': filters.instrumental,
+        'Gender': filters.gender,
+        'TrackDurationRange.Start': timeFormatters[filters.duration][0],
+        'TrackDurationRange.End':timeFormatters[filters.duration][1],
     }
-    catch(err){
-        return -1
+    const query = buildQueryString(formatFilters);
+    try {
+        let response = undefined;
+        if (isAuthorized) {
+            response = await axiosAuthorized.get('api/song/list?' + query);
+        } else {
+            response = await axiosUnauthorized.get('api/song/list?' + query);
+        }
+        
+        let result = response.data;
+        return result.songList;
+    }
+    catch (err) {
+        return -1;
     }
 }
 

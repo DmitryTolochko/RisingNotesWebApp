@@ -159,20 +159,18 @@ function Clip({key, clipId, authorId, songId, name, deleteFunc=undefined, isArti
                         <img alt='list' src={trashIcon} />
                     </button>
 
-                    {deletePopupVisible && 
-                        <div className="delete-popup">
-                            <p>Вы действительно хотите удалить этот клип?</p>
-                            <div className="popup-actions">
-                                <button onClick={() => {if(deleteFunc) deleteFunc(clipId)}}>
-                                    <img src={trashIcon} alt=""/>
-                                    <span>Да</span>
-                                </button>
-                                <button className='primary' onClick={()=>setDeletePopupVisible(false)}>
-                                    <span>Нет</span>
-                                </button>
-                            </div>
+                    <div className={deletePopupVisible ? "delete-popup" : "delete-popup hidden-popup"}>
+                        <p>Вы действительно хотите удалить этот клип?</p>
+                        <div className="popup-actions">
+                            <button onClick={() => {if(deleteFunc) deleteFunc(clipId)}}>
+                                <img src={trashIcon} alt=""/>
+                                <span>Да</span>
+                            </button>
+                            <button className='primary' onClick={()=>setDeletePopupVisible(false)}>
+                                <span>Нет</span>
+                            </button>
                         </div>
-                    }
+                    </div>
 
                 </div>
             ) : (<></>)}

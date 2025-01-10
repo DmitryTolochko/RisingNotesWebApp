@@ -40,6 +40,7 @@ import { updateVertVideoPlayerValue } from '../../Redux/slices/vertVideoPlayerSl
 import { showError } from '../../Redux/slices/errorMessageSlice.js';
 import PlayerQueue from '../../Pages/PlayerQueue/PlayerQueue.jsx';
 import ClipPage from '../../Pages/ClipPage/ClipPage.jsx';
+import MusicExplorer from '../../Pages/MusicExplorer/MusicExplorer.jsx';
 
 export const api = 'http://81.31.247.227/';
 axios.defaults.headers.post['Access-Control-Allow-Origin'] = 'rn-api-storage.s3.yandexcloud.net';
@@ -90,6 +91,7 @@ function App() {
     const currentSong_ = useSelector((state) => state.currentSong.value)
     const songs_ = useSelector((state) => state.songs.value)
     const playerQueueName_ = useSelector((state) =>  state.playerQueue.currentQueue)
+    const filters_ = useSelector((state) => state.filters.value)
     
     const navigate = useNavigate();
     const [cookies, setCookies] = useCookies(['accessToken', 'refreshToken', 'authorId', 'role', 'userId']);
@@ -257,7 +259,8 @@ function App() {
         localStorage.setItem('PLAYLISTS', JSON.stringify(playlists_));
         localStorage.setItem('RESIZE', JSON.stringify(resize_));
         localStorage.setItem('CURR_QUEUE', JSON.stringify(playerQueueName_));
-    }, [songs_, currentSong_, subscriptions_, featured_, excluded_, playlists_, resize_, playerQueueName_]);
+        localStorage.setItem('FILTERS', JSON.stringify(filters_));
+    }, [songs_, currentSong_, subscriptions_, featured_, excluded_, playlists_, resize_, playerQueueName_, filters_]);
 
     return (
         <div className="App">
@@ -280,7 +283,7 @@ function App() {
                     <Route path={'/'} element={<AdminPanel/>}/>
                 </>) : (
                 <>
-                    <Route path={'/'} element={<Player/>}/>
+                    <Route path={'/'} element={<MusicExplorer/>}/>
                     <Route path={'/featured'} element={<Featured/>}/>
                     <Route path={'/account'} element={<AccountPage/>}/>
                     <Route path={'/uploadmusic'} element={<UploadMusic/>}/>

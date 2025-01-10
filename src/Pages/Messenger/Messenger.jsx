@@ -4,18 +4,22 @@ import defaultAvatar from '../../Images/image-placeholder/user_logo_small_placeh
 import { useEffect, useState } from "react";
 import {  api, axiosAuthorized, axiosUnauthorized } from '../../Components/App/App';
 import { useCookies } from "react-cookie";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Contacts from "../../Components/MessengerComponents/Contacts";
 import Chat from "../../Components/MessengerComponents/Chat";
 import Loader from "../../Components/Loader/Loader";
+import { HttpTransportType, HubConnectionBuilder } from '@microsoft/signalr';
 
 const ChatTypes = {
     public: 1,
     private: 2
 }
 
-function Messenger(params) {
+function Messenger() {
+    const [cookies, setCookies] = useCookies(['accessToken', 'userId']);
+    const location = useLocation();
+    const params = new URLSearchParams(location.search);
     const navigate = useNavigate();
     const resize = useSelector((state)=> state.resize.value);
     const [searchValue, setSearchValue] = useState(undefined);
@@ -30,8 +34,6 @@ function Messenger(params) {
     const [userName, setUserName] = useState(undefined);
     const [userLogo, setUserLogo] = useState(defaultAvatar);
     const [userId, setUserId] = useState(undefined);
-
-    const [cookies, setCookies] = useCookies(['userId']);
 
     async function getRecentChats() {
         // Получить существующие чаты
@@ -94,7 +96,7 @@ function Messenger(params) {
     async function getChatMessages(id) {
         // Получить сообщения чата
         let response = await axiosAuthorized.get('api/chat-message/' + id +  '/list')
-        .catch(err => console.log(err));
+        .catch(err => {return undefined});
 
         setMessages(response?.data?.messageList);
     }
@@ -123,6 +125,18 @@ function Messenger(params) {
               setUsers(filteredUsers.map(result => result[0]));
         } else {
             setUsers(list);
+        }
+    }
+
+    async function getUserById(id) {
+        let response = await axiosAuthorized.get('api/user/' + id)
+        .catch(err => {return undefined});
+
+        let charResp = await axiosAuthorized.get('api/chat/private/' + id)
+        .catch(err => {return undefined});
+
+        if (response !== undefined) {
+            await setUser(response.data.userName, response.data.logoLink, response.data.id, charResp?.data?.id)
         }
     }
 
@@ -156,7 +170,27 @@ function Messenger(params) {
     }
 
     useEffect(() => {
+        // Подгрузить чат с пользователем, если я попал к нему напрямую в ЛС
         getRecentChats();
+        const Id = params.get('id');
+        if (Id !== null) {
+            getUserById(Id);
+        }
+
+        // connection.on('onError', (error) => {
+        //     console.log(error);
+        // });
+        const connection = new HubConnectionBuilder()
+        .withUrl('ws://81.31.247.227' + '/messenger', {
+            skipNegotiation: false,
+            transport: HttpTransportType.WebSockets,
+            accessTokenFactory: () => {return 'Bearer ' + cookies.accessToken}
+        })
+        .build();
+        
+        connection.start().catch(error => {
+            console.error('Ошибка подключения:', error);
+        });
     }, [])
 
     useEffect(() => {

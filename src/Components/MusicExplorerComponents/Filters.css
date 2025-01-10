@@ -1,0 +1,70 @@
+.explorer-filters {
+    width: 349px;
+    background: linear-gradient(180deg, rgba(25, 30, 40, 1) 50%, rgba(15, 20, 29, 1) 100%);
+    display: flex;
+    align-items: end;
+    flex-direction: column;
+    z-index: 3;
+    border-left: 1px solid #2C323D;
+    position: fixed;
+    top:78px;
+    right: 0;
+    height: 100vh;
+    transition: all .2s ease-in-out;
+}
+
+.filters-h {
+    display: flex;
+    gap: 8px;
+    font-size: 24px;
+    font-weight: 500;
+
+    width: 100%;
+    padding: 25px 36px;
+}
+
+.close-explorer-filters {
+    margin-top: 27px;
+    margin-right: 27px;
+}
+
+.filters-settings {
+    border-top: 1px solid #2C323D;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    align-items: start;
+    justify-content: start;
+    width: 100%;
+    padding: 32px;
+    overflow-y: scroll;
+    min-height: 0;
+    max-height: 645px;
+
+    @media screen and (max-height: 1079px) and (min-height: 985px) { 
+        max-height: 550px;
+    }
+    @media screen and (max-height: 984px) and (min-height: 935px) { 
+        max-height: 500px;
+    }
+    @media screen and (max-height: 934px) and (min-height: 882px) { 
+        max-height: 450px;
+    }
+    @media screen and (max-height: 881px) and (min-height: 830px) { 
+        max-height: 400px;
+    }
+    @media screen and (max-height: 829px) and (min-height: 785px) { 
+        max-height: 350px;
+    }
+    @media screen and (max-height: 784px) and (min-height: 735px) { 
+        max-height: 300px;
+    }
+    @media screen and (max-height: 734px) and (min-height: 100px) { 
+        max-height: 250px;
+    }
+}
+
+.hidden-filters {
+    right: -350px;
+    transition: all .2s ease-in-out;
+}

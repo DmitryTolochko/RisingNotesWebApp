@@ -35,7 +35,7 @@ function Excluded () {
     return (
         <div>
             <h2 className='sub-h2'>Исключенные треки</h2>
-            <div className='tracks'>
+            <div className='tracks scroll-tracks'>
                 {songs.map(el => (
                     <Song key={el.id} id={el.id} name={el.name} duration={el.durationMs} artist={el.authorName} genres={el.genreList}/>
                 ))}

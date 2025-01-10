@@ -65,7 +65,7 @@ export default function PlayerQueue () {
                 {currPage === 0 ? (
                     <div>
                         <h2 className='queue-name'>Сейчас играет <p>«{queueName}»</p></h2>
-                        <div className='tracks'>
+                        <div className='tracks scroll-tracks'>
                             {songsInfo.map(el => (
                                 <Song 
                                     key={el.id} 

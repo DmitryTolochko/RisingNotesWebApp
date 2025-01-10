@@ -15,10 +15,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { updateSubscriptionsValue } from "../../Redux/slices/subscriptionsSlice.js";
 
 import './ArtistCard.css';
+import Loader from "../../Components/Loader/Loader.jsx";
 
 function ArtistCard(){
     const navigate = useNavigate();
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
     const subscriptions = useSelector((state)=>state.subscriptions.value)
     const params = useParams();
     const [artist, setArtist] = useState(undefined);
@@ -26,27 +27,27 @@ function ArtistCard(){
     const [isSubscribed, setIsSubscribed] = useState(subscriptions.includes(params.id));
     const [currPage, setCurrPage] = useState(0);
 
-    const handleSubscribe = async () => {
-        // подписка
-        await axiosAuthorized.post(api + `api/subscription/${params.id}`)
-        .then( r => {
-            dispatch(updateSubscriptionsValue([...subscriptions, params.id]))
-            setIsSubscribed(subscriptions.includes(params.id));
-            setIsLoaded(false);
-        })
-        .catch(err => {console.log(err)});
-    }
+    // const handleSubscribe = async () => {
+    //     // подписка
+    //     await axiosAuthorized.post(api + `api/subscription/${params.id}`)
+    //     .then( r => {
+    //         dispatch(updateSubscriptionsValue([...subscriptions, params.id]))
+    //         setIsSubscribed(subscriptions.includes(params.id));
+    //         setIsLoaded(false);
+    //     })
+    //     .catch(err => {console.log(err)});
+    // }
 
-    const handleUnsubscribe = async () => {
-        // отписка
-        await axiosAuthorized.delete(api + `api/subscription/${params.id}`)
-        .then( r => {
-            dispatch(updateSubscriptionsValue(subscriptions.filter(el => el != params.id)))
-            setIsSubscribed(subscriptions.includes(params.id));
-            setIsLoaded(false);
-        })
-        .catch(err => {console.log(err)});
-    }
+    // const handleUnsubscribe = async () => {
+    //     // отписка
+    //     await axiosAuthorized.delete(api + `api/subscription/${params.id}`)
+    //     .then( r => {
+    //         dispatch(updateSubscriptionsValue(subscriptions.filter(el => el != params.id)))
+    //         setIsSubscribed(subscriptions.includes(params.id));
+    //         setIsLoaded(false);
+    //     })
+    //     .catch(err => {console.log(err)});
+    // }
 
     useEffect(() => {
         // обновление информации об авторе
@@ -55,6 +56,7 @@ function ArtistCard(){
             axiosUnauthorized.get(api + `api/author/${params.id}`)
             .then(response => {
                 setArtist({
+                    artistId: params.id,
                     userId: response.data.userId,
                     artistName: response.data.name,
                     artistImage: ArtistImage,
@@ -90,9 +92,7 @@ function ArtistCard(){
             <section className="comment-page-wrapper">
                 <div className="comment-page">
                     <BackButton/>
-                    <ArtistInfo artist={artist} 
-                        handleSubscribe={handleSubscribe} 
-                        handleUnsubscribe={handleUnsubscribe}/>
+                    <ArtistInfo artist={artist}/>
 
                     <div className="artist-card-menu">
                         <a onClick={() => handleChangePage(0)} 
@@ -145,6 +145,16 @@ function ArtistCard(){
                 <img className="artist-bg-image" src={api + `api/user/${artist.userId}/logo?width=400&height=400`}/>
             </section>
         )
+        else {
+            return (
+                <section className="comment-page-wrapper">
+                <div className="comment-page">
+                    <BackButton/>
+                    <Loader/>
+                </div>
+                </section>
+            )
+        }
 }
 
 export default ArtistCard
