@@ -1,22 +1,26 @@
 import { createSlice } from '@reduxjs/toolkit'
 
-const initialState ={
-    value:{
-        visibility: false,
-        genre : [],
-        genreOrAnd: 'and',
-        language : [],
-        languageOrAnd: 'and',
-        similar : [],
-        similarOrAnd: 'and',
-        mood : [],
-        moodOrAnd: 'and',
-        duration : 'any',
-        extra: {
-                explicit : "Disabled",
-                removed : "Disabled"}
-    }
+const saved = localStorage.getItem('FILTERS');
+const valid = saved ? JSON.parse(saved) : {
+    visibility: false,
+    genre : [],
+    genreOrAnd: 'and',
+    language : [],
+    languageOrAnd: 'and',
+    similar : [],
+    similarOrAnd: 'and',
+    mood : [],
+    moodOrAnd: 'and',
+    duration : 'any',
+    instrumental: false,
+    gender: 0,
+    extra: {
+            explicit : "Disabled",
+            removed : "Disabled"}
 } 
+const initialState = {
+    value:valid
+}
 
 export const filtersSlice = createSlice({
     name:'filters',
@@ -49,6 +53,12 @@ export const filtersSlice = createSlice({
                     break
                 case "extra":
                     state.value.extra = value
+                    break
+                case "instrumental":
+                    state.value.instrumental = value
+                    break
+                case "gender":
+                    state.value.gender = value
                     break
                 default:
                     break

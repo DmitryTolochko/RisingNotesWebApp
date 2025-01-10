@@ -37,6 +37,31 @@
     justify-content: start;
     width: 100%;
     padding: 32px;
+    overflow-y: scroll;
+    min-height: 0;
+    max-height: 645px;
+
+    @media screen and (max-height: 1079px) and (min-height: 985px) { 
+        max-height: 550px;
+    }
+    @media screen and (max-height: 984px) and (min-height: 935px) { 
+        max-height: 500px;
+    }
+    @media screen and (max-height: 934px) and (min-height: 882px) { 
+        max-height: 450px;
+    }
+    @media screen and (max-height: 881px) and (min-height: 830px) { 
+        max-height: 400px;
+    }
+    @media screen and (max-height: 829px) and (min-height: 785px) { 
+        max-height: 350px;
+    }
+    @media screen and (max-height: 784px) and (min-height: 735px) { 
+        max-height: 300px;
+    }
+    @media screen and (max-height: 734px) and (min-height: 100px) { 
+        max-height: 250px;
+    }
 }
 
 .hidden-filters {

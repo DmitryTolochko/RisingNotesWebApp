@@ -7,9 +7,10 @@ import yandexIcon from '../../../Images/artist-card/yandex.svg'
 import defaultAvatar from '../../../Images/main-placeholder.png'
 import messageIcon from '../../../Images/controller/message.png';
 import { useEffect, useState } from "react"
-import { api, axiosPictures } from "../../App/App"
+import { api, axiosAuthorized, axiosPictures } from "../../App/App"
 import { useNavigate, useParams } from "react-router-dom"
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
+import { updateSubscriptionsValue } from "../../../Redux/slices/subscriptionsSlice"
 
 function getSubsText(number) {
     if (number % 10 > 4 || number === 0) {
@@ -23,6 +24,7 @@ function getSubsText(number) {
 
 function ArtistInfo(props) {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const artistName = props.artist.artistName
     const artistInfoText = props.artist.artistInfoText
     const resize = useSelector((state)=> state.resize.value)
@@ -34,22 +36,48 @@ function ArtistInfo(props) {
     const userId = props.artist.userId;
 
     const params = useParams();
-    const [isSubscribed, setIsSubscribed] = useState(subscriptions.includes(params.id));
+    const [isSubscribed, setIsSubscribed] = useState(undefined);
     const [avatar, setAavatar] = useState(defaultAvatar);
 
     useEffect(() => {
-        // проверка наличия картинки и подписки
+        // проверка наличия подписки
+        checkIfSubscribed();
+    }, [subscriptions]);
+
+    useEffect(() => {
+        // проверка наличия картинки
         axiosPictures.get(api + `api/user/${userId}/logo/link`)
         .then(response => setAavatar(response?.data?.presignedLink))
         .catch(err => {setAavatar(defaultAvatar)});
 
-        if (props.isSubscribed !== undefined) {
-            setIsSubscribed(props.isSubscribed);
-        } else {
-            setIsSubscribed(subscriptions.includes(params.id));
-        }
         setSubscribersCount(props.artist.subscribersCount);
-    }, [subscriptions, props.artist]);
+    }, [props.artist])
+
+    const handleSubscribe = async () => {
+            // подписка
+            await axiosAuthorized.post(api + `api/subscription/${props.artist.artistId}`)
+            .then( r => {
+                dispatch(updateSubscriptionsValue([...subscriptions, props.artist.artistId]))
+                checkIfSubscribed();
+                setSubscribersCount(subcribersCount + 1);
+            })
+            .catch(err => {console.log(err)});
+        }
+    
+        const handleUnsubscribe = async () => {
+            // отписка
+            await axiosAuthorized.delete(api + `api/subscription/${props.artist.artistId}`)
+            .then( r => {
+                dispatch(updateSubscriptionsValue(subscriptions.filter(el => el != props.artist.artistId)))
+                checkIfSubscribed();
+                setSubscribersCount(subcribersCount - 1);
+            })
+            .catch(err => {console.log(err)});
+        }
+
+    function checkIfSubscribed() {
+        setIsSubscribed(subscriptions.includes(props.artist.artistId));
+    }
 
     return(
         <div className="info-container">
@@ -63,12 +91,12 @@ function ArtistInfo(props) {
                         <span>Сообщение</span>
                     </button>
                     {isSubscribed ? (
-                        <button className={"subscribe-btn"} onClick={props.handleUnsubscribe}>
+                        <button className={"subscribe-btn"} onClick={handleUnsubscribe}>
                             <img src={subscribeIcon} alt="unsubscribe" draggable='false'/>
                             <span>Отписаться</span>
                         </button>
                     ) : (
-                        <button className={"subscribe-btn-red"} onClick={props.handleSubscribe}>
+                        <button className={"subscribe-btn-red"} onClick={handleSubscribe}>
                             <img src={subscribeIcon} alt="subscribe" draggable='false'/>
                             <span>Подписаться</span>
                         </button>

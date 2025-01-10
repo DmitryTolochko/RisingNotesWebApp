@@ -3,14 +3,12 @@ const FilterNotificationPopup = ({
     visible,
     notificationText, 
     actionButtonText, 
-    actionButtonCallback
+    actionButtonCallback=undefined
 }) => {
     return(
         <div className="filters-notification-popup" style={{display: visible? 'flex' : 'none'}}>
-            {notificationText}
-            <button onClick={actionButtonCallback}>
-                {actionButtonText}
-            </button>
+            <h2>{notificationText}</h2>
+            <p>Попробуйте изменить фильтры</p>
         </div>
     )
 }

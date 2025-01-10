@@ -13,6 +13,7 @@ import rewind_backward from '../../Images/controller/rewind-1.svg';
 import ArtistInfo from '../../Components/ArtistCardComponents/ArtistInfo/ArtistInfo';
 import { updateSubscriptionsValue } from '../../Redux/slices/subscriptionsSlice';
 import { updateCurrentSongValue } from '../../Redux/slices/currentSongSlice';
+import FilterNotificationPopup from '../../Components/Player/FilterComponent/FilterElements/FilterNotificationPopup';
 
 function MusicExplorer() {
     const [iconColor, setIconColor] = useState('#000000');
@@ -24,7 +25,7 @@ function MusicExplorer() {
     const dispatch = useDispatch();
 
     const [filtersApplied, setFiltersApplied] = useState(false);
-    const [isSubscribed, setIsSubscribed] = useState(false);
+    const [musicClipLink, setMusicClipLink] = useState(undefined);
     const [bgImage, setBgImage] = useState(background);
     const [currentTrackInfo, setCurrentTrackInfo] = useState({
         id: '',
@@ -48,26 +49,6 @@ function MusicExplorer() {
         }
     });
 
-    const handleSubscribe = async () => {
-        // подписка
-        await axiosAuthorized.post(api + `api/subscription/${currentTrackInfo?.authorId}`)
-        .then( r => {
-            dispatch(updateSubscriptionsValue([...subscriptions, currentTrackInfo?.authorId]))
-            setIsSubscribed(subscriptions.includes(currentTrackInfo?.authorId));
-        })
-        .catch(err => {console.log(err)});
-    }
-
-    const handleUnsubscribe = async () => {
-        // отписка
-        await axiosAuthorized.delete(api + `api/subscription/${currentTrackInfo?.authorId}`)
-        .then( r => {
-            dispatch(updateSubscriptionsValue(subscriptions.filter(el => el != currentTrackInfo?.authorId)))
-            setIsSubscribed(subscriptions.includes(currentTrackInfo?.authorId));
-        })
-        .catch(err => {console.log(err)});
-    }
-
     useEffect(() => {
         // обновление информации об авторе
         if (currentTrackInfo.authorId !== '') {
@@ -87,7 +68,6 @@ function MusicExplorer() {
                             yandex:response.data.yaMusicLink
                         }
                     });
-                    setIsSubscribed(subscriptions.includes(currentTrackInfo?.authorId));
                 })
                 .catch(err => {
                     console.log(err);
@@ -133,10 +113,19 @@ function MusicExplorer() {
             info.authorLogo = songCoverTemplate
         });
 
+        let thisMusicClipLink = await axiosPictures.get('api/music-clip/by-song/' + currentSong)
+        .then(response => {
+            return axiosPictures.get('api/music-clip/' + response.data.clipId + '/file/link')
+            .then(resp => {return resp.data.presignedLink});
+        })
+        .catch(err => {return undefined});
+        setMusicClipLink(thisMusicClipLink);
+
         setCurrentTrackInfo(info);
     }
 
     function handleNextSong() {
+        // следующая песня
         let index = songs.indexOf(currentSong);
         if (index === songs.length - 1) {
             dispatch(updateCurrentSongValue(songs[0]));
@@ -147,6 +136,7 @@ function MusicExplorer() {
     }
 
     function handlePrevSong() {
+        // предыдущая песня
         let index = songs.indexOf(currentSong);
         if (index === 0) {
             dispatch(updateCurrentSongValue(songs[songs.length - 1]));
@@ -163,7 +153,7 @@ function MusicExplorer() {
         getCurrentTrackInfo();
     }, [currentSong, filtersApplied])
 
-    if (!filtersApplied)
+    if (!filtersApplied || songs.length === 0)
     return (
         <div className='comment-page-wrapper'>
             <div className='explorer' style={{justifyContent: 'center', marginTop: '0'}}>
@@ -181,6 +171,11 @@ function MusicExplorer() {
                 </button>
                 <img className="player-bg-image bg-loaded" src={bgImage} alt="" />  
                 <Filters setFiltersApplied={setFiltersApplied}/>
+                
+                <div className="filters-notification-popup" style={{display: filtersApplied && songs.length === 0 ? 'flex' : 'none'}}>
+                    <h2>Песен по вашему запросу не найдено</h2>
+                    <p>Попробуйте изменить фильтры</p>
+                </div>
             </div>
         </div>
     )
@@ -193,7 +188,12 @@ function MusicExplorer() {
                             <img alt='previous' src={rewind_backward}/>
                         </button>
                         <div className='song-info'>
-                            <img alt='song-cover' src={currentTrackInfo.trackCover}/>
+                            {musicClipLink === undefined ? (
+                                <img alt='song-cover' src={currentTrackInfo.trackCover}/>
+                            ) : (
+                                <video className='explorer-video' src={musicClipLink} autoPlay={true} muted preload='auto' type='video/mp4' loop={true}/>
+                            )}
+                            
                             <span className='explorer-start-h'>
                                 <img src={icon}/>
                                 {currentTrackInfo.trackName}
@@ -208,10 +208,7 @@ function MusicExplorer() {
                             <img alt='next' src={rewind_forwrad}/>
                         </button>
                     </div>
-                    <ArtistInfo artist={artist} 
-                        handleSubscribe={handleSubscribe} 
-                        handleUnsubscribe={handleUnsubscribe}
-                        isSubscribed={isSubscribed}/>
+                    <ArtistInfo artist={artist}/>
                     <img className="player-bg-image bg-loaded" src={bgImage} alt="" />  
                 </div>
             </div>

@@ -23,7 +23,7 @@ function FilterDuration() {
             <div className="filter-top">
                 <div className="filter-top-start">
                     <div className="filter-dot"></div>
-                    <span className="filter-name">Длительность</span>
+                    <span className="filter-name">Длительность песни</span>
                 </div>
             </div>
             <form className="filters-form">

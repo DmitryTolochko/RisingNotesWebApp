@@ -13,6 +13,8 @@ import { updateSongsValue } from '../../Redux/slices/songsSlice';
 import { updateCurrentSongValue } from '../../Redux/slices/currentSongSlice';
 import { musicIsPlayingSlice, updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlice';
 import FilterDuration from './FilterDuration';
+import FilterBool from './FilterBool';
+import { useCookies } from 'react-cookie';
 
 function Filters({setFiltersApplied}) {
     const filters = useSelector((state)=>state.filters.value);
@@ -29,6 +31,8 @@ function Filters({setFiltersApplied}) {
     const [genrePredicate, setGenrePredicate] = useState(filters.genreOrAnd);
     const [langPredicate, setLangPredicate] = useState(filters.languageOrAnd);
     const [moodPredicate, setMoodPredicate] = useState(filters.moodOrAnd);
+
+    const [cookies, setCookies] = useCookies(['role']);
 
     useEffect(() => {
         // получение опций для выпадающих списков
@@ -64,7 +68,7 @@ function Filters({setFiltersApplied}) {
     async function applyFilters() {
         // применение фильтров
         dispatch(updateMusicIsPlayingValue(false));
-        await songsByFiltersGetter(filters)
+        await songsByFiltersGetter(filters, cookies.role ? true : false)
         .then(res=> {
             if(res == -1 || res == [] ){
                 return;
@@ -75,10 +79,10 @@ function Filters({setFiltersApplied}) {
             if (songs.length > 0) {
                 dispatch(updateCurrentSongValue(songs[0]));
                 dispatch(updateMusicIsPlayingValue(true));
-                setFiltersApplied(true);
-            }
-
-            hideFilters();
+                hideFilters();
+            }   
+            
+            setFiltersApplied(true);
         })
         .catch(err=> {
             console.log('Error while getting songs by filters: \n')
@@ -123,13 +127,13 @@ function Filters({setFiltersApplied}) {
                     predicate={moodPredicate}
                     setPredicate={setMoodPredicate}/>
                 <FilterDuration/>
-                {/* <FilterTimeElement  name="Длительность" id="duration" updater = {filtersUpdateFunction}/>
-                <FilterChckboxElement name="Дополнительно" id="extra"  updater = {filtersUpdateFunction}/> */}
+                <FilterBool/>
             </div>
             <div className="filters-settings">
                 <CustomButton 
                     text={'Применить фильтры'} 
                     success={'Изменить фильтры'} 
+                    errorText={'Песен не найдено'}
                     reusable={true}
                     func={applyFilters}/>
             </div>

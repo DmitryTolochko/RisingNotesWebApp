@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import Clip from "../../../Components/Clip/Clip";
 import plus from '../../../Images/account-page/plus-icon.svg';
 import { useCookies } from "react-cookie";
-import { api } from "../../../Components/App/App";
+import { api, axiosAuthorized } from "../../../Components/App/App";
 import { useEffect,useState } from "react";
 import axios from "axios";
 
@@ -32,20 +32,26 @@ export default function Clips() {
     }, [])
 
     const deleteClip = async (id) => {
-        try{
-            const response = await axios({
-                method:'DELETE',
-                url: api + 'api/music-clip/' + id,
-            })
-            if(response){
-                getAuthorClips()
-                    .then(res=>setClips(res))
-                    .catch(err=>console.log(err))
-            }
+        let resp = await axiosAuthorized.delete('api/music-clip/' + id);
+        if (resp) {
+            getAuthorClips()
+                .then(res=>setClips(res))
+                .catch(err=>console.log(err))
         }
-        catch(err){
-            return Promise.reject(err);
-        }
+        // try{
+        //     const response = await axios({
+        //         method:'DELETE',
+        //         url: api + 'api/music-clip/' + id,
+        //     })
+        //     if(response){
+        //         getAuthorClips()
+        //             .then(res=>setClips(res))
+        //             .catch(err=>console.log(err))
+        //     }
+        // }
+        // catch(err){
+        //     return Promise.reject(err);
+        // }
     }
 
 
