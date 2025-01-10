@@ -508,3 +508,17 @@
     visibility: visible;
     background: linear-gradient(0deg, #191E28 0%, rgba(25, 30, 40, 0.00) 193.75%);
 }
+
+.password-window {
+    padding: 20px;
+    border-radius: 20px;
+    background: linear-gradient(0deg, #191E28 0%, rgba(25, 30, 40, 0.00) 193.75%);
+    width: 100%;
+    max-width: 20%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: fixed;
+    right: 50%;
+    top: 0;
+}

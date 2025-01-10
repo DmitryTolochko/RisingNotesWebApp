@@ -7,11 +7,16 @@ import CustomInput from '../../../Components/CustomInput/CustomInput';
 export default function AccountUser (props) {
     const [userName, setUserName] = useState(props.userName);
     const [email, setEmail] = useState(props.email);
+    const [oldPassword, setOldPassword] = useState(undefined);
+    const [newPassword, setNewPassword] = useState(undefined);
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
     async function handleSave() {
         try {
-            await props.changeUserName(userName);
+            if (userName !== props.userName)
+                await props.changeUserName(userName);
+            if (email !== props.email)
+                await props.changeUserEmail(email);
         }
         catch (err) {
             return Promise.reject(err);
@@ -59,6 +64,29 @@ export default function AccountUser (props) {
                     Изменить пароль
                 </button>
             </div>
+
+            <div className='password-window'>
+                <h2>Изменить пароль</h2>
+                <CustomInput 
+                    heading={'Старый пароль'} 
+                    placeholder="Начните вводить..."
+                    value={oldPassword} 
+                    onChange={e => setOldPassword(e.target.value)}
+                    isRequired={true}/>
+                <CustomInput 
+                    heading={'Новый пароль'} 
+                    placeholder="Начните вводить..."
+                    value={newPassword} 
+                    onChange={e => setNewPassword(e.target.value)}
+                    isRequired={true}/>
+                <div className="account-page-user-buttons">
+                <CustomButton func={handleSave} icon={saveIcon} text={'Сохранить'} success={'Сохранено'}/>
+                <button className='account-page-unfilled-button'>
+                    Отмена
+                </button>
+                </div>
+            </div>
+            
         </div>
     )
 }

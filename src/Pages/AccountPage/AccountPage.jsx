@@ -116,6 +116,32 @@ export default function AccountPage () {
         }
     }
 
+    const changeUserEmail = async (email) => {
+        // обновление почты пользователя
+        try {
+            await axiosAuthorized.patch('api/profile/email', {
+                newEmail: email
+            })
+            setEmail(email);
+        }
+        catch (err) {
+            return Promise.reject(err);
+        }
+    }
+
+    const changeUserPassword = async (oldPassword, newPassword) => {
+        // обновление пароля пользователя
+        try {
+            await axiosAuthorized.patch('api/profile/password', {
+                oldPassword: oldPassword, 
+                newPassword: newPassword
+            })
+        }
+        catch (err) {
+            return Promise.reject(err);
+        }
+    }
+
     const handleChangePage = (id) => {
         // смена страницы в лк
         setCurrPage(id);
@@ -175,6 +201,7 @@ export default function AccountPage () {
                     {currPage === 0 ? <AccountUser 
                         userName={userName}
                         changeUserName={changeUserName}
+                        changeUserEmail={changeUserEmail}
                         email={email}/> : <></>}
                     {currPage === 1 ? <AccountMusician 
                         authorId={authorId} 
