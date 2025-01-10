@@ -1,0 +1,20 @@
+.bar-chart-wrapper{
+    background-color: #191E28;
+    border: 1px solid #2C323D;
+    border-radius: 40px;
+    width: 100%;
+    min-height: 400px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+/* .MuiBarElement-root{
+    fill:#FE1170 !important;
+} */
+
+.bar-chart-wrapper > h2{
+    margin-top: 32px;
+    width: 100%;
+    padding-inline: 40px;
+}

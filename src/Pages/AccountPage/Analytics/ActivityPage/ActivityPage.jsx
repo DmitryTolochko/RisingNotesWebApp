@@ -1,4 +1,4 @@
-import Chart from "../PageComponents/Chart/Chart";
+import Chart from "../PageComponents/LineChart/Chart";
 import './ActivityPage.css'
 
 function ActivityPage() {

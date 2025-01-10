@@ -1,0 +1,29 @@
+
+.countries-ul{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    width: 100%;
+    margin-top: 60px;
+    max-height: 50%;
+    height: 100%;
+    padding-inline: 40px;
+}
+
+.countries-li{
+    display: flex;
+    gap:8px;
+    align-items: center;
+    justify-content: space-between;
+}
+.countries-li > hr{
+    width: 100%;
+    color: transparent;
+}
+.countries-label{
+    font-size: 32px;
+}
+.countries-value{
+    font-size:24px;
+}

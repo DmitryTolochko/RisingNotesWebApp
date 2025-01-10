@@ -1,0 +1,5 @@
+.audience-top-row{
+    display: flex;
+    gap:40px;
+    margin-block: 40px;
+}
