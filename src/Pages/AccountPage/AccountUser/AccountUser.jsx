@@ -3,13 +3,13 @@ import editIcon from '../../../Images/account-page/edit-icon.svg';
 import { useEffect, useState } from 'react';
 import CustomButton from '../../../Components/CustomButton/CustomButton';
 import CustomInput from '../../../Components/CustomInput/CustomInput';
+import PasswordWindow from '../../../Components/PasswordWindow/PasswordWindow';
 
 export default function AccountUser (props) {
     const [userName, setUserName] = useState(props.userName);
     const [email, setEmail] = useState(props.email);
-    const [oldPassword, setOldPassword] = useState(undefined);
-    const [newPassword, setNewPassword] = useState(undefined);
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+    const [isPasswordWindowVisible, setIsPasswordWindowVisible] = useState(false);
 
     async function handleSave() {
         try {
@@ -59,34 +59,12 @@ export default function AccountUser (props) {
             <div className="account-page-user-buttons">
                 <CustomButton func={handleSave} icon={saveIcon} text={'Сохранить'} success={'Сохранено'} disabled={isButtonDisabled}/>
 
-                <button className='account-page-unfilled-button'>
+                <button className='account-page-unfilled-button' onClick={() => setIsPasswordWindowVisible(!isPasswordWindowVisible)}>
                     <img src={editIcon}/>
                     Изменить пароль
                 </button>
             </div>
-
-            <div className='password-window'>
-                <h2>Изменить пароль</h2>
-                <CustomInput 
-                    heading={'Старый пароль'} 
-                    placeholder="Начните вводить..."
-                    value={oldPassword} 
-                    onChange={e => setOldPassword(e.target.value)}
-                    isRequired={true}/>
-                <CustomInput 
-                    heading={'Новый пароль'} 
-                    placeholder="Начните вводить..."
-                    value={newPassword} 
-                    onChange={e => setNewPassword(e.target.value)}
-                    isRequired={true}/>
-                <div className="account-page-user-buttons">
-                <CustomButton func={handleSave} icon={saveIcon} text={'Сохранить'} success={'Сохранено'}/>
-                <button className='account-page-unfilled-button'>
-                    Отмена
-                </button>
-                </div>
-            </div>
-            
+            <PasswordWindow visibility={isPasswordWindowVisible} func={setIsPasswordWindowVisible}/>
         </div>
     )
 }

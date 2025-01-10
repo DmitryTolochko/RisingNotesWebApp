@@ -9,7 +9,8 @@ function CustomInput({
     onChange, 
     validRegex=undefined,
     isTextArea=false,
-    isRequired=false}) {
+    isRequired=false,
+    type='text'}) {
 
     function isValidValue() {
         if (!isRequired && (value === '' || value === undefined)) {
@@ -37,7 +38,7 @@ function CustomInput({
             </span>
             {isTextArea ? 
             <textarea className='song-text-area' placeholder={placeholder} value={value} onChange={onChange}/> :
-            <input className='inp-column1' placeholder={placeholder} value={value} onChange={onChange}/>}
+            <input className='inp-column1' placeholder={placeholder} value={value} onChange={onChange} type={type}/>}
         </>
     )
 }

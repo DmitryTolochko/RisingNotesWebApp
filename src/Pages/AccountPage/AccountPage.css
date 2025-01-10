@@ -238,7 +238,7 @@
 .account-page-user-buttons {
     display: flex;
     gap: 24px;
-    height: 52px;
+    /* height: 52px; */
     flex-wrap: wrap;
 }
 
@@ -292,6 +292,7 @@
 }
 
 .account-page-unfilled-button:hover {
+    cursor: pointer;
     background: #212b3d;
     transition: all .2s ease;
 }
@@ -510,15 +511,49 @@
 }
 
 .password-window {
-    padding: 20px;
-    border-radius: 20px;
-    background: linear-gradient(0deg, #191E28 0%, rgba(25, 30, 40, 0.00) 193.75%);
+    padding: 40px;
+    border-radius: 26px;
+    border: 1px solid rgb(100, 100, 100);
+    background: radial-gradient(237.69% 139.69% at 0.9% 2.98%, rgba(255, 255, 255, 0.40) 0%, rgba(255, 255, 255, 0.00) 100%);
+    backdrop-filter: blur(21px);   
     width: 100%;
-    max-width: 20%;
+    max-width: 500px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    height: fit-content;
+}
+
+.password-wrapper {
+    height: 95.5vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     position: fixed;
-    right: 50%;
+    width: 1220px;
+    z-index: 10;
     top: 0;
+    animation: password-animation .2s linear normal ;
+
+    @media screen and (max-width: 1221px) and (min-width: 721px){ 
+        width: 90%;
+    }
+    @media screen and (max-width: 720px){ 
+        width:90%;
+    }
+}
+
+.hidden-password {
+    display: none;
+}
+
+@keyframes password-animation {
+    0% {
+        display: flex;
+        opacity: 0%;
+        margin-top: 10px;
+    }
+    100% {
+        opacity: 100%;
+        margin-top: 0;
+    }
 }

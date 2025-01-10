@@ -129,19 +129,6 @@ export default function AccountPage () {
         }
     }
 
-    const changeUserPassword = async (oldPassword, newPassword) => {
-        // обновление пароля пользователя
-        try {
-            await axiosAuthorized.patch('api/profile/password', {
-                oldPassword: oldPassword, 
-                newPassword: newPassword
-            })
-        }
-        catch (err) {
-            return Promise.reject(err);
-        }
-    }
-
     const handleChangePage = (id) => {
         // смена страницы в лк
         setCurrPage(id);
