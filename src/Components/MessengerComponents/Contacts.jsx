@@ -1,7 +1,51 @@
+import { useEffect, useState } from 'react';
 import defaultAvatar from '../../Images/image-placeholder/user_logo_small_placeholder.png';
 import { ReactComponent as SearchIcon} from '../../Images/sidebar/Vector.svg';
+import { axiosAuthorized } from '../App/App';
 
-const Contacts = ({userName, searchValue, setSearchValue, resize, recentChats, recentChatsFiltered, setUser, formatTime, shortenLastMessage, users}) => {
+const Contacts = ({
+    userName, 
+    searchValue, 
+    setSearchValue, 
+    resize, 
+    recentChats, 
+    recentChatsFiltered, 
+    setUser, 
+    formatTime, 
+    shortenLastMessage, 
+    users
+}) => {
+    const [updatedChats, setUpdatedChats] = useState(recentChatsFiltered);
+
+    useEffect(() => {
+        getAllUnreadCounts();
+    }, [recentChatsFiltered]);
+
+    async function getAllUnreadCounts() {
+        // получить количество непрочитанных сообщений для всех чатов
+        let chats = await Promise.all(recentChatsFiltered
+        .map(async chat => {
+            if (chat.lastMessage.readAt === null)
+                chat.unreadCount = await getUnreadCount(chat.id);
+            return chat;
+        }));
+        setUpdatedChats(chats);
+    }
+
+    async function getUnreadCount(chatId) {
+        // получить количество непрочитанных сообщений одного чата
+        let response = await axiosAuthorized.get(`api/chat-message/${chatId}/unread/count`)
+        .catch(err => {return undefined})
+
+        if (response) return response.data.unreadMessageCount;
+        else return 0;
+    }
+
+    async function handleSetUser(el) {
+        setUser(el.userName, el.logoLink, el.id, undefined);
+        await getAllUnreadCounts();
+    }
+
     if (resize === 'standart' || userName === undefined) {
         return (
             <div className="contacts">
@@ -19,10 +63,10 @@ const Contacts = ({userName, searchValue, setSearchValue, resize, recentChats, r
                         />
                     </div>
                 </div>
-                {recentChatsFiltered?.length > 0 ? (
+                {updatedChats?.length > 0 ? (
                 <>
                     <p className="contacts-h">Ваши чаты</p>
-                    {recentChatsFiltered.map(el => (
+                    {updatedChats.map(el => (
                         <div className={el.chatName === userName ? 'contact contact-active' : 'contact'} key={el.id} onClick={() => setUser(el.chatName, el.logoFileLink, undefined, el.id)}>
                             <img alt='avatar' src={el.logoFileLink !== null ? el.logoFileLink : defaultAvatar}/>
                             <span className="contact-info">
@@ -30,7 +74,12 @@ const Contacts = ({userName, searchValue, setSearchValue, resize, recentChats, r
                                     <p className="contact-name">{el.chatName}</p>
                                     <p>{formatTime(el?.lastMessage?.sentAt)}</p>
                                 </span>
-                                <p>{shortenLastMessage(el?.lastMessage?.text)}</p>
+                                {el?.lastMessage?.readAt === null && el?.unreadCount > 0 ? (
+                                    <span>
+                                        <p>{shortenLastMessage(el?.lastMessage?.text)}</p>
+                                        <div className='unread'>{el?.unreadCount}</div>
+                                    </span>
+                                ) : (<></>)}
                             </span>
                         </div>
                     ))}

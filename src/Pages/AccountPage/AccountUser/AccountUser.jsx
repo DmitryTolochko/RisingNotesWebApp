@@ -3,15 +3,20 @@ import editIcon from '../../../Images/account-page/edit-icon.svg';
 import { useEffect, useState } from 'react';
 import CustomButton from '../../../Components/CustomButton/CustomButton';
 import CustomInput from '../../../Components/CustomInput/CustomInput';
+import PasswordWindow from '../../../Components/PasswordWindow/PasswordWindow';
 
 export default function AccountUser (props) {
     const [userName, setUserName] = useState(props.userName);
     const [email, setEmail] = useState(props.email);
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+    const [isPasswordWindowVisible, setIsPasswordWindowVisible] = useState(false);
 
     async function handleSave() {
         try {
-            await props.changeUserName(userName);
+            if (userName !== props.userName)
+                await props.changeUserName(userName);
+            if (email !== props.email)
+                await props.changeUserEmail(email);
         }
         catch (err) {
             return Promise.reject(err);
@@ -54,11 +59,12 @@ export default function AccountUser (props) {
             <div className="account-page-user-buttons">
                 <CustomButton func={handleSave} icon={saveIcon} text={'Сохранить'} success={'Сохранено'} disabled={isButtonDisabled}/>
 
-                <button className='account-page-unfilled-button'>
+                <button className='account-page-unfilled-button' onClick={() => setIsPasswordWindowVisible(!isPasswordWindowVisible)}>
                     <img src={editIcon}/>
                     Изменить пароль
                 </button>
             </div>
+            <PasswordWindow visibility={isPasswordWindowVisible} func={setIsPasswordWindowVisible}/>
         </div>
     )
 }
