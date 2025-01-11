@@ -21,9 +21,9 @@ function AudiencePage() {
 
     //Данные для стран
     const countriesData = [
-        { label: 'Россия', value: 2400 },
-        { label: 'Белоруссия', value: 247 },
-        { label: 'Казахстан', value: 56 },
+        { label: 'Россия', value: 62 },
+        { label: 'Белоруссия', value: 1 },
+        { label: 'Казахстан', value: 5 },
         { label: 'Кыргызстан', value: 3 },
         { label: 'Туркменистан', value: 1 },
     ]
