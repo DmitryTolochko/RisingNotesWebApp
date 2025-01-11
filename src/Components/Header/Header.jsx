@@ -9,9 +9,11 @@ import defaultAvatar from '../../Images/main-placeholder.png';
 import burderImg from '../../Images/burger.svg';
 import useSearchClean from '../../Hooks/useSearchClean/useSearchClean';
 import useMenuToggle from '../../Hooks/useMenuToggle/useMenuToggle';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { ReactComponent as BellImage} from '../../Images/controller/bell.svg';
 
 import './Header.css';
+import { updatePlayerQueueVisibility } from '../../Redux/slices/playerQueueSlice';
 
 function Header() {
     const [logo, setLogo] = useState(logotype);
@@ -23,6 +25,7 @@ function Header() {
     const resize = useSelector((state)=> state.resize.value)
     const {cleanQuery} = useSearchClean()
     const {toggler} = useMenuToggle()
+    const dispatch = useDispatch();
 
     useEffect(() => {
         // проверка картинки
@@ -51,6 +54,10 @@ function Header() {
             {isUserAuthorized ? (
                 <>
                     <div className='header_pfp'>
+                    {/* <span className='notifications'>
+                        <div className='notification'>5</div>
+                        <BellImage alt='notifications'/>
+                    </span> */}
                         {resize === 'standart' ? (
                             <span className={isMenuOpened ? "pfp_dropdown-down" : "pfp_dropdown-up"} 
                                 onClick={() => setIsMenuOpened(!isMenuOpened)}>
@@ -62,6 +69,10 @@ function Header() {
                             onClick={() => setIsMenuOpened(!isMenuOpened)}/>
                     </div>
                     {isMenuOpened ? <FallDownMenu callback={setIsMenuOpened}/> : <></>}
+                    {/* <div className="fall-down-menu" style={{width: '230px', textAlign: 'start', alignItems: 'center'}}>
+                        <p className='menu-h'>Уведомления</p>
+                        <p className='menu-text'>У вас новые сообщения</p>
+                    </div> */}
                 </>
             ) : (
                 <div className='unauth-header'>

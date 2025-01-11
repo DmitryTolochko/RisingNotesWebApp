@@ -1,7 +1,7 @@
 import BackButton from "../../Components/BackButton";
 import './Messenger.css';
 import defaultAvatar from '../../Images/image-placeholder/user_logo_small_placeholder.png';
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {  api, axiosAuthorized, axiosUnauthorized } from '../../Components/App/App';
 import { useCookies } from "react-cookie";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -28,12 +28,23 @@ function Messenger() {
     const [users, setUsers] = useState([]);
     const [chatInfo, setChatInfo] = useState(undefined);
     const [chatId, setChatId] = useState(undefined);
+    const chatIdRef = useRef(null);
     const [messages, setMessages] = useState([]);
     const [currentText, setCurrentText] = useState(undefined);
 
     const [userName, setUserName] = useState(undefined);
     const [userLogo, setUserLogo] = useState(defaultAvatar);
     const [userId, setUserId] = useState(undefined);
+
+    useEffect(() => {
+        chatIdRef.current = chatId;
+    }, [chatId])
+
+    const connection = new HubConnectionBuilder()
+        .withUrl(api + 'messenger', {
+            accessTokenFactory: () => {return cookies.accessToken}
+        })
+        .build();
 
     async function getRecentChats() {
         // Получить существующие чаты
@@ -90,6 +101,8 @@ function Messenger() {
             .catch(err => console.log(err));
             setCurrentText('');
             await getChatMessages(chatId);
+            await getRecentChats();
+            // await getNewMessage(chatId);
         }
     }
 
@@ -129,6 +142,7 @@ function Messenger() {
     }
 
     async function getUserById(id) {
+        // получить пользваотеля по Id
         let response = await axiosAuthorized.get('api/user/' + id)
         .catch(err => {return undefined});
 
@@ -170,27 +184,14 @@ function Messenger() {
     }
 
     useEffect(() => {
-        // Подгрузить чат с пользователем, если я попал к нему напрямую в ЛС
+        // Подгрузить все чаты и чат с пользователем, если я попал к нему напрямую в ЛС
         getRecentChats();
         const Id = params.get('id');
         if (Id !== null) {
             getUserById(Id);
         }
 
-        // connection.on('onError', (error) => {
-        //     console.log(error);
-        // });
-        const connection = new HubConnectionBuilder()
-        .withUrl('ws://81.31.247.227' + '/messenger', {
-            skipNegotiation: false,
-            transport: HttpTransportType.WebSockets,
-            accessTokenFactory: () => {return 'Bearer ' + cookies.accessToken}
-        })
-        .build();
-        
-        connection.start().catch(error => {
-            console.error('Ошибка подключения:', error);
-        });
+        configSocket();        
     }, [])
 
     useEffect(() => {
@@ -202,6 +203,43 @@ function Messenger() {
             setRecentChatsFiltered(recentChats);
         }
     }, [searchValue]);
+
+    async function configSocket() {
+        // соединение с сокетом
+            
+        async function start() {
+            try {
+                await connection.start();
+                console.log("SignalR Connected.");
+            } catch (err) {
+                console.log(err);
+                setTimeout(start, 5000);
+            }
+        };
+        
+        connection.onclose(async () => {
+            await start();
+        });
+
+        connection.on('onNewMessage', async (thisChatId, preparedMessage, userName) => {
+            // await getNewMessage(chatId);
+            console.log(thisChatId);
+            console.log(chatIdRef.current);
+            if (thisChatId === chatIdRef.current)
+                await getChatMessages(thisChatId);
+            await getRecentChats();
+        })
+
+        connection.on('onError', (errorText) => {
+            console.log(errorText);
+        })
+
+        connection.on('onMessageRead', (chatId, userId, messageId) => {
+            console.log(userId);
+        })
+
+        await start();
+    }
 
     if (recentChats === undefined) {
         return (

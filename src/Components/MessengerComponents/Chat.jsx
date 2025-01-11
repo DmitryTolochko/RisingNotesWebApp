@@ -6,7 +6,19 @@ import defaultAvatar from '../../Images/image-placeholder/user_logo_small_placeh
 import chatIcon from '../../Images/chat.svg';
 import sendIcon from '../../Images/controller/sendIcon.svg';
 
-const Chat = ({userName, chatInfo, setUser, userLogo, messages, formatTime, currentText, resize, sendMessage, setCurrentText, chatId}) => {
+const Chat = ({
+    userName, 
+    chatInfo, 
+    setUser, 
+    userLogo, 
+    messages, 
+    formatTime, 
+    currentText, 
+    resize, 
+    sendMessage, 
+    setCurrentText, 
+    chatId
+}) => {
 
     if (userName !== undefined || chatInfo !== undefined) {
         return (
@@ -26,7 +38,10 @@ const Chat = ({userName, chatInfo, setUser, userLogo, messages, formatTime, curr
                             id={el.senderId} 
                             text={el.text} 
                             sentAt={el.sentAt}
-                            formatTime={formatTime}/>
+                            formatTime={formatTime}
+                            readAt={el.readAt}
+                            messageId={el.id}
+                            />
                     </>))
                     }
                     <NewDate currentDate={-1}/>
