@@ -1,7 +1,5 @@
-import { useEffect } from 'react';
 import './BarChart.css'
 import { BarChart } from '@mui/x-charts/BarChart';
-
 
 function Bar({
     dataValues,
@@ -9,12 +7,10 @@ function Bar({
     label,
     color
 }) {
-
     return ( 
         <div className="bar-chart-wrapper">
             <h2>{label}</h2>
             <BarChart
-                width={1220}
                 grid={{horizontal:true}}
                 height={300}
                 series={[
