@@ -10,3 +10,9 @@
     display: flex;
     gap:40px;
 }
+
+@media screen and (max-width:720px) {
+    .cw-bottom-charts{
+       flex-direction: column;
+    }
+}

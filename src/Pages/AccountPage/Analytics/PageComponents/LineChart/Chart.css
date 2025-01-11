@@ -33,3 +33,17 @@
 .psb-active{
     background-color: #FE1170;
 }
+
+@media screen and (max-width:720px) {
+    .period-selector-btn{
+        font-size: 12px;
+        padding: 6px 8px;
+    }
+}
+
+@media screen and (max-width:520px) {
+    .period-selector{
+        width: 100%;
+        justify-content: space-between;
+    }
+}

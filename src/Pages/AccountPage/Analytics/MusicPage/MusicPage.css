@@ -1,0 +1,58 @@
+.top-tracks{
+    background-color: #191E28;
+    border: 1px solid #2C323D;
+    border-radius: 40px;
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+    padding: 32px 40px 64px 40px;
+}
+
+.top-tracks > h2{
+    font-size: 24px;
+}
+
+
+/* Растяггивает скелетон по всей длине контейнера */
+.top-tracks > span{
+    width: 100%;
+}
+
+.tt-ul{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px
+}
+.tt-li{
+    display: flex;
+    gap: 15px;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tt-li:hover{
+    cursor: pointer;
+}
+
+.tt-li > img{
+    width: 48px;
+    border-radius: 8px;
+    object-fit: cover;
+    aspect-ratio: 1/1;
+}
+
+.tt-li > span{
+    opacity: .7;
+    white-space: pre;
+}
+
+.tt-li > hr{
+    transform: translateY(50%);
+    border-top: 1px dashed #787885;
+    color: transparent;
+    width: 85%;
+}

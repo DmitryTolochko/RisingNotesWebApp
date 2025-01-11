@@ -88,7 +88,7 @@ export default function AccountHead (props) {
                 ) : <></>}
             </span>
 
-            <input type='file' accept=".jpg,.png" className='input-file' ref={fileRef} onChange={changeLogo} maxSize='5000000'></input>
+            <input type='file' accept=".jpg,.png" className='input-file' ref={fileRef} onChange={changeLogo} maxsize='5000000'></input>
         </div>
     );
 }

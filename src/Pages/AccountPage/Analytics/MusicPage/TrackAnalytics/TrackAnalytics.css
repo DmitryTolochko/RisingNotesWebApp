@@ -1,0 +1,38 @@
+.ta-wrapper{
+    display:flex;
+    width: 100%;
+    flex-direction: column;
+}
+
+.ta-wrapper > h2{
+    margin-top: 40px;
+}
+
+.wa-select{
+    width: 100%;
+    padding: 24px;
+    background-color: #191E28;
+    border: 1px solid #2C323D;
+    border-radius: 10px;
+    color:#fff;
+    font-size: 20px;
+    margin-top: 12px;
+    margin-bottom: 40px;
+}
+
+.wa-select {
+    -moz-appearance:none; /* Firefox */
+    -webkit-appearance:none; /* Safari and Chrome */
+    appearance:none;
+}
+
+.wa-select:hover,
+.wa-select > option:hover{
+    cursor: pointer;
+}
+
+.tao-img{
+    width: 48px;
+    border-radius: 8px;
+    aspect-ratio: 1/1;
+}

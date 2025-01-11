@@ -3,3 +3,9 @@
     gap:40px;
     margin-block: 40px;
 }
+
+@media screen and (max-width:720px) {
+    .audience-top-row{
+        flex-direction: column;
+    }
+}
