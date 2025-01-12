@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { api, axiosAuthorized, axiosPictures, axiosUnauthorized } from '../App/App';
 import { updatePlaylistsValue } from '../../Redux/slices/playlistsSlice';
+import { shortenText } from '../ArtistCardComponents/ArtistInfo/ArtistInfo';
 
 function PlaylistModalMenu({songAuthor, songName, id}) {
     const dispatch = useDispatch();
@@ -62,7 +63,7 @@ function PlaylistModalMenu({songAuthor, songName, id}) {
         // Создать новый плейлист и добавить в него песню
         let id = 0
         let formData = new FormData();
-        formData.append('Name', songAuthor + ' - ' + songName)
+        formData.append('Name', shortenText(songAuthor, 15) + ' - ' + shortenText(songName, 15))
         await axiosAuthorized.post(api + 'api/playlist', formData, { headers: {
             "Content-Type": "multipart/form-data",
         }})

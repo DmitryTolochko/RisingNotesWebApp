@@ -25,6 +25,7 @@ import { updateCurrentSongValue } from '../../Redux/slices/currentSongSlice';
 import { updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlice';
 import { updateFeaturedValue } from '../../Redux/slices/featuredSlice';
 import PlaylistModalMenu from '../../Components/PlaylistModalMenu/PlaylistModalMenu';
+import { shortenText } from '../../Components/ArtistCardComponents/ArtistInfo/ArtistInfo';
 
 const Commentaries = ({clip}) => {
     const params = useParams();
@@ -212,8 +213,8 @@ const Commentaries = ({clip}) => {
                         </div>
                         <img alt='cover' src={songLogo} draggable='false'/>
                         <span className='comm-page-text'>
-                            <h2 className='comm-page-h2'>{songName}</h2>
-                            <Link to={`/artist/${authorId}`} className='comm-page-author'><img src={artistAvatar} alt='avatar'/>{songAuthor}</Link>
+                            <h2 className='comm-page-h2'>{shortenText(songName, 25)}</h2>
+                            <Link to={`/artist/${authorId}`} className='comm-page-author'><img src={artistAvatar} alt='avatar'/>{shortenText(songAuthor, 25)}</Link>
                             <div className='comm-head-buttons'>
                                 {genres.map(el => <span key={el} className='song-tag'>{el}</span>)}
                             </div>
@@ -253,7 +254,7 @@ const Commentaries = ({clip}) => {
                     <>
                         <div className='comment-input-wrapper' style={{marginTop: clip? 24 : 0}}>
                             <textarea placeholder='Введите текст комментария здесь...' className='comment-input' 
-                                onChange={(e) => setComment(e.target.value)} value={comment}></textarea>
+                                onChange={(e) => setComment(shortenText(e.target.value, 550))} value={shortenText(comment, 550)} maxLength={549}></textarea>
                                 {resize === 'mobile' ? <button className='comment-btn-offset' onClick={handleSendComment}><img src={sendIcon}/></button> : <></>}
                                 {resize === 'standart' ? <CustomButton text={'Отправить'} func={handleSendComment} icon={sendIcon} errorText='Ошибка' success={'Отправить'}/> : <></>}
                         </div>

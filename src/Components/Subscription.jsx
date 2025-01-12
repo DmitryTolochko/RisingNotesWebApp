@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import defaultAvatar from '../Images/main-placeholder.png';
 import { useEffect, useState } from 'react';
 import { api, axiosPictures, axiosUnauthorized } from './App/App';
+import { shortenText } from './ArtistCardComponents/ArtistInfo/ArtistInfo';
 
 function Subscription (props) {
     const [name, setName] = useState('');
@@ -27,7 +28,7 @@ function Subscription (props) {
     return (
         <Link to={`/artist/${props.authorId}`} className='playlist'>
             <img className='playlistskin' alt='cover' src={avatar}/>
-            <p className='labelplaylist'>{name}</p>
+            <p className='labelplaylist'>{shortenText(name, 17)}</p>
         </Link>
     )
 }

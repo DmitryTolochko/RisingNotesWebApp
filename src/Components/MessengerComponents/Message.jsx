@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useCookies } from "react-cookie";
 import { axiosAuthorized } from "../App/App";
+import { shortenText } from "../ArtistCardComponents/ArtistInfo/ArtistInfo";
 
 const Message = ({id, text, sentAt, formatTime, readAt, messageId}) => {
     const [cookies, setCookies] = useCookies(['userId']);
@@ -16,7 +17,7 @@ const Message = ({id, text, sentAt, formatTime, readAt, messageId}) => {
         case cookies.userId:
             return (
                 <span className="my-message" key={id}>
-                    {text}
+                    {shortenText(text, 550)}
                     <p>{formatTime(sentAt)}</p>
                 </span>
             )
@@ -24,7 +25,7 @@ const Message = ({id, text, sentAt, formatTime, readAt, messageId}) => {
         default:
             return (
                 <span className="opponent-message" key={id}>
-                    {text}
+                    {shortenText(text, 550)}
                     <p>{formatTime(sentAt)}</p>
                 </span>
             )

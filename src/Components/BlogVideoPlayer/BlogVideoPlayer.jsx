@@ -11,6 +11,7 @@ import Comment from '../Comment';
 import sendIcon from '../../Images/controller/sendIcon.svg';
 import CustomButton from '../CustomButton/CustomButton';
 import { useSearchParams } from 'react-router-dom';
+import { shortenText } from '../ArtistCardComponents/ArtistInfo/ArtistInfo';
 
 function VertVideoPlayer() {
     const videoRef = useRef();
@@ -146,17 +147,17 @@ function VertVideoPlayer() {
                             </button>
                             <button onClick={handleClickOnAuthor} className='blog-author'>
                                 <img  alt='avatar' src={vertVideoInfo.authorAvatar} />
-                                <p>{vertVideoInfo.authorName}</p>
+                                <p>{shortenText(vertVideoInfo.authorName, 20)}</p>
                             </button>
 
-                            <p>{vertVideoInfo.description}</p>
+                            <p>{shortenText(vertVideoInfo.description, 350)}</p>
 
                             <div className='blog-song'>
                                 <img alt='photo' src={vertVideoInfo.songLogo} onClick={handleClickOnSong}/>
                                 <span>
                                     <span onClick={handleClickOnSong}>
-                                        <p className='blog-song-name'>{vertVideoInfo.title}</p>
-                                        <p className='blog-artist-name'>{vertVideoInfo.authorName}</p>
+                                        <p className='blog-song-name'>{shortenText(vertVideoInfo.title, 20)}</p>
+                                        <p className='blog-artist-name'>{shortenText(vertVideoInfo.authorName, 25)}</p>
                                     </span>
                                     <button onClick={() => handleToFavorite(vertVideoInfo.relatedSongId)}>
                                         <img className='blog-fav-icon' alt='to_favourites' src={featured.includes(vertVideoInfo.relatedSongId) ? redHeart : heart} />
@@ -166,7 +167,7 @@ function VertVideoPlayer() {
 
                             <div className='comment-input-wrapper'>
                                 <textarea placeholder='Введите текст комментария здесь...' className='comment-input' 
-                                    onChange={(e) => setComment(e.target.value)} value={comment}></textarea>
+                                    onChange={(e) => setComment(shortenText(e.target.value, 350))} value={shortenText(comment, 350)} maxLength={349}></textarea>
                                 <button className='comment-btn-offset' style={{right: '68px'}} onClick={handleSendComment}><img src={sendIcon}/></button>
                             </div>
 

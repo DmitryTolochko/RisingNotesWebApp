@@ -53,6 +53,8 @@
     border-radius: 100px;
     width: 48px;
     height: 48px;
+    aspect-ratio: 1/1;
+    object-fit: cover;
 }
 
 .contact:hover, .contact-active {
@@ -164,6 +166,8 @@
 .chat-header > img {
     width: 48px;
     height: 48px;
+    aspect-ratio: 1/1;
+    object-fit: cover;
     border-radius: 100px;
     @media screen and (max-width: 720px){ 
         width: 32px;

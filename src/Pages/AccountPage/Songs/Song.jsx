@@ -5,6 +5,7 @@ import message from '../../../Images/controller/Chat_Dots.png';
 import statsIcon from '../../../Images/account-page/stats-icon.svg';
 import { api, axiosAuthorized, axiosUnauthorized } from '../../../Components/App/App';
 import cover from '../../../Images/main-placeholder.png';
+import { shortenText } from '../../../Components/ArtistCardComponents/ArtistInfo/ArtistInfo';
 
 const statusType = {
     0: 'Нет файлов',
@@ -69,7 +70,7 @@ export default function Song (props) {
     return (
         <div className='track'>
             <img draggable='false' className='song-img' alt='cover' src={coverLink}/>
-            <p className='song-title-t'>{songName}<p className='songAuthor'>{props.artist}</p></p>
+            <p className='song-title-t'>{shortenText(songName, 15)}<p className='songAuthor'>{shortenText(props.artist, 15)}</p></p>
             <p className='track-statistic'><img alt='stats' src={statsIcon}/>{auditionCount}</p>
             <p className='song-status'>
                 <div className={'song-status-dot ' + statusColor[props.status]}></div>

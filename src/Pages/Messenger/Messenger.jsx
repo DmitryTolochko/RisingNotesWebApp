@@ -154,13 +154,6 @@ function Messenger() {
         }
     }
 
-    function shortenLastMessage(text) {
-        // Сократить сообщение
-        if (text?.length > 28)
-            return text.slice(0, 28) + '...';
-        return text;
-    }
-
     function formatTime(time) {
         // Отформатировать время к нужному виду
         if (time !== undefined && time !== null) {
@@ -264,7 +257,6 @@ function Messenger() {
                     recentChatsFiltered={recentChatsFiltered}
                     setUser={setUser}
                     formatTime={formatTime}
-                    shortenLastMessage={shortenLastMessage}
                     users={users}/>
                 <Chat
                     userName={userName}

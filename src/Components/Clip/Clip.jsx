@@ -18,6 +18,7 @@ import { updateCurrentSongValue } from '../../Redux/slices/currentSongSlice';
 import { updateSongsValue } from '../../Redux/slices/songsSlice';
 import { updateVideoPlayerValue } from '../../Redux/slices/videoPlayerSlice';
 import { axiosUnauthorized } from '../App/App';
+import { shortenText } from '../ArtistCardComponents/ArtistInfo/ArtistInfo';
 
 const statusType = {
     0: 'Неизвестно',
@@ -140,10 +141,10 @@ function Clip({key, clipId, authorId, songId, name, deleteFunc=undefined, isArti
                     <img src={api + `api/song/${songId}/logo`} alt="" style={{height:'100%'}}/>
                 </div>
                 <div className="song-info-wrapper">
-                    <span className="clip-song-name">{name}</span>
+                    <span className="clip-song-name">{shortenText(name, 25)}</span>
                     <span className="clip-song-author">
                         <NavLink to={`/artist/${authorId}`} onClick={cleanQuery}>
-                            {authorName}
+                            {shortenText(authorName, 25)}
                         </NavLink>
                     </span>
                 </div>

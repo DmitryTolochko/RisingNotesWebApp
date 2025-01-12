@@ -34,6 +34,8 @@
     text-decoration-thickness: 2px;
     text-underline-offset:4px;
     font-size: 36px;
+    text-wrap: wrap;
+    overflow-wrap: anywhere;
     @media screen and (max-width: 720px){ 
         font-size: 24px;
     }
@@ -75,6 +77,8 @@
     font-size: 16px;
     font-weight: 300;
     text-align: start;
+    text-wrap: wrap;
+    overflow-wrap: anywhere;
 
     @media screen and (max-width: 720px){ 
         font-size: 12px;
@@ -130,10 +134,10 @@
 
 .artist-img {
     max-width: 250px;
-    /* max-height: 250px; */
+    max-height: 250px;
     object-fit: cover;
     width: 100%;
-    height: auto;
+    /* height: auto; */
     border-radius: 19px;
     aspect-ratio: 1/1;
 

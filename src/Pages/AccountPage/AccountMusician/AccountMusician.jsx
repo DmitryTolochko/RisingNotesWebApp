@@ -56,7 +56,7 @@ export default function AccountMusician (props) {
             <h2>Информация о музыканте</h2>
             <p>Описание</p>
             <textarea placeholder='Введите информацию о вас или вашей группе... ' 
-                className='account-page-textarea' onChange={e => setAbout(e.target.value)}>
+                className='account-page-textarea' maxLength={550} onChange={e => setAbout(e.target.value)}>
                 {about}
             </textarea>
             <p>Ссылки</p>

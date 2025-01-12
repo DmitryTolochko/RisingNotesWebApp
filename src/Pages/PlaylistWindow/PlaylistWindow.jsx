@@ -15,6 +15,7 @@ import { updateSongsValue } from '../../Redux/slices/songsSlice';
 import { updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlice';
 import { showError } from '../../Redux/slices/errorMessageSlice';
 import { updatePlayerQueueName } from '../../Redux/slices/playerQueueSlice';
+import { shortenText } from '../../Components/ArtistCardComponents/ArtistInfo/ArtistInfo';
 
 function PlaylistWindow(){
     const imageSetterRef = useRef(null);
@@ -121,7 +122,7 @@ function PlaylistWindow(){
     };
 
     const handleInputChange = (event) => {
-        setNamePlaylist(event.target.value);
+        setNamePlaylist(shortenText(event.target.value, 35));
     };
 
     const handleBlur = async () => {
@@ -177,13 +178,14 @@ function PlaylistWindow(){
                             <input
                                 className='input-name-playlist'
                                 type="text"
-                                value={namePlaylist}
+                                value={shortenText(namePlaylist, 35)}
                                 placeholder={'Введите название...'}
                                 onChange={handleInputChange}
                                 onBlur={handleBlur}
+                                maxLength={34}
                             />
                             ) : (
-                            <p className='playlistname' onClick={toggleEditMode}>{namePlaylist}</p>
+                            <p className='playlistname' onClick={toggleEditMode}>{shortenText(namePlaylist, 35)}</p>
                         )}
                         {playlists.filter(el => el === params.id).length > 0 ? (
                             <div className='playlist-edit'>

@@ -30,6 +30,8 @@
     display: block;
     width: 100%;
     background-color: black;
+    aspect-ratio: 16 / 9;
+    border-radius: 20px;
 }
 
 
@@ -50,8 +52,11 @@
 
 .clip-hr{
     height: 1px;
-    color: #2C323D;
+    color: #787885;
     margin-block: 40px;
+    border-color: #787885;
+    background-color: #787885;
+    border-bottom: 1px;
 }
 .clip-comment-title{
     font-size: 24px;

@@ -9,6 +9,7 @@ import xIcon from '../Images/commentaries/x-icon.svg';
 import { ResizeContext, api, axiosPictures, axiosUnauthorized } from './App/App';
 import { axiosAuthorized } from './App/App';
 import { useSelector } from 'react-redux';
+import { shortenText } from './ArtistCardComponents/ArtistInfo/ArtistInfo';
 
 const Comment = (props) => {
     const [isDeleted, setIsDeleted] = useState(false);
@@ -81,8 +82,8 @@ const Comment = (props) => {
                         </button>
                     </div>
                     ) : (<></>)}
-                    <h2>{props.data.authorDisplayedName}</h2> 
-                    <text>{comment}</text>
+                    <h2>{shortenText(props.data.authorDisplayedName, 25)}</h2> 
+                    <text>{shortenText(comment, 550)}</text>
                 </span>
             </div>
             {cookies.userId === props.data.authorId && !isDeleted ? (

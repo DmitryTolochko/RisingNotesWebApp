@@ -22,6 +22,13 @@ function getSubsText(number) {
     }
 }
 
+export function shortenText(text, numberOfSymbols) {
+    // Сократить сообщение
+    if (text?.length > numberOfSymbols)
+        return text.slice(0, numberOfSymbols) + '...';
+    return text;
+}
+
 function ArtistInfo(props) {
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -84,7 +91,7 @@ function ArtistInfo(props) {
             <img src={avatar} alt="" className="artist-img" draggable='false'/>
             <div className="artist-info">
                 <div className="row-top">
-                    <a className="artist-name" onClick={() =>  navigate(`/artist/${props.artist.artistId}`)}>{artistName}</a>
+                    <a className="artist-name" onClick={() =>  navigate(`/artist/${props.artist.artistId}`)}>{shortenText(artistName, 30)}</a>
                     <div className="artist-btns">
                     <button className="artist-message-btn" onClick={() =>  navigate(`/messenger?id=${userId}`)} >
                         <img alt='message' src={messageIcon}/>
@@ -110,7 +117,7 @@ function ArtistInfo(props) {
                 </div>
                 <div className="row-md">
                     <p className="artist-info-p">
-                        {artistInfoText}
+                        {shortenText(artistInfoText, 550)}
                     </p>
                 </div>
                 <div className="row-bottom">

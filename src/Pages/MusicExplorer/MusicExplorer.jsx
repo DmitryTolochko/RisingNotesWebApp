@@ -10,7 +10,7 @@ import songCoverTemplate from '../../Images/main-placeholder.png';
 import { api, axiosAuthorized, axiosPictures, axiosUnauthorized } from '../../Components/App/App';
 import rewind_forwrad from '../../Images/controller/rewind.svg';
 import rewind_backward from '../../Images/controller/rewind-1.svg';
-import ArtistInfo from '../../Components/ArtistCardComponents/ArtistInfo/ArtistInfo';
+import ArtistInfo, { shortenText } from '../../Components/ArtistCardComponents/ArtistInfo/ArtistInfo';
 import { updateSubscriptionsValue } from '../../Redux/slices/subscriptionsSlice';
 import { updateCurrentSongValue } from '../../Redux/slices/currentSongSlice';
 import FilterNotificationPopup from '../../Components/Player/FilterComponent/FilterElements/FilterNotificationPopup';
@@ -196,7 +196,7 @@ function MusicExplorer() {
                             
                             <span className='explorer-start-h'>
                                 <img src={icon}/>
-                                {currentTrackInfo.trackName}
+                                {shortenText(currentTrackInfo.trackName, 40)}
                             </span>
                             <div className="player-track-tags" style={{marginBottom:24, maxWidth: '100%'}}>
                                 {currentTrackInfo?.tags?.map((tag, index)=>(

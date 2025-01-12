@@ -11,6 +11,7 @@ import { api } from "../../Components/App/App";
 import CustomControls from "./CustomControl/CustomControls";
 import Skeleton from "react-loading-skeleton";
 import { Link } from "react-router-dom";
+import { shortenText } from "../../Components/ArtistCardComponents/ArtistInfo/ArtistInfo";
 
 function ClipPage() {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -113,11 +114,11 @@ function ClipPage() {
                         isPlaying={isPlaying}
                         setIsPlaying={setIsPlaying}
                     />
-                    <h2 className="clip-page-song-name">{title}</h2>
+                    <h2 className="clip-page-song-name">{shortenText(title, 30)}</h2>
                     {author ?                 
                         <Link to={`/artist/${authorId}`} className="clip-page-author-wrapper">
                             <img src={api+`api/author/${authorId}/logo`} alt="" className="clip-page-author-avatar" />
-                            <span className="clip-page-author-name">{author}</span>
+                            <span className="clip-page-author-name">{shortenText(author, 25)}</span>
                         </Link> 
                             :
                         <Skeleton baseColor='#0F141D' highlightColor="#2C323D"  height={200}/>

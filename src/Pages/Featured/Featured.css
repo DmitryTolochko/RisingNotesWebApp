@@ -62,8 +62,8 @@
 } */
 
 .playlistskin {
-    /* width: 230px;
-    height: 230px; */
+    /* max-width: 230px;
+    max-height: 230px; */
     border-radius: 25px;
     object-fit: cover;
     width: 100%;
@@ -152,6 +152,7 @@
 .featured-section__subscriptions-wrapper{
     display: flex;
     gap:40px 2%;
+    flex-wrap: wrap;
 }
 
 

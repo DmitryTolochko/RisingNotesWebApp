@@ -5,6 +5,7 @@ import Chevron from '../../Images/controller/chevron-left.svg';
 import defaultAvatar from '../../Images/image-placeholder/user_logo_small_placeholder.png';
 import chatIcon from '../../Images/chat.svg';
 import sendIcon from '../../Images/controller/sendIcon.svg';
+import { shortenText } from "../ArtistCardComponents/ArtistInfo/ArtistInfo";
 
 const Chat = ({
     userName, 
@@ -26,7 +27,7 @@ const Chat = ({
                 <div className="chat-header">
                     <a onClick={() => setUser(undefined, defaultAvatar, undefined, undefined)}><img src={Chevron}/></a>
                     <img src={userLogo !== null ? userLogo : defaultAvatar}/>
-                    <p className="chat-name">{userName}</p>
+                    <p className="chat-name">{shortenText(userName, 20)}</p>
                 </div>
 
                 <div className="chat-container">
@@ -51,8 +52,9 @@ const Chat = ({
                     <textarea 
                         placeholder='Напишите сообщение...' 
                         className='comment-input' 
-                        onChange={e => setCurrentText(e.target.value)}
-                        value={currentText}
+                        onChange={e => setCurrentText(shortenText(e.target.value, 550))}
+                        value={shortenText(currentText, 550)}
+                        maxLength={549}
                         onKeyDown={(e) => {
                             if (e.key === "Enter" && !e.shiftKey) {
                                 e.preventDefault();
