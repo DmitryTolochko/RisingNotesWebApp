@@ -53,6 +53,7 @@ function Clip({key, clipId, authorId, songId, name, deleteFunc=undefined, isArti
     const songs = useSelector((state)=>state.songs.value)
     const [clipLink, setClipLink] = useState(undefined);
     const [previewLink, setPreviewLink] = useState(undefined);
+    const [coverLink, setCoverLink] = useState(undefined);
     const dispatch = useDispatch()
 
     useEffect(() => {
@@ -60,6 +61,8 @@ function Clip({key, clipId, authorId, songId, name, deleteFunc=undefined, isArti
             .then(response => setClipLink(response));
         getPreviewLink()
             .then(response => setPreviewLink(response));
+        getSongCoverLink()
+            .then(response => setCoverLink(response));
     }, []);
 
     async function getClipLink() {
@@ -71,6 +74,13 @@ function Clip({key, clipId, authorId, songId, name, deleteFunc=undefined, isArti
 
     async function getPreviewLink() {
         let response = await axiosUnauthorized.get('api/music-clip/' + clipId + '/preview/link')
+        .catch(err => Promise.reject(err));
+
+        return response?.data?.presignedLink;
+    }
+
+    async function getSongCoverLink() {
+        let response = await axiosUnauthorized.get('api/song/' + songId + '/logo/link')
         .catch(err => Promise.reject(err));
 
         return response?.data?.presignedLink;
@@ -138,7 +148,7 @@ function Clip({key, clipId, authorId, songId, name, deleteFunc=undefined, isArti
             </div>
             <div className="clip-song" onClick={handleSongClick} style={videoLoaded?{display:'flex'}:{display:'none'}}> 
                 <div className="song-img-placeholder">
-                    <img src={api + `api/song/${songId}/logo`} alt="" style={{height:'100%'}}/>
+                    <img src={coverLink} alt="" style={{height:'100%'}}/>
                 </div>
                 <div className="song-info-wrapper">
                     <span className="clip-song-name">{shortenText(name, 25)}</span>

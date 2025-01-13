@@ -4,6 +4,7 @@ import Song from '../../Components/Song/Song';
 import BackButton from '../../Components/BackButton';
 import trash from '../../Images/trash.svg';
 import bigEdit from '../../Images/account-page/edit-big.svg';
+import pencil from '../../Images/pencil_gray.svg';
 import { useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector   } from 'react-redux';
@@ -82,7 +83,8 @@ function PlaylistWindow(){
     }
 
     const handleImageInput = () => {
-        imageSetterRef.current.click();
+        if (playlists.filter(el => el === params.id).length > 0)
+            imageSetterRef.current.click();
     }
 
     async function uploadLogo(event) {
@@ -116,13 +118,16 @@ function PlaylistWindow(){
     const toggleEditMode = () => {
         // переход в режим редактирования и удаление текущего плейлиста из списка
         setIsEditing(!isEditing);
-        dispatch(
-            updatePlaylistsValue(playlists.filter(el => el != params.id))
-        )
+       
     };
 
     const handleInputChange = (event) => {
-        setNamePlaylist(shortenText(event.target.value, 35));
+        if (playlists.some(el => el === params.id)) {
+            dispatch(
+                updatePlaylistsValue(playlists.filter(el => el != params.id))
+            )
+        }
+        setNamePlaylist(event.target.value);
     };
 
     const handleBlur = async () => {
@@ -135,9 +140,11 @@ function PlaylistWindow(){
         .then(() => {
             setIsEditing(false);
         });
-        dispatch(
-            updatePlaylistsValue([...playlists, params.id])
-        )
+        if (!playlists.some(el => el === params.id)) {
+            dispatch(
+                updatePlaylistsValue([...playlists, params.id])
+            )
+        }
     };
 
     const handleCheckboxChange = async () => {
@@ -169,7 +176,8 @@ function PlaylistWindow(){
                 <BackButton/>
                 <div className='playlist-information'>
                     <div className='playlist-image-wrapper' onClick={handleImageInput}>
-                        <div className='playlist-image-change'><img draggable='false' src={bigEdit}/></div>
+                        {playlists.filter(el => el === params.id).length > 0 ? 
+                            <div className='playlist-image-change'><img draggable='false' src={bigEdit}/></div> : <></>}
                         <img draggable='false' className='playlist-image' alt='playlist cover' 
                             src={logofile}/>
                     </div>
@@ -185,7 +193,7 @@ function PlaylistWindow(){
                                 maxLength={34}
                             />
                             ) : (
-                            <p className='playlistname' onClick={toggleEditMode}>{shortenText(namePlaylist, 35)}</p>
+                            <p className='playlistname' >{shortenText(namePlaylist, 35)}</p>
                         )}
                         {playlists.filter(el => el === params.id).length > 0 ? (
                             <div className='playlist-edit'>
@@ -194,8 +202,10 @@ function PlaylistWindow(){
                                     <span className="checkbox-icon"></span>
                                     <label className='private-playlist' onClick={handleCheckboxChange}>Приватный</label>
                                 </div>
-                                {/* <p className='rename-playlist'><img className='pencil-icon' alt='pencil' src={pencil} /> Переименовать</p> */}
-                                <p className='delete-playlist' onClick={() => deletePlaylist()}><img className='pencil-icon' alt='pencil' src={trash}/>Удалить плейлист</p>
+                                <p className='rename-playlist' onClick={toggleEditMode}>
+                                    <img className='pencil-icon' alt='pencil' src={pencil}/> Переименовать</p>
+                                <p className='delete-playlist' onClick={() => deletePlaylist()}>
+                                    <img className='pencil-icon' alt='pencil' src={trash}/>Удалить плейлист</p>
                             </div>
                         ): (<></>)} 
                     </div>

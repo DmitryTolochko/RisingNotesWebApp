@@ -94,7 +94,7 @@ const Commentaries = ({clip}) => {
                     setSongName(response.data.name);
                     setGenres(response.data.genreList);
                     setSongAuthor(response.data.authorName);
-                    setText(response.data.lyrics ? response.data.lyrics : 'Мы не знаем текст этой песни :(');
+                    setText(response.data?.lyrics !== 'undefined' && response.data.lyrics ? response.data.lyrics : 'Мы не знаем текст этой песни :(');
                     authorId = response.data.authorId;
                     setAuthorId(authorId);
                 })
@@ -272,7 +272,7 @@ const Commentaries = ({clip}) => {
                 (<></>)}
                 
             </div>
-            <img className="player-bg-image" onLoad={bgLoaded} src={(api + `api/song/${params.id}/logo?width=500&height=500`)} alt="" />
+            <img className="player-bg-image" onLoad={bgLoaded} src={songLogo} alt="" />
         </div>
     );
 }
