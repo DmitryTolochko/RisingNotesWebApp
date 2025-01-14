@@ -244,7 +244,9 @@ function InstallVerticalVideo(){
                             value={description} 
                             onChange={e => setDescription(e.target.value)}
                             isTextArea={true}
-                            isRequired={true}/>
+                            isRequired={true}
+                            maxLength={300}
+                            />
                     </div>
                 </div>
                 <div className='video-information-3' >

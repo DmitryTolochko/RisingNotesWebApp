@@ -45,7 +45,9 @@ export default function AccountUser (props) {
                     placeholder="Введите ваш никнейм или имя"
                     value={userName} 
                     onChange={e => setUserName(e.target.value)}
-                    isRequired={true}/>
+                    isRequired={true}
+                    maxLength={40}
+                    />
                 </span>
                 <span className='account-page-user-input'>
                 <CustomInput
@@ -53,7 +55,9 @@ export default function AccountUser (props) {
                     placeholder="Введите вашу почту"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
-                    isRequired={true}/>
+                    isRequired={true}
+                    maxLength={40}
+                    />
                 </span>
             </div>
             <div className="account-page-user-buttons">

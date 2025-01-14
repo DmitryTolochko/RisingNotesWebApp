@@ -10,6 +10,7 @@ import {  api, axiosAuthorized, axiosPictures, axiosUnauthorized } from '../../.
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { showError } from '../../../Redux/slices/errorMessageSlice';
+import { shortenText } from '../../../Components/ArtistCardComponents/ArtistInfo/ArtistInfo';
 
 export default function AccountHead (props) {
     const dispatch = useDispatch();
@@ -77,7 +78,7 @@ export default function AccountHead (props) {
                 <img alt='avatar' ref={imgRef} src={avatar}/>
             </button>
             <span>
-                <h1 className="account-page-username">{props.userName}</h1>
+                <h1 className="account-page-username">{shortenText(props.userName, 20)}</h1>
                 <p className='account-page-user-status'>{props.role === 'author' ? 'Музыкант' : 'Слушатель'}</p>
                 {props.role === 'author' ? (
                     <span className='account-stats'>

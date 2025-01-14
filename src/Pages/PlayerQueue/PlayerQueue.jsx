@@ -8,6 +8,7 @@ import { axiosUnauthorized } from "../../Components/App/App";
 import Song from "../../Components/Song/Song";
 import './PlayerQueue.css';
 import { updatePlayerQueueVisibility } from "../../Redux/slices/playerQueueSlice";
+import { shortenText } from "../../Components/ArtistCardComponents/ArtistInfo/ArtistInfo";
 
 export default function PlayerQueue () {
     const dispatch = useDispatch();
@@ -64,7 +65,7 @@ export default function PlayerQueue () {
                 {currPage === 1 ? <Excluded/> : <></>}
                 {currPage === 0 ? (
                     <div>
-                        <h2 className='queue-name'>Сейчас играет <p>«{queueName}»</p></h2>
+                        <h2 className='queue-name'>Сейчас играет <p>«{shortenText(queueName, 40)}»</p></h2>
                         <div className='tracks scroll-tracks'>
                             {songsInfo.map(el => (
                                 <Song 

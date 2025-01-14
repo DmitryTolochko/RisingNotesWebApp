@@ -146,10 +146,15 @@ export async function songsByFiltersGetter(filters, isAuthorized=false){
         'VibeList.ValueList': filters.mood,
         'VibeList.OrPredicate': filters.moodOrAnd !== 'and' ? true : false,
         'Instrumental': filters.instrumental,
-        'Gender': filters.gender,
         'TrackDurationRange.Start': timeFormatters[filters.duration][0],
         'TrackDurationRange.End':timeFormatters[filters.duration][1],
     }
+
+    if (filters.gender !== '0') {
+        formatFilters['Gender'] = filters.gender;
+    }
+
+    console.log(formatFilters);
     const query = buildQueryString(formatFilters);
     try {
         let response = undefined;
@@ -159,8 +164,8 @@ export async function songsByFiltersGetter(filters, isAuthorized=false){
             response = await axiosUnauthorized.get('api/song/list?' + query);
         }
         
-        let result = response.data;
-        return result.songList;
+        let result = response.data.songList.reverse();
+        return result;
     }
     catch (err) {
         return -1;

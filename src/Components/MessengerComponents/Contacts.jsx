@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import defaultAvatar from '../../Images/image-placeholder/user_logo_small_placeholder.png';
 import { ReactComponent as SearchIcon} from '../../Images/sidebar/Vector.svg';
 import { axiosAuthorized } from '../App/App';
+import { shortenText } from '../ArtistCardComponents/ArtistInfo/ArtistInfo';
 
 const Contacts = ({
     userName, 
@@ -12,7 +13,6 @@ const Contacts = ({
     recentChatsFiltered, 
     setUser, 
     formatTime, 
-    shortenLastMessage, 
     users
 }) => {
     const [updatedChats, setUpdatedChats] = useState(recentChatsFiltered);
@@ -71,12 +71,12 @@ const Contacts = ({
                             <img alt='avatar' src={el.logoFileLink !== null ? el.logoFileLink : defaultAvatar}/>
                             <span className="contact-info">
                                 <span>
-                                    <p className="contact-name">{el.chatName}</p>
+                                    <p className="contact-name">{shortenText(el.chatName, 13)}</p>
                                     <p>{formatTime(el?.lastMessage?.sentAt)}</p>
                                 </span>
                                 {el?.lastMessage?.readAt === null && el?.unreadCount > 0 ? (
                                     <span>
-                                        <p>{shortenLastMessage(el?.lastMessage?.text)}</p>
+                                        <p>{shortenText(el?.lastMessage?.text, 20)}</p>
                                         <div className='unread'>{el?.unreadCount}</div>
                                     </span>
                                 ) : (<></>)}
@@ -95,7 +95,7 @@ const Contacts = ({
                             <img alt='avatar' src={el.logoLink !== null ? el.logoLink : defaultAvatar}/>
                             <span className="contact-info">
                                 <span>
-                                    <p className="contact-name">{el.userName}</p>
+                                    <p className="contact-name">{shortenText(el.userName, 13)}</p>
                                 </span>
                             </span>
                         </div>

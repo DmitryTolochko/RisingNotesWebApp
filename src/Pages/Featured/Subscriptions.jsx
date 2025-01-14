@@ -10,7 +10,7 @@ const Subscriptions = ({subscriptions, activeTab, setActiveTab}) =>{
                 <h2 className='featured-section__title'>Подписки</h2>
                 <ShowMoreBtn collection={subscriptions} redirect={'subscriptions'} maxValue={5} activeTab={activeTab} setActiveTab={setActiveTab}/>
             </div>
-            <div className='featured-section__subscriptions-wrapper'>
+            <div className='playlists'>
                 {subscriptionsToShow?.map((id) =>
                     <Subscription authorId={id}/>
                 )}

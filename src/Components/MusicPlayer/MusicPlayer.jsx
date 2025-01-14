@@ -31,6 +31,7 @@ import PlaylistModalMenu from '../PlaylistModalMenu/PlaylistModalMenu';
 import filtersToggle from '../../Hooks/filtersToggle';
 import { updatePlayerQueueVisibility } from '../../Redux/slices/playerQueueSlice';
 import usePrevious from '../../Hooks/usePrevious/usePrevious';
+import { shortenText } from '../ArtistCardComponents/ArtistInfo/ArtistInfo';
 
 const MusicPlayer = () => {
     const [playerQueueButtonColor, setPlayerQueueButtonColor] = useState('#FFFFFF');
@@ -345,8 +346,8 @@ const MusicPlayer = () => {
                 <img className={isPlaying ? 'music-player-cover rotate' : 'music-player-cover'} draggable='false' src={coverLink} alt='cover'/>
 
                 <span className='music-player-head' onClick={hideAllModals}>
-                    <Link to={currentSong === '' ? '' : `/commentaries/${currentSong}`} className='music-player-head-song'>{songName}</Link>
-                    <Link to={`/artist/${authorId}`} className='music-player-head-author'>{songAuthor}</Link>
+                    <Link to={currentSong === '' ? '' : `/commentaries/${currentSong}`} className='music-player-head-song'>{shortenText(songName, 25)}</Link>
+                    <Link to={`/artist/${authorId}`} className='music-player-head-author'>{shortenText(songAuthor, 25)}</Link>
                 </span>
 
                 <div className='music-player-buttons'>
@@ -405,8 +406,8 @@ const MusicPlayer = () => {
                 <div className='mobile-music-player-song'>
                     <img className={isPlaying ? 'mobile-music-player-img rotate' : 'mobile-music-player-img'} draggable='false' src={coverLink} alt='cover'/>
                     <span>
-                        <Link to={currentSong === '' ? '' : `/commentaries/${currentSong}`} className='mobile-music-player-song-name'>{songName}</Link>
-                        <Link to={`/artist/${authorId}`} className='mobile-music-player-author'>{songAuthor}</Link>
+                        <Link to={currentSong === '' ? '' : `/commentaries/${currentSong}`} className='mobile-music-player-song-name'>{shortenText(songName, 25)}</Link>
+                        <Link to={`/artist/${authorId}`} className='mobile-music-player-author'>{shortenText(songAuthor, 25)}</Link>
                     </span>
                     <a onClick={() => {
                         dispatch(updatePlayerQueueVisibility(!isPlayerQueueVisible));

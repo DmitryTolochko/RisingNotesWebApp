@@ -26,11 +26,14 @@ function Messenger() {
     const [recentChats, setRecentChats] = useState(undefined);
     const [recentChatsFiltered, setRecentChatsFiltered] = useState([]);
     const [users, setUsers] = useState([]);
+
     const [chatInfo, setChatInfo] = useState(undefined);
     const [chatId, setChatId] = useState(undefined);
     const chatIdRef = useRef(null);
     const [messages, setMessages] = useState([]);
     const [currentText, setCurrentText] = useState(undefined);
+    const [messagesOffset, setMessagesOffset] = useState(0);
+    const [offsetCount, setOffsetCount] = useState(10);
 
     const [userName, setUserName] = useState(undefined);
     const [userLogo, setUserLogo] = useState(defaultAvatar);
@@ -42,7 +45,9 @@ function Messenger() {
 
     const connection = new HubConnectionBuilder()
         .withUrl(api + 'messenger', {
-            accessTokenFactory: () => {return cookies.accessToken}
+            accessTokenFactory: () => {return cookies.accessToken},
+            withCredentials: true
+            
         })
         .build();
 
@@ -63,7 +68,7 @@ function Messenger() {
             .catch(err => console.log(err));
     
             setChatInfo(response?.data);
-            await getChatMessages(id);
+            await getChatMessages(id, true);
         }
     }
 
@@ -100,18 +105,52 @@ function Messenger() {
             }})
             .catch(err => console.log(err));
             setCurrentText('');
-            await getChatMessages(chatId);
+            // await getChatMessages(chatId, true);
+            await getLastMessage(chatId);
             await getRecentChats();
             // await getNewMessage(chatId);
         }
     }
 
-    async function getChatMessages(id) {
+    async function getChatMessages(id, cleanPrev=false) {
         // Получить сообщения чата
-        let response = await axiosAuthorized.get('api/chat-message/' + id +  '/list')
-        .catch(err => {return undefined});
+        let offsetCount = 10
 
-        setMessages(response?.data?.messageList);
+        if (cleanPrev) {
+            let messagesOffset = 0;
+            let response = await axiosAuthorized.get(`api/chat-message/${id}/list?count=${offsetCount}&offset=${messagesOffset}`)
+            .catch(err => {return []});
+
+            setMessages(response?.data?.messageList);
+            setMessagesOffset(offsetCount);
+            setOffsetCount(offsetCount);
+        } else {
+            let response = await axiosAuthorized.get(`api/chat-message/${id}/list?count=${offsetCount}&offset=${messagesOffset}`)
+            .catch(err => {return []});
+
+            if (response?.data?.messageList?.length === 0) {
+                setOffsetCount(0);
+            }
+            else {
+                setOffsetCount(offsetCount);
+            }
+
+            setMessagesOffset(messagesOffset + offsetCount);
+            let newList = messages.concat(...response?.data?.messageList);
+            setMessages(newList);
+        }
+    }
+
+    async function getLastMessage(id) {
+        let response = await axiosAuthorized.get(`api/chat-message/${id}/list?count=${1}&offset=${0}`)
+            .catch(err => {return undefined});
+
+        let newList = messages;
+        if (response) {
+            newList = response?.data?.messageList.concat(...messages);
+        }
+        
+        setMessages(newList);
     }
 
     async function getUsersByName(name) {
@@ -152,13 +191,6 @@ function Messenger() {
         if (response !== undefined) {
             await setUser(response.data.userName, response.data.logoLink, response.data.id, charResp?.data?.id)
         }
-    }
-
-    function shortenLastMessage(text) {
-        // Сократить сообщение
-        if (text?.length > 28)
-            return text.slice(0, 28) + '...';
-        return text;
     }
 
     function formatTime(time) {
@@ -222,11 +254,9 @@ function Messenger() {
         });
 
         connection.on('onNewMessage', async (thisChatId, preparedMessage, userName) => {
-            // await getNewMessage(chatId);
-            console.log(thisChatId);
-            console.log(chatIdRef.current);
             if (thisChatId === chatIdRef.current)
-                await getChatMessages(thisChatId);
+                await getLastMessage(thisChatId);
+                // await getChatMessages(thisChatId);
             await getRecentChats();
         })
 
@@ -264,7 +294,6 @@ function Messenger() {
                     recentChatsFiltered={recentChatsFiltered}
                     setUser={setUser}
                     formatTime={formatTime}
-                    shortenLastMessage={shortenLastMessage}
                     users={users}/>
                 <Chat
                     userName={userName}
@@ -277,7 +306,9 @@ function Messenger() {
                     resize={resize}
                     sendMessage={sendMessage}
                     setCurrentText={setCurrentText}
-                    chatId={chatId}/>
+                    chatId={chatId}
+                    getChatMessages={getChatMessages}
+                    offsetCount={offsetCount}/>
             </div>
         </section>
     )

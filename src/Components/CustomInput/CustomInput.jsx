@@ -1,4 +1,5 @@
 import errorImg from '../../Images/error.svg';
+import { shortenText } from '../ArtistCardComponents/ArtistInfo/ArtistInfo';
 import './CustomInput.css';
 
 function CustomInput({   
@@ -10,7 +11,8 @@ function CustomInput({
     validRegex=undefined,
     isTextArea=false,
     isRequired=false,
-    type='text'}) {
+    type='text',
+    maxLength=100}) {
 
     function isValidValue() {
         if (!isRequired && (value === '' || value === undefined)) {
@@ -22,6 +24,13 @@ function CustomInput({
         }
 
         return !validRegex.test(value);
+    }
+
+    function handleOnChange(e) {
+        // if (e.target.value.length > maxLength) {
+        //     e.target.value = shortenText(e.target.value, maxLength);
+        // }
+        onChange(e);
     }
     return (
         <>
@@ -37,8 +46,8 @@ function CustomInput({
                 
             </span>
             {isTextArea ? 
-            <textarea className='song-text-area' placeholder={placeholder} value={value} onChange={onChange}/> :
-            <input className='inp-column1' placeholder={placeholder} value={value} onChange={onChange} type={type}/>}
+            <textarea className='song-text-area' placeholder={placeholder} value={value} maxLength={maxLength} onChange={handleOnChange}/> :
+            <input className='inp-column1' placeholder={placeholder} value={value} maxLength={maxLength} onChange={handleOnChange} type={type}/>}
         </>
     )
 }

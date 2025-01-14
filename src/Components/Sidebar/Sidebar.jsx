@@ -21,6 +21,7 @@ import useMenuToggle from '../../Hooks/useMenuToggle/useMenuToggle';
 
 import './Sidebar.css';
 import { updatePlayerQueueVisibility } from '../../Redux/slices/playerQueueSlice'
+import { shortenText } from '../ArtistCardComponents/ArtistInfo/ArtistInfo'
 
 
 function Sidebar(props) {
@@ -166,7 +167,7 @@ function Sidebar(props) {
                      <NavLink onClick={()=>sidebarClickHandler()} draggable='false' to={`/playlist/${pl.id}`} className='sidebar-playlist-name' 
                         style={({ isActive }) => (isActive ? {color: '#FE1170'} : {color: '#787885'})}>
                            <img draggable='false' src={pl.img}/>
-                           {pl.name}
+                           {shortenText(pl.name, 15)}
                      </NavLink>
                   </li>
                ))}

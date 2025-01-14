@@ -10,6 +10,7 @@ import { updateVertVideoPlayerValue } from '../../Redux/slices/vertVideoPlayerSl
 import { updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlice'
 import defaultAvatar from '../../Images/image-placeholder/user_logo_small_placeholder.png';
 import { useSearchParams } from 'react-router-dom'
+import { shortenText } from '../ArtistCardComponents/ArtistInfo/ArtistInfo'
 
 function VerticalClip(props) {
     const [dataFetched, setDataFetched] = useState(false);
@@ -121,8 +122,8 @@ function VerticalClip(props) {
                     Sorry, your browser doesn't support embedded videos
                 </video>
                 <div className="vert-data-label" style={videoLoaded?{display:'block'}:{display:'none'}}>
-                    <h2>{vertData.title}</h2>
-                    <span>{vertData.description}</span>
+                    <h2>{shortenText(vertData.title, 13)}</h2>
+                    <span>{shortenText(vertData.description, 25)}</span>
                 </div>
             </div>
             }

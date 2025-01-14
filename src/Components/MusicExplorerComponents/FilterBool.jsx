@@ -31,8 +31,8 @@ function FilterBool(params) {
             <form className="filters-form">
                 <select className="filters-input" onChange={e => setGender(e.target.value)} value={gender}>
                     <option value={0}>Не имеет значения</option>
-                    <option value={1}>Мужской</option>
-                    <option value={2}>Женский</option>
+                    <option value={2}>Мужской</option>
+                    <option value={1}>Женский</option>
                 </select>
             </form>
         </div>

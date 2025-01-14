@@ -4,7 +4,7 @@ import TrackTemplate from '../../Images/main-placeholder.png';
 
 import ArtistInfo from "../../Components/ArtistCardComponents/ArtistInfo/ArtistInfo.jsx"
 import { useEffect, useState } from "react"
-import { api, axiosAuthorized, axiosUnauthorized } from "../../Components/App/App.jsx"
+import { api, axiosAuthorized, axiosPictures, axiosUnauthorized } from "../../Components/App/App.jsx"
 import BackButton from "../../Components/BackButton.jsx";
 import Songs from "../../Components/ArtistCardComponents/Songs/Songs.jsx"
 import Blog from "../../Components/Blog/Blog.jsx"
@@ -26,28 +26,14 @@ function ArtistCard(){
     const [isLoaded, setIsLoaded] = useState(false);
     const [isSubscribed, setIsSubscribed] = useState(subscriptions.includes(params.id));
     const [currPage, setCurrPage] = useState(0);
+    const [avatar, setAavatar] = useState(ArtistImage);
 
-    // const handleSubscribe = async () => {
-    //     // подписка
-    //     await axiosAuthorized.post(api + `api/subscription/${params.id}`)
-    //     .then( r => {
-    //         dispatch(updateSubscriptionsValue([...subscriptions, params.id]))
-    //         setIsSubscribed(subscriptions.includes(params.id));
-    //         setIsLoaded(false);
-    //     })
-    //     .catch(err => {console.log(err)});
-    // }
-
-    // const handleUnsubscribe = async () => {
-    //     // отписка
-    //     await axiosAuthorized.delete(api + `api/subscription/${params.id}`)
-    //     .then( r => {
-    //         dispatch(updateSubscriptionsValue(subscriptions.filter(el => el != params.id)))
-    //         setIsSubscribed(subscriptions.includes(params.id));
-    //         setIsLoaded(false);
-    //     })
-    //     .catch(err => {console.log(err)});
-    // }
+    useEffect(() => {
+        // проверка наличия картинки
+        axiosPictures.get(api + `api/user/${artist?.userId}/logo/link`)
+        .then(response => setAavatar(response?.data?.presignedLink))
+        .catch(err => {setAavatar(ArtistImage)});
+    }, [artist])
 
     useEffect(() => {
         // обновление информации об авторе
@@ -142,7 +128,7 @@ function ArtistCard(){
                     {currPage === 3 ? <Blog artistId={params.id}/> : <></>}
                     
                 </div>
-                <img className="artist-bg-image" src={api + `api/user/${artist.userId}/logo?width=400&height=400`}/>
+                <img className="artist-bg-image" src={avatar}/>
             </section>
         )
         else {

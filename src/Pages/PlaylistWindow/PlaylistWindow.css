@@ -1,8 +1,8 @@
 .playlist-information {
     display: flex;
     width: 100%;
-    height: 250px;
-    margin-bottom: 106px;
+    height: fit-content;
+    margin-bottom: 80px;
     gap: 40px;
 
     @media screen and (max-width: 720px){ 
@@ -15,11 +15,12 @@
 .playlist-edit {
     display: inline-flex;
     width: 100%;
-    gap: 30px;
-    height: 22px;
+    gap: 8px 30px;
+    height: fit-content;
     margin-top: 20px;
     align-items: center; 
     justify-content: start;
+    flex-wrap: wrap;
     @media screen and (max-width: 720px){ 
         justify-content: center;
     }
@@ -28,6 +29,7 @@
 .nameplaylist-and-buttons {
     text-align: start;
     width: 100%;
+    height: fit-content;
 
     @media screen and (max-width: 720px){ 
         text-align: center;
@@ -35,7 +37,7 @@
 }
 
 .delete-playlist {
-    color: #787885;
+    color: #e3e3e3;
     
     font-family: Montserrat;
     font-size: 16px;
@@ -65,12 +67,17 @@
     }
 }
 
+.pencil-icon {
+    width: 24px;
+    height: 24px;
+}
+
 .rename-playlist:hover {
     cursor: pointer;
 }
 
 .rename-playlist {
-    color: #787885;
+    color: #e3e3e3;
     
     font-family: Montserrat;
     font-size: 16px;
@@ -85,7 +92,7 @@
 }
 
 .private-playlist {
-    color: #787885;
+    color: #e3e3e3;
     animation-name: textColor;
     animation-duration: 0s;
     font-family: Montserrat;
@@ -98,6 +105,10 @@
     align-items: center;
     justify-content: center;
     gap: 4px;
+
+    @media screen and (max-width: 720px){ 
+        font-size: 12px;
+    }
 }
 
 .private-playlist:hover {
@@ -111,9 +122,10 @@
 } 
 
 .input-name-playlist{
-    background-color: transparent;
+    background-color: #191E28;
     width: 100%;
-    border: none;
+    border: 1px solid #191E28;
+    border-radius: 10px;
     box-shadow: none;
     color: white;
     font-family: Montserrat;
@@ -128,22 +140,6 @@
     pointer-events: none;
     position: absolute;
     left: var(--sidebar-width);
-
-    width: calc(100% - var(--sidebar-width));
-    height: max(100%, 100vh);
-
-    object-fit: cover;
-    mask-image: linear-gradient(to bottom, rgba(0,0,0,1)-60%, rgba(0,0,0,0)80%);
-    filter: blur(.5em);
-
-    transition: 250ms ease-in-out;
-}
-
-.playlist-bg-image {
-    pointer-events: none;
-    position: absolute;
-    left: var(--sidebar-width);
-    background-color: #0F141D;
 
     width: calc(100% - var(--sidebar-width));
     height: max(100%, 100vh);

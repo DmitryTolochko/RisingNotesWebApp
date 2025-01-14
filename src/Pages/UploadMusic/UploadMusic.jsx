@@ -396,7 +396,9 @@ function UploadMusic(){
                             value={name} 
                             onChange={e => setName(e.target.value)}
                             heading={'Название трека'}
-                            isRequired={true}/>
+                            isRequired={true}
+                            maxLength={40}
+                            />
                     </div>
                     <div className='column'>
                         <CustomInputWithTags 
@@ -439,7 +441,9 @@ function UploadMusic(){
                             value={lyrics} 
                             onChange={e => setLyrics(e.target.value)}
                             isTextArea={true}
-                            isRequired={true}/>
+                            isRequired={true}
+                            maxLength={600}
+                            />
                         <div className="text-checkbox">
                             <input type="checkbox" className='checkbox-button'/>
                             <label className='label-checkbox'>Ненормативная лексика</label>

@@ -5,20 +5,34 @@ import Chevron from '../../Images/controller/chevron-left.svg';
 import defaultAvatar from '../../Images/image-placeholder/user_logo_small_placeholder.png';
 import chatIcon from '../../Images/chat.svg';
 import sendIcon from '../../Images/controller/sendIcon.svg';
+import { shortenText } from "../ArtistCardComponents/ArtistInfo/ArtistInfo";
+import { useEffect, useState } from "react";
 
 const Chat = ({
     userName, 
     chatInfo, 
     setUser, 
     userLogo, 
-    messages, 
+    messages=[], 
     formatTime, 
     currentText, 
     resize, 
     sendMessage, 
     setCurrentText, 
-    chatId
+    chatId,
+    getChatMessages,
+    offsetCount
 }) => {
+    const [showMore, setShowMore] = useState(false);
+
+    useEffect(() => {
+        if (messages.length >= offsetCount && offsetCount !== 0) {
+            setShowMore(true);
+        }
+        else {
+            setShowMore(false);
+        }
+    }, [messages, offsetCount]);
 
     if (userName !== undefined || chatInfo !== undefined) {
         return (
@@ -26,24 +40,34 @@ const Chat = ({
                 <div className="chat-header">
                     <a onClick={() => setUser(undefined, defaultAvatar, undefined, undefined)}><img src={Chevron}/></a>
                     <img src={userLogo !== null ? userLogo : defaultAvatar}/>
-                    <p className="chat-name">{userName}</p>
+                    <p className="chat-name">{shortenText(userName, 20)}</p>
                 </div>
 
                 <div className="chat-container">
                     {messages.map(el => (
                     <>
-                        <NewDate currentDate={el.sentAt}/>
+                        <NewDate currentDate={el?.sentAt}/>
                         <Message 
-                            key={el.id} 
-                            id={el.senderId} 
-                            text={el.text} 
-                            sentAt={el.sentAt}
+                            key={el?.id} 
+                            id={el?.senderId} 
+                            text={el?.text} 
+                            sentAt={el?.sentAt}
                             formatTime={formatTime}
-                            readAt={el.readAt}
-                            messageId={el.id}
+                            readAt={el?.readAt}
+                            messageId={el?.id}
                             />
                     </>))
                     }
+                    {console.log(messages.length)}
+                    {showMore ? (
+                        <CustomButton 
+                            text={'Подгрузить еще сообщения'}
+                            success={'Подгрузить еще сообщения'}
+                            errorText="Это все сообщения"
+                            reusable={true}
+                            func={() => getChatMessages(chatId)}/>
+                    ) : (<></>)}
+                    
                     <NewDate currentDate={-1}/>
                 </div>
 
@@ -51,8 +75,9 @@ const Chat = ({
                     <textarea 
                         placeholder='Напишите сообщение...' 
                         className='comment-input' 
-                        onChange={e => setCurrentText(e.target.value)}
-                        value={currentText}
+                        onChange={e => setCurrentText(shortenText(e.target.value, 550))}
+                        value={shortenText(currentText, 550)}
+                        maxLength={549}
                         onKeyDown={(e) => {
                             if (e.key === "Enter" && !e.shiftKey) {
                                 e.preventDefault();

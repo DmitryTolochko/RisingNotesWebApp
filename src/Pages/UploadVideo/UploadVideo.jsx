@@ -230,7 +230,9 @@ function UploadVideo(){
                             placeholder={'Введите описание...'} 
                             value={description} 
                             onChange={e => setDescription(e.target.value)}
-                            isTextArea={true}/>
+                            isTextArea={true}
+                            maxLength={300}
+                            />
                     </div>
                 </div>
                 <div className='video-information-3' >
