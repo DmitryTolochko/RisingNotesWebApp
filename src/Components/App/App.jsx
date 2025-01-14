@@ -42,6 +42,9 @@ import PlayerQueue from '../../Pages/PlayerQueue/PlayerQueue.jsx';
 import ClipPage from '../../Pages/ClipPage/ClipPage.jsx';
 import MusicExplorer from '../../Pages/MusicExplorer/MusicExplorer.jsx';
 
+import moment from "moment";
+import 'moment/locale/ru'
+
 export const api = 'http://81.31.247.227/';
 axios.defaults.headers.post['Access-Control-Allow-Origin'] = 'rn-api-storage.s3.yandexcloud.net';
 
@@ -78,6 +81,7 @@ export const axiosPictures = axios.create({
 function App() {
     const location = useLocation()
     const [searchParams, setSearchParams] = useSearchParams();
+    moment.locale('ru')
 
     //Redux Dispatcher
     const dispatch = useDispatch()

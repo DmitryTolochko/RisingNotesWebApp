@@ -88,7 +88,7 @@ export default function Featured() {
                     <Loader/> : 
                     <>
                         <TabSelector/>
-                        {(activeTab == 'main' || activeTab == 'playlists') && <Playlists playlists={playlists} activeTab={activeTab}/>}
+                        {(activeTab == 'main' || activeTab == 'playlists') && <Playlists playlists={playlists} activeTab={activeTab} setActiveTab={setActiveTab}/>}
                         {(activeTab == 'main' || activeTab == 'tracks') && <Tracks songs={songs} activeTab={activeTab} setActiveTab={setActiveTab} featured={featured}/>}
                         {(activeTab == 'main' || activeTab == 'subscriptions') && <Subscriptions subscriptions={subscriptions} activeTab={activeTab} setActiveTab={setActiveTab}/>}
                     </>
