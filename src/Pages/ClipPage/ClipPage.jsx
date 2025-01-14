@@ -12,6 +12,7 @@ import CustomControls from "./CustomControl/CustomControls";
 import Skeleton from "react-loading-skeleton";
 import { Link } from "react-router-dom";
 import { shortenText } from "../../Components/ArtistCardComponents/ArtistInfo/ArtistInfo";
+import BackButton from "../../Components/BackButton";
 
 function ClipPage() {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -90,47 +91,47 @@ function ClipPage() {
 
     return (
         <>
-            <div className="clip-page-wrapper">
-                <div className="clip-page-top">
-                    <button className="clip-back-btn" onClick={()=>navigate(-1)}>
-                        <img src={backIcon} alt=""/> Назад
-                    </button>
+            <div className="comment-page-wrapper" style={{minHeight:'0', flexDirection: 'column'}}>
+                <div className="clip-page-wrapper">
+                    <BackButton/>
+                    <div ref={videoWrapperRef} className="video-wrapper">
+                        <video 
+                            className='video-player' 
+                            ref={videoRef} 
+                            type="video/mp4" 
+                            preload="auto" 
+                            autoPlay={false}
+
+                            onCanPlay={()=>setCanPlay(true)} 
+                            onClick={handleVideoClick}
+                        />
+                        <CustomControls 
+                            video={videoRef.current} 
+                            wrapper={videoWrapperRef} 
+                            canPlay={canPlay}
+                            isPlaying={isPlaying}
+                            setIsPlaying={setIsPlaying}
+                        />
+                        <h2 className="clip-page-song-name">{shortenText(title, 30)}</h2>
+                        {author ?                 
+                            <Link to={`/artist/${authorId}`} className="clip-page-author-wrapper">
+                                <img src={api+`api/author/${authorId}/logo`} alt="" className="clip-page-author-avatar" />
+                                <span className="clip-page-author-name">{shortenText(author, 25)}</span>
+                            </Link> 
+                                :
+                            <Skeleton baseColor='#0F141D' highlightColor="#2C323D"  height={200}/>
+                        }
+                    </div>
                 </div>
-                <div ref={videoWrapperRef} className="video-wrapper">
-                    <video 
-                        className='video-player' 
-                        ref={videoRef} 
-                        type="video/mp4" 
-                        preload="auto" 
-                        autoPlay={false}
-
-                        onCanPlay={()=>setCanPlay(true)} 
-                        onClick={handleVideoClick}
-                    />
-                    <CustomControls 
-                        video={videoRef.current} 
-                        wrapper={videoWrapperRef} 
-                        canPlay={canPlay}
-                        isPlaying={isPlaying}
-                        setIsPlaying={setIsPlaying}
-                    />
-                    <h2 className="clip-page-song-name">{shortenText(title, 30)}</h2>
-                    {author ?                 
-                        <Link to={`/artist/${authorId}`} className="clip-page-author-wrapper">
-                            <img src={api+`api/author/${authorId}/logo`} alt="" className="clip-page-author-avatar" />
-                            <span className="clip-page-author-name">{shortenText(author, 25)}</span>
-                        </Link> 
-                            :
-                        <Skeleton baseColor='#0F141D' highlightColor="#2C323D"  height={200}/>
-                    }
                 </div>
-            </div>
+               
 
-            <hr className="clip-hr"/>
+            <hr className="clip-hr" style={{zIndex: '2'}}/>
 
-            <div className="clip-page-wrapper" style={{marginTop:0}}>
-                <Commentaries clip={clipId}/>
+            <div style={{marginTop: '-72px'}}>
+            <Commentaries clip={clipId}/>
             </div>
+            
         </>
 
     );

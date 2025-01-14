@@ -191,6 +191,12 @@ function PlaylistWindow(){
                                 onChange={handleInputChange}
                                 onBlur={handleBlur}
                                 maxLength={34}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        e.preventDefault();
+                                        handleBlur();
+                                    }
+                                }}
                             />
                             ) : (
                             <p className='playlistname' >{shortenText(namePlaylist, 35)}</p>
@@ -202,9 +208,9 @@ function PlaylistWindow(){
                                     <span className="checkbox-icon"></span>
                                     <label className='private-playlist' onClick={handleCheckboxChange}>Приватный</label>
                                 </div>
-                                <p className='rename-playlist' onClick={toggleEditMode}>
+                                <p className='private-playlist' onClick={toggleEditMode}>
                                     <img className='pencil-icon' alt='pencil' src={pencil}/> Переименовать</p>
-                                <p className='delete-playlist' onClick={() => deletePlaylist()}>
+                                <p className='private-playlist' onClick={() => deletePlaylist()}>
                                     <img className='pencil-icon' alt='pencil' src={trash}/>Удалить плейлист</p>
                             </div>
                         ): (<></>)} 

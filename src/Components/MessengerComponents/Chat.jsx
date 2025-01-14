@@ -6,20 +6,33 @@ import defaultAvatar from '../../Images/image-placeholder/user_logo_small_placeh
 import chatIcon from '../../Images/chat.svg';
 import sendIcon from '../../Images/controller/sendIcon.svg';
 import { shortenText } from "../ArtistCardComponents/ArtistInfo/ArtistInfo";
+import { useEffect, useState } from "react";
 
 const Chat = ({
     userName, 
     chatInfo, 
     setUser, 
     userLogo, 
-    messages, 
+    messages=[], 
     formatTime, 
     currentText, 
     resize, 
     sendMessage, 
     setCurrentText, 
-    chatId
+    chatId,
+    getChatMessages,
+    offsetCount
 }) => {
+    const [showMore, setShowMore] = useState(false);
+
+    useEffect(() => {
+        if (messages.length >= offsetCount && offsetCount !== 0) {
+            setShowMore(true);
+        }
+        else {
+            setShowMore(false);
+        }
+    }, [messages, offsetCount]);
 
     if (userName !== undefined || chatInfo !== undefined) {
         return (
@@ -33,18 +46,28 @@ const Chat = ({
                 <div className="chat-container">
                     {messages.map(el => (
                     <>
-                        <NewDate currentDate={el.sentAt}/>
+                        <NewDate currentDate={el?.sentAt}/>
                         <Message 
-                            key={el.id} 
-                            id={el.senderId} 
-                            text={el.text} 
-                            sentAt={el.sentAt}
+                            key={el?.id} 
+                            id={el?.senderId} 
+                            text={el?.text} 
+                            sentAt={el?.sentAt}
                             formatTime={formatTime}
-                            readAt={el.readAt}
-                            messageId={el.id}
+                            readAt={el?.readAt}
+                            messageId={el?.id}
                             />
                     </>))
                     }
+                    {console.log(messages.length)}
+                    {showMore ? (
+                        <CustomButton 
+                            text={'Подгрузить еще сообщения'}
+                            success={'Подгрузить еще сообщения'}
+                            errorText="Это все сообщения"
+                            reusable={true}
+                            func={() => getChatMessages(chatId)}/>
+                    ) : (<></>)}
+                    
                     <NewDate currentDate={-1}/>
                 </div>
 

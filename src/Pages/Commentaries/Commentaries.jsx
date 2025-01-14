@@ -272,7 +272,8 @@ const Commentaries = ({clip}) => {
                 (<></>)}
                 
             </div>
-            <img className="player-bg-image" onLoad={bgLoaded} src={songLogo} alt="" />
+            {!clip ? <img className="player-bg-image" onLoad={bgLoaded} src={songLogo} alt="" /> : <></>}
+            
         </div>
     );
 }
