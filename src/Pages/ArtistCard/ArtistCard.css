@@ -337,7 +337,7 @@
     @media screen and (max-width: 720px){ 
         border-bottom: #191E28 solid 2px;
         margin-top: 10px;
-        height: 45px;
+        /* height: 45px; */
         margin-bottom: 24px;
     }
 }
@@ -356,14 +356,25 @@
     font-weight: 500;
 
     border-bottom: #191E28 solid 4px;
-
+    text-wrap: nowrap;
     padding-left: 24px;
     padding-right: 24px;
 
     @media screen and (max-width: 720px){ 
         font-size: 14px;
-        border-bottom: #191E28 solid 1px;
-        height: 45px;
+        border-bottom: #191E28 solid 2px;
+        /* height: 45px; */
+    }
+}
+
+.artist-card-menu-item-active {
+    border-bottom: #FE1170 solid 4px;
+    transition: all .2s ease-in-out;
+    z-index: 2;
+    @media screen and (max-width: 720px){ 
+        font-size: 14px;
+        border-bottom: #FE1170 solid 2px;
+        /* height: 45px; */
     }
 }
 

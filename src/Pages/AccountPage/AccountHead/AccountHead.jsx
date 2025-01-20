@@ -84,7 +84,7 @@ export default function AccountHead (props) {
                     <span className='account-stats'>
                         <p className='account-page-stats'><img src={statsIcon}/>{resize === 'standart' ? 'Прослушиваний в месяц: ' + auditionsCount : auditionsCount}</p>
                         <p className='account-page-stats'><img src={subsIcon}/>{resize === 'standart' ? 'Подписчиков: ' + subsCount : subsCount}</p>
-                        <p className='account-page-stats'><img src={creditIcon}/>{resize === 'standart' ? 'Месяц оплачен' : 'Оплачено'}</p>
+                        {/* <p className='account-page-stats'><img src={creditIcon}/>{resize === 'standart' ? 'Месяц оплачен' : 'Оплачено'}</p> */}
                     </span>
                 ) : <></>}
             </span>

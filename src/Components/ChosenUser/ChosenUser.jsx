@@ -13,9 +13,9 @@ export default function ChosenUser({info}) {
         <div className='user-settings'>
             <img src={defaultImg} alt='image'/>
             <p>Имя пользователя</p>
-            <input className="input-installmusic" placeholder={''}/>
+            <input className="input-installmusic" placeholder={''} value={info.name}/>
             <p>Почта</p>
-            <input className="input-installmusic" placeholder={''}/>
+            <input className="input-installmusic" placeholder={''} value={info.userId}/>
             <p>Роль</p>
             <select className="filters-select">
                 <option value={0}>Слушатель</option>

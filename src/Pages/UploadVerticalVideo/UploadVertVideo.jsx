@@ -13,7 +13,7 @@ import './UploadVertVideo.css';
 import CustomButton from '../../Components/CustomButton/CustomButton';
 import InputSongs from '../UploadVideo/InputSongs';
 import { useDropzone } from 'react-dropzone';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { updateVertVideoInfoValue } from '../../Redux/slices/vertVideoInfoSlice';
 import { updateVertVideoPlayerValue } from '../../Redux/slices/vertVideoPlayerSlice';
 import CustomInput from '../../Components/CustomInput/CustomInput';
@@ -36,9 +36,12 @@ function InstallVerticalVideo(){
     const dispatch = useDispatch();
 
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+    const [isSent, setIsSent] = useState(false);
+    const resize = useSelector((state)=> state.resize.value);
 
     useEffect(() => {
-        setIsButtonDisabled(checkInputs());
+        if (!isSent)
+            setIsButtonDisabled(checkInputs());
     }, [imageFile, videoFile, description])
 
     function checkInputs() {
@@ -96,6 +99,9 @@ function InstallVerticalVideo(){
         let clipId = undefined;
         let uploadId = undefined;
         let fileExtension = '.' + videoFile.type.split('/')[1];
+
+        setIsButtonDisabled(true);
+        setIsSent(true);
 
         // загрузка видео
         formData.append('Title', title);
@@ -198,6 +204,10 @@ function InstallVerticalVideo(){
         },
     });   
 
+    const handleVideoInput = (e) => {
+        e.preventDefault();
+        videoSetterRef.current.click();
+    }
 
     return (
         <section className='comment-page-wrapper'>
@@ -213,20 +223,28 @@ function InstallVerticalVideo(){
                         {videoFile ? <button className='close-button' onClick={() => setVideofile(undefined)}><img src={closeImg}/></button> : <></>}
                         <div className={videoFile ? 'uploadtrack-div red-border' : 'uploadtrack-div'}>
                             {videoFile ? (
-                                    <div className='div-track'>
-                                    <button className='play-button' onClick={handlePlayVideo}><img src={isPlaying ? pauseImg : playImg}/></button>
-                                    {videoFileName && <p className='name-new-song'>{`${videoFileName}`}</p>}
-                                </div>
-                                ) : (
-                                    <div className='div-track' {...getInputFile()}> 
-                                        <div className='uploadtrack-div-inf'>
-                                            <p className='uploadtrack-p1'>Перетащите свое видео сюда</p>
-                                            <p className='uploadtrack-p2'>.mp4 или .mkv, макс. 100ГБ</p>
-                                        </div>
-                                        <p className='or'>или</p>
-                                        <CustomButton text={'Выберите файл'} func={() => getInputFile()} success={'Изменить'} icon={uploadImg}/>
+                                <div className='div-track'>
+                                <button className='play-button' onClick={handlePlayVideo}><img src={isPlaying ? pauseImg : playImg}/></button>
+                                {videoFileName && <p className='name-new-song'>{`${videoFileName}`}</p>}
+                            </div>
+                            ) : (<></>)}
+
+                            {!videoFile && resize === 'standart' ? (
+                                <div className='div-track' {...getInputFile()}> 
+                                    <div className='uploadtrack-div-inf'>
+                                        <p className='uploadtrack-p1'>Перетащите свое видео сюда</p>
+                                        <p className='uploadtrack-p2'>.mp4 или .mkv, макс. 100ГБ</p>
                                     </div>
-                                )}
+                                    <p className='or'>или</p>
+                                    <CustomButton text={'Выберите файл'} func={() => getInputFile()} success={'Изменить'} icon={uploadImg}/>
+                                </div>
+                            ) : (<></>)}
+
+                            {!videoFile && resize === 'mobile' ? (
+                                <div className='div-track' onClick={handleVideoInput}> 
+                                    <CustomButton text={'Выберите файл'} success={'Изменить'} icon={uploadImg}/>
+                                </div>
+                            ) : (<></>)}
                         </div>
                     </span>
                 </div>
@@ -259,7 +277,7 @@ function InstallVerticalVideo(){
                             disabled={isButtonDisabled}/>
                     </div>
                     {/* <text className='warning-upload'>*перед публикацией видео будет отправлено на модерацию</text> */}
-                    <input type='file' className='input-file' ref={videoSetterRef} onChange={changeVideo}></input>
+                    <input type='file' className='input-file'  accept=".mp4,.avi,.mkv,.mov" ref={videoSetterRef} onChange={changeVideo}></input>
                     <input type='file' accept="image/*" className='input-file' ref={vertskinSetterRef} onChange={changeSkin}></input>
                 </div>
             </div>  

@@ -119,7 +119,7 @@ function Song({id, onClick=undefined, duration, artist, genres, name}) {
             <div className={currentSong === id ? 'track selected-track' : 'track'}>
                 <div className='song-img' onMouseOver={() => setIsHoverOn(true)}
                 onMouseLeave={() => setIsHoverOn(false)}>
-                    {isHoverOn || currentSong === id ? (
+                    {isHoverOn ? (
                         <>
                             <img onClick={handleAddToSongs} className='song-img-icon' alt='cover' src={currentSong === id ? selectedIcon : hoverIcon} draggable='false'/>
                             <div className='song-img hover'></div>

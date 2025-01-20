@@ -1,0 +1,16 @@
+User-agent: *
+Disallow: /*.pdf$
+Disallow: /*.jpg$
+Disallow: /*?*
+Disallow: /*%
+
+User-agent: Yandex
+Disallow: /*.pdf$
+Disallow: /*.jpg$
+
+User-agent: Googlebot
+Disallow: /*.pdf$
+Disallow: /*.jpg$
+
+Host: https://risingnotes-com.web.app/
+Sitemap: https://risingnotes-com.web.app/Sitemap.xml

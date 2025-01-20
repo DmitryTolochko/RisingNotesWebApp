@@ -34,6 +34,7 @@ function AudiencePage() {
 
     return ( 
         <div className="audience-wrapper">
+            <p>***Данные могут быть неверны***</p>
             <ChartPeriodSelector currentPeriod={selectedPeriod} setNewPeriod={setSelectedPeriod}/>
             <div className="audience-top-row">
                 <Pie data={genderData}colors={genderColors}/>

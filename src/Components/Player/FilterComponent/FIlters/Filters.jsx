@@ -145,13 +145,17 @@ export async function songsByFiltersGetter(filters, isAuthorized=false){
         'LanguageList.OrPredicate': filters.languageOrAnd !== 'and' ? true : false,
         'VibeList.ValueList': filters.mood,
         'VibeList.OrPredicate': filters.moodOrAnd !== 'and' ? true : false,
-        'Instrumental': filters.instrumental,
         'TrackDurationRange.Start': timeFormatters[filters.duration][0],
         'TrackDurationRange.End':timeFormatters[filters.duration][1],
     }
 
-    if (filters.gender !== '0') {
+    console.log(filters.gender);
+    if (filters.gender !== '0' && filters.gender !== 0) {
         formatFilters['Gender'] = filters.gender;
+    }
+
+    if (filters.instrumental) {
+        formatFilters['Instrumental'] = !filters.instrumental;
     }
 
     console.log(formatFilters);

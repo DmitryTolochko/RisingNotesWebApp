@@ -52,12 +52,15 @@ function UploadMusic(){
     const [duration, setDuration] = useState(0);
 
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+    const [isSent, setIsSent] = useState(false);
     const dispatch = useDispatch();
+    const resize = useSelector((state)=> state.resize.value);
 
     const formData = new FormData();
 
     useEffect(() => {
-        setIsButtonDisabled(checkInputs());
+        if (!isSent)
+            setIsButtonDisabled(checkInputs());
     }, [name, isLyricsExist, lyrics, genre, vibe, language, gender, songfile, logofile])
 
     function checkInputs() {
@@ -79,6 +82,9 @@ function UploadMusic(){
 
     async function uploadToModeration() {
         // Отправка на модерацию
+
+        setIsButtonDisabled(true);
+        setIsSent(true);
 
         let id = undefined;
         formData.append('Name', name);
@@ -133,7 +139,8 @@ function UploadMusic(){
         imageSetterRef.current.click();
     }
 
-    const handleSongInput = () => {
+    const handleSongInput = (e) => {
+        e.preventDefault();
         songSetterRef.current.click();
     }
 
@@ -374,16 +381,24 @@ function UploadMusic(){
                                     <button className='play-button' onClick={handlePlayFile}><img src={isPlaying ? pauseImg : playImg}/></button>
                                     {songFileName && <p className='name-new-song'>{`${songFileName}`}</p>}
                                 </div>
-                            ) : (
+                            ) : (<></>)}
+
+                            {!songfile && resize === 'standart' ? (
                                 <div className='div-track' {...getInputFile()}> 
                                     <div className='uploadtrack-div-inf'>
                                         <p className='uploadtrack-p1'>Перетащите свой трек сюда</p>
                                         <p className='uploadtrack-p2'>.mp3 или .wav, макс. 100мб</p>
                                     </div>
                                     <p className='or'>или</p>
-                                    <CustomButton text={'Выберите файл'} func={() => getInputFile()} success={'Изменить'} icon={uploadImg}/>
+                                    <CustomButton text={'Выберите файл'} func={handleSongInput} success={'Изменить'} icon={uploadImg}/>
                                 </div>
-                            )}
+                            ) : (<></>)}
+
+                            {!songfile && resize === 'mobile' ? (
+                                <div className='div-track' onClick={handleSongInput}> 
+                                    <CustomButton text={'Выберите файл'}  success={'Изменить'} icon={uploadImg}/>
+                                </div>
+                            ) : (<></>)}
                             
                         </div>
                     </span>
@@ -466,7 +481,7 @@ function UploadMusic(){
                         <div className='button-and-text'>
                             <CustomButton text={'Одобрить'} func={acceptSong} success={'Одобрено'} icon={uploadImg}/>
                             <button className='save-installmusic' onClick={declineSong}><img src={closeImg}/>Отклонить</button>
-                            <button className='save-installmusic' onClick={deleteSong}><img src={trashImg}/>Удалить</button>
+                            {/* <button className='save-installmusic' onClick={deleteSong}><img src={trashImg}/>Удалить</button> */}
                         </div>
                         <h2 className='column1-h2'>Комментарий</h2>
                         <input id='myinput' value={comment} onChange={event => setComment(event.target.value)} className='inp-column1' placeholder={'Введите комментарий...'}/>
@@ -474,7 +489,7 @@ function UploadMusic(){
 
                     {role === 'authoredit' ? <div>
                         <div className='button-and-text'>
-                            <CustomButton text={'Сохранить*'} func={uploadToModeration} success={'Сохранено'} icon={uploadImg}/>
+                            {/* <CustomButton text={'Сохранить*'} func={uploadToModeration} success={'Сохранено'} icon={uploadImg}/> */}
                             <button className='save-installmusic' onClick={deleteSong}><img src={trashImg}/>Удалить</button>
                         </div>
                         <h2 className='column1-h2'>Комментарий модератора</h2>
@@ -485,7 +500,7 @@ function UploadMusic(){
                             {role !== 'admin' && comment !== '' ? (
                                 <>
                                     <p className='inp-column1' style={{padding: '10px 16px'}}>{comment}</p>
-                                    <text className='warning-upload'>*перед публикацией трек будет отправлен на модерацию</text>
+                                    {/* <text className='warning-upload'>*перед публикацией трек будет отправлен на модерацию</text> */}
                                 </>
                             ) : (<></>)}
                     </div> : ''}

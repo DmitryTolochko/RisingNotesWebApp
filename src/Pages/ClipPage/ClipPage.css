@@ -43,10 +43,16 @@
 .clip-page-song-name{
     font-size: 40px;
     margin-block: 12px;
+    @media screen and (max-width: 720px){ 
+        font-size: 24px;
+    }
 }
 .clip-page-author-name{
     font-size: 28px;
     color:#C5C5C5;
+    @media screen and (max-width: 720px){ 
+        font-size: 16px;
+    }
 }
 
 .clip-page-wrapper > .comment-page-wrapper{
@@ -76,6 +82,10 @@
     width: 32px;
     height: 32px;
     border-radius: 50%;
+    @media screen and (max-width: 720px){ 
+        width: 28px;
+        height: 28px;
+    }
 }
 .clip-page-author-wrapper{
     display: flex;

@@ -78,6 +78,13 @@ const MusicPlayer = () => {
     }, [location, songs]);
 
     useEffect(() => {
+        if (isPlayerQueueVisible)
+            setPlayerQueueButtonColor('#FE1170');
+        else
+            setPlayerQueueButtonColor('#FFFFFF');
+    }, [isPlayerQueueVisible]);
+
+    useEffect(() => {
         // сохранение громкости плеера 
         let audio = document.querySelector('audio');
         audio.volume = volume;
@@ -380,7 +387,6 @@ const MusicPlayer = () => {
                 <div className='music-player-buttons'>
                     <a onClick={() => {
                         dispatch(updatePlayerQueueVisibility(!isPlayerQueueVisible));
-                        setPlayerQueueButtonColor(playerQueueButtonColor === '#FFFFFF' ? '#FE1170' : '#FFFFFF');
                     }}>
                         <ListIcon stroke={playerQueueButtonColor}/>
                     </a>
@@ -396,7 +402,7 @@ const MusicPlayer = () => {
         </div>)
     }
     else {
-        return (<div className="music-player-wrapper">
+        return (<div className={"music-player-wrapper"  + hiddenTag}>
             <audio ref={audioRef}
                 onEnded={handleNextSong} type="audio/mpeg" autoPlay={isPlaying} controls style={{ display: 'none' }}/>
             <input className={'track-range-input mobile-player-input ' + hiddenTag} value={trackCurrentDuration} 
@@ -411,7 +417,6 @@ const MusicPlayer = () => {
                     </span>
                     <a onClick={() => {
                         dispatch(updatePlayerQueueVisibility(!isPlayerQueueVisible));
-                        setPlayerQueueButtonColor(playerQueueButtonColor === '#FFFFFF' ? '#FE1170' : '#FFFFFF');
                     }}>
                         <ListIcon stroke={playerQueueButtonColor}/>
                     </a>

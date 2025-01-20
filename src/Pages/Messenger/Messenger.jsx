@@ -30,10 +30,11 @@ function Messenger() {
     const [chatInfo, setChatInfo] = useState(undefined);
     const [chatId, setChatId] = useState(undefined);
     const chatIdRef = useRef(null);
+    const messagesRef = useRef(null);
     const [messages, setMessages] = useState([]);
     const [currentText, setCurrentText] = useState(undefined);
     const [messagesOffset, setMessagesOffset] = useState(0);
-    const [offsetCount, setOffsetCount] = useState(10);
+    const [offsetCount, setOffsetCount] = useState(20);
 
     const [userName, setUserName] = useState(undefined);
     const [userLogo, setUserLogo] = useState(defaultAvatar);
@@ -43,11 +44,13 @@ function Messenger() {
         chatIdRef.current = chatId;
     }, [chatId])
 
+    useEffect(() => {
+        messagesRef.current = messages;
+    }, [messages])
+
     const connection = new HubConnectionBuilder()
         .withUrl(api + 'messenger', {
             accessTokenFactory: () => {return cookies.accessToken},
-            withCredentials: true
-            
         })
         .build();
 
@@ -106,7 +109,7 @@ function Messenger() {
             .catch(err => console.log(err));
             setCurrentText('');
             // await getChatMessages(chatId, true);
-            await getLastMessage(chatId);
+            await getLastMessage(chatId, messagesRef.current);
             await getRecentChats();
             // await getNewMessage(chatId);
         }
@@ -114,7 +117,7 @@ function Messenger() {
 
     async function getChatMessages(id, cleanPrev=false) {
         // Получить сообщения чата
-        let offsetCount = 10
+        let offsetCount = 20
 
         if (cleanPrev) {
             let messagesOffset = 0;
@@ -141,13 +144,13 @@ function Messenger() {
         }
     }
 
-    async function getLastMessage(id) {
+    async function getLastMessage(id, messages) {
         let response = await axiosAuthorized.get(`api/chat-message/${id}/list?count=${1}&offset=${0}`)
             .catch(err => {return undefined});
 
         let newList = messages;
         if (response) {
-            newList = response?.data?.messageList.concat(...messages);
+            response?.data?.messageList?.map(el => newList.unshift(el));
         }
         
         setMessages(newList);
@@ -255,8 +258,7 @@ function Messenger() {
 
         connection.on('onNewMessage', async (thisChatId, preparedMessage, userName) => {
             if (thisChatId === chatIdRef.current)
-                await getLastMessage(thisChatId);
-                // await getChatMessages(thisChatId);
+                await getLastMessage(thisChatId, messagesRef.current);
             await getRecentChats();
         })
 

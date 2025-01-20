@@ -136,6 +136,10 @@
     flex-direction: column;
     list-style-type: none;
     gap:22px;
+    max-height: 250px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    mask-image: linear-gradient(to top, transparent 0%, black 15%);
 }
 .sidebar-playlist-thumb, .add-playlist-btn{
     width: 24px;

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api, axiosPictures, axiosUnauthorized } from './App/App';
 import useSearchClean from '../Hooks/useSearchClean/useSearchClean';
+import { shortenText } from './ArtistCardComponents/ArtistInfo/ArtistInfo';
 
 
 function Playlist(props) {
@@ -31,7 +32,7 @@ function Playlist(props) {
     return (
         <Link draggable='false' to={`/playlist/${props.id}`} className='playlist' onClick={() => cleanQuery()}>
             <img draggable='false' className='playlistskin' alt='cover' src={avatar}/>
-            <p className='labelplaylist'>{namePlaylist}</p>
+            <p className='labelplaylist'>{shortenText(namePlaylist, 20)}</p>
         </Link>
     )
 }

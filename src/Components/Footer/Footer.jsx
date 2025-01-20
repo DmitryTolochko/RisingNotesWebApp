@@ -7,7 +7,7 @@ import mailIcon from '../../Images/Mail.svg';
 import { Link } from 'react-router-dom';
 
 export default function Footer(params) {
-    if (!window.location.href.includes('login') && !window.location.href.includes('registration'))
+    if (!window.location.href.includes('login') && !window.location.href.includes('registration') && !window.location.href.includes('messenger'))
     return (
         <div className='footer-wrapper'>
             <div className='stripe'></div>
@@ -16,18 +16,18 @@ export default function Footer(params) {
                     <span className='logo_txt'><Link to={'/'} className='logo_link'>RISING NOTES</Link></span>
                     <span>
                         <img alt='mail' src={mailIcon}/>
-                        <p>rising.notes@mail.com</p>
+                        <p>dimatol36@gmail.com</p>
                     </span>
                     
-                    <span>
+                    {/* <span>
                         <img alt='phone' src={phoneIcon}/>
                         <p>+7 (123) 456-78-09</p>
-                    </span>
-                    <span>
+                    </span> */}
+                    {/* <span>
                         <a><img alt='facebook' src={facebookIcon}/></a>
                         <a><img alt='telegram' src={telegramIcon}/></a>
                         <a><img alt='youtube' src={youtubeIcon}/></a>
-                    </span>
+                    </span> */}
                 </span>
             </div>
         </div>

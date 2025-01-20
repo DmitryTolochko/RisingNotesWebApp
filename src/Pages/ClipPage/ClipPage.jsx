@@ -6,13 +6,14 @@ import backIcon from '../../Images/back.svg'
 import { updateMusicIsPlayingValue } from "../../Redux/slices/musicIsPlayingSlice";
 import Commentaries from "../Commentaries/Commentaries";
 import './ClipPage.css'
-import { axiosUnauthorized } from "../../Components/App/App"
+import { axiosPictures, axiosUnauthorized } from "../../Components/App/App"
 import { api } from "../../Components/App/App";
 import CustomControls from "./CustomControl/CustomControls";
 import Skeleton from "react-loading-skeleton";
 import { Link } from "react-router-dom";
 import { shortenText } from "../../Components/ArtistCardComponents/ArtistInfo/ArtistInfo";
 import BackButton from "../../Components/BackButton";
+import defaultAvatar from '../../Images/image-placeholder/user_logo_small_placeholder.png';
 
 function ClipPage() {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -29,6 +30,7 @@ function ClipPage() {
     const [author, setAuthor] = useState(null)
     const [authorId, setAuthorId] = useState(null)
     const [title, setTitle] = useState(null)
+    const [artistAvatar, setArtistAvatar] = useState(defaultAvatar);
 
     const getClipInfo = async () => {
         await axiosUnauthorized.get(api + `api/music-clip/${clipId}`)
@@ -47,6 +49,17 @@ function ClipPage() {
     useEffect(()=>{
         getClipInfo()
     },[])
+
+    useEffect(() => {
+        axiosPictures.get('api/author/' + authorId + '/logo/link')
+        .then(response => {
+            setArtistAvatar(response?.data?.presignedLink)
+        })
+        .catch(err => {
+            setArtistAvatar(defaultAvatar);
+        });
+
+    }, [authorId])
 
     const getAuthorName = async (id) => {
         await axiosUnauthorized.get(api+`api/author/${id}`)
@@ -115,11 +128,12 @@ function ClipPage() {
                         <h2 className="clip-page-song-name">{shortenText(title, 30)}</h2>
                         {author ?                 
                             <Link to={`/artist/${authorId}`} className="clip-page-author-wrapper">
-                                <img src={api+`api/author/${authorId}/logo`} alt="" className="clip-page-author-avatar" />
+                                <img src={artistAvatar} alt="" className="clip-page-author-avatar" />
                                 <span className="clip-page-author-name">{shortenText(author, 25)}</span>
                             </Link> 
                                 :
-                            <Skeleton baseColor='#0F141D' highlightColor="#2C323D"  height={200}/>
+                                <></>
+                            // <Skeleton baseColor='#0F141D' highlightColor="#2C323D"  height={200}/>
                         }
                     </div>
                 </div>

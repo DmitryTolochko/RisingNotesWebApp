@@ -69,24 +69,6 @@ function AdminPanel() {
         .then(response => {
             list = response.data.authorList;
         });
-
-        // for (var el of list) {
-        //     try {
-        //         let response = await axiosAuthorized.get('api/user/' + el.id);
-        //         correctList = [...correctList, {
-        //             name: el.name,
-        //             logo: api + 'api/user/' + el.id + '/logo',
-        //             role: '~Музыкант',
-        //             id: el.id,
-        //             email: response.data.email
-        //         }];
-        //     }
-        //     catch (err) {
-        //         console.log(err);
-        //     }
-        // }
-
-        // setUsers(correctList);
         setUsers(list);
         setIsLoaded(true);
     }

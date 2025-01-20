@@ -45,7 +45,7 @@ import MusicExplorer from '../../Pages/MusicExplorer/MusicExplorer.jsx';
 import moment from "moment";
 import 'moment/locale/ru'
 
-export const api = 'http://81.31.247.227/';
+export const api = 'https://rn-app.tw1.su/';
 // axios.defaults.headers.post['Access-Control-Allow-Origin'] = 'rn-api-storage.s3.yandexcloud.net';
 
 export const axiosAuthorized = axios.create({
@@ -130,6 +130,9 @@ function App() {
     function invokeErrorMessage(error) {
         if (error.response === undefined) {
             dispatch(showError({errorText: 'Нет сети'}))
+        }
+        else if (error.config.url.includes('chat/private')) {
+            console.log('Диалог не обнаружен');
         }
         else if (error.response?.status === 404) {
             dispatch(showError({errorText: 'Указанного объекта не существует'}))
@@ -285,6 +288,7 @@ function App() {
                 <Route path={'*'} element={<ErrorPage/>}/>
                 {cookies.role === 'admin' ? (<>
                     <Route path={'/'} element={<AdminPanel/>}/>
+                    <Route path={'/account'} element={<AccountPage/>}/>
                 </>) : (
                 <>
                     <Route path={'/'} element={<MusicExplorer/>}/>

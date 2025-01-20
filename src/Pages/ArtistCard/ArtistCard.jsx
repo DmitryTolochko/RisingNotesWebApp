@@ -82,19 +82,19 @@ function ArtistCard(){
 
                     <div className="artist-card-menu">
                         <a onClick={() => handleChangePage(0)} 
-                            className={currPage === 0 ? 'artist-card-menu-item account-page-active' : 'artist-card-menu-item'}>
+                            className={currPage === 0 ? 'artist-card-menu-item artist-card-menu-item-active' : 'artist-card-menu-item'}>
                             Главная
                         </a>
                         <a onClick={() => handleChangePage(1)} 
-                            className={currPage === 1 ? 'artist-card-menu-item account-page-active' : 'artist-card-menu-item'}>
+                            className={currPage === 1 ? 'artist-card-menu-item artist-card-menu-item-active' : 'artist-card-menu-item'}>
                             Треки
                         </a>
                         <a onClick={() => handleChangePage(2)} 
-                            className={currPage === 2 ? 'artist-card-menu-item account-page-active' : 'artist-card-menu-item'}>
+                            className={currPage === 2 ? 'artist-card-menu-item artist-card-menu-item-active' : 'artist-card-menu-item'}>
                             Клипы
                         </a>
                         <a onClick={() => handleChangePage(3)} 
-                            className={currPage === 3 ? 'artist-card-menu-item account-page-active' : 'artist-card-menu-item'}>
+                            className={currPage === 3 ? 'artist-card-menu-item artist-card-menu-item-active' : 'artist-card-menu-item'}>
                             Блог
                         </a>
                     </div>

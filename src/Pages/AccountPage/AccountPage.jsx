@@ -146,7 +146,7 @@ export default function AccountPage () {
                             {resize === 'standart' ? <img alt='icon' src={userIcon}/> : <></>}
                             Аккаунт
                         </a>
-                        <a onClick={() => handleChangePage(role ==='author' ? 1 : 3)} 
+                        <a onClick={() => handleChangePage(role ==='author' || role === 'admin' ? 1 : 3)} 
                                     className={currPage === 1 || currPage === 3 ? 'account-page-menu-item account-page-active' : 'account-page-menu-item'}>
                                     {resize === 'standart' ? <img alt='icon' src={profileIcon}/> : <></>}
                                     Профиль музыканта
@@ -173,11 +173,11 @@ export default function AccountPage () {
                                     {resize === 'standart' ? <img alt='icon' src={blogIcon}/> : <></>}
                                     Блог
                                 </a>
-                                <a onClick={() => handleChangePage(2)} 
+                                {/* <a onClick={() => handleChangePage(2)} 
                                     className={currPage === 2 ? 'account-page-menu-item account-page-active' : 'account-page-menu-item'}>
                                     {resize === 'standart' ? <img alt='icon' src={creditCard}/> : <></>}
                                     Оплата
-                                </a>
+                                </a> */}
                                 
                             </>
                             

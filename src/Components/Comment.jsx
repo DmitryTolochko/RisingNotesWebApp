@@ -89,7 +89,7 @@ const Comment = (props) => {
             {cookies.userId === props.data.authorId && !isDeleted ? (
                 <button className='comment-del-button' onClick={handleDeleteComment}>
                     <img alt='delete' src={trashIcon}/>
-                    {resize === 'standart' ? 'Удалить' : ''}
+                    {resize === 'standart' && !props?.isMobile ? 'Удалить' : ''}
                 </button>
             ) : (<></>)}
         </>

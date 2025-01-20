@@ -9,6 +9,7 @@ function ActivityPage() {
 
     return ( 
         <div className="charts-wrapper">
+            <p>***Данные могут быть неверны***</p>
             <div className="cw-top-chart">
                 <Chart
                     id={0}

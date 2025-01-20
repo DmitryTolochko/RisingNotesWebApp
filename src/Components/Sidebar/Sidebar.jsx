@@ -171,11 +171,12 @@ function Sidebar(props) {
                      </NavLink>
                   </li>
                ))}
-               <li className='add-playlist' onClick={addNewPlaylist}>
-                  <span className="add-playlist-icon">+</span>
-                  <span className='sidebar-playlist-name'> Добавить плейлист</span>
-               </li>
             </ul>
+            
+            <li className='add-playlist' onClick={addNewPlaylist}>
+               <span className="add-playlist-icon">+</span>
+               <span className='sidebar-playlist-name'> Добавить плейлист</span>
+            </li>
          </div> :
          <></>}
       </div>

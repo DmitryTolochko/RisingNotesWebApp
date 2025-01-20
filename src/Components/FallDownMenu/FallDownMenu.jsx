@@ -34,13 +34,13 @@ export default function FallDownMenu ({callback}) {
                     <img draggable='false'src={settingsIcon}/>
                     Админ панель
                 </NavLink>   
-            ) : (
-                <NavLink draggable='false' to='/account' className={'fall-down-menu-ref'} onClick={() => {cleanQuery(); callback(false)}}
-                    style={({ isActive }) => (isActive ? {color: '#FE1170'} : {color: '#787885'})}>
-                    <img draggable='false'src={userIcon}/>
-                    Личный кабинет
-                </NavLink>)
+            ) : (<></>)
             }
+            <NavLink draggable='false' to='/account' className={'fall-down-menu-ref'} onClick={() => {cleanQuery(); callback(false)}}
+                style={({ isActive }) => (isActive ? {color: '#FE1170'} : {color: '#787885'})}>
+                <img draggable='false'src={userIcon}/>
+                Личный кабинет
+            </NavLink>
 
             <button className="logout-button" onClick={logoutUser}>
                      <img draggable='false'src={exitIcon}/>Выход</button>

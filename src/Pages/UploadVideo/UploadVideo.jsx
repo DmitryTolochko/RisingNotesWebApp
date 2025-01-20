@@ -14,7 +14,7 @@ import CustomButton from '../../Components/CustomButton/CustomButton';
 import { useDropzone } from 'react-dropzone';
 import InputSongs from './InputSongs';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { updateVideoPlayerValue } from '../../Redux/slices/videoPlayerSlice';
 import CustomInput from '../../Components/CustomInput/CustomInput';
 import { showError } from '../../Redux/slices/errorMessageSlice';
@@ -33,9 +33,12 @@ function UploadVideo(){
     const [title, setTitle] = useState(undefined);
 
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+    const [isSent, setIsSent] = useState(false);
+    const resize = useSelector((state)=> state.resize.value);
 
     useEffect(() => {
-        setIsButtonDisabled(checkInputs());
+        if (!isSent)
+            setIsButtonDisabled(checkInputs());
     }, [imageFile, videoFile, songId])
 
     function checkInputs() {
@@ -67,6 +70,9 @@ function UploadVideo(){
         let clipId = undefined;
         let uploadId = undefined;
         let fileExtension = '.' + videoFile.type.split('/')[1];
+
+        setIsButtonDisabled(true);
+        setIsSent(true);
         
         formData.append('Title', title);
         formData.append('Description', description);
@@ -184,6 +190,11 @@ function UploadVideo(){
         }
     }
 
+    const handleVideoInput = (e) => {
+        e.preventDefault();
+        videoSetterRef.current.click();
+    }
+
     return (
         <section className='comment-page-wrapper'>
             <div className='featured'>
@@ -202,7 +213,9 @@ function UploadVideo(){
                                 <button className='play-button' onClick={handlePlayVideo}><img src={isPlaying ? pauseImg : playImg}/></button>
                                 {videoFileName && <p className='name-new-song'>{`${videoFileName}`}</p>}
                             </div>
-                            ) : (
+                            ) : (<></>)}
+
+                            {!videoFile && resize === 'standart' ? (
                                 <div className='div-track' {...getInputFile()}> 
                                     <div className='uploadtrack-div-inf'>
                                         <p className='uploadtrack-p1'>Перетащите свой клип сюда</p>
@@ -211,7 +224,13 @@ function UploadVideo(){
                                     <p className='or'>или</p>
                                     <CustomButton text={'Выберите файл'} func={() => getInputFile()} success={'Изменить'} icon={uploadImg}/>
                                 </div>
-                            )}
+                            ) : (<></>)}
+
+                            {!videoFile && resize === 'mobile' ? (
+                                <div className='div-track' onClick={handleVideoInput}> 
+                                    <CustomButton text={'Выберите файл'} success={'Изменить'} icon={uploadImg}/>
+                                </div>
+                            ) : (<></>)}
                         </div>
                     </span>
                 </div>

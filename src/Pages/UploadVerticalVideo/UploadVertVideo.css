@@ -5,7 +5,10 @@
     width: 100%;
     gap: 40px;
     justify-content: space-between;
-
+    @media screen and (max-width: 720px){ 
+        flex-direction:column-reverse;
+        align-items: center;
+    }
 }
 
 .column1-2 {

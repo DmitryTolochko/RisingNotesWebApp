@@ -2,7 +2,7 @@ import BackButton from '../../Components/BackButton';
 import Comment from '../../Components/Comment';
 import { api, axiosPictures } from '../../Components/App/App';
 import React from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from "react";
 import { axiosAuthorized, axiosUnauthorized } from '../../Components/App/App';
 import commentsIcon from '../../Images/controller/message.svg';
@@ -26,6 +26,7 @@ import { updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlic
 import { updateFeaturedValue } from '../../Redux/slices/featuredSlice';
 import PlaylistModalMenu from '../../Components/PlaylistModalMenu/PlaylistModalMenu';
 import { shortenText } from '../../Components/ArtistCardComponents/ArtistInfo/ArtistInfo';
+import useSearchClean from '../../Hooks/useSearchClean/useSearchClean';
 
 const Commentaries = ({clip}) => {
     const params = useParams();
@@ -49,6 +50,8 @@ const Commentaries = ({clip}) => {
     const currentSong = useSelector((state)=> state.currentSong.value);
     const isPlaying = useSelector((state) => state.musicIsPlaying.value);
     const [modalIsHidden, setModalIsHidden] = useState(true);
+    const {cleanQuery} = useSearchClean();
+    const navigate = useNavigate();
 
     useEffect(() => {
         // отображение кнопки игры и паузы трека
@@ -219,13 +222,19 @@ const Commentaries = ({clip}) => {
                                 {genres.map(el => <span key={el} className='song-tag'>{el}</span>)}
                             </div>
                             {clipId && resize === 'mobile' ? (
-                                <CustomButton text={'Смотреть клип'} icon={playIcon} func={() => dispatch(updateVideoPlayerValue(api + `api/music-clip/${clipId}/file`))} success={'Смотреть клип'}/>
+                                <CustomButton text={'Смотреть клип'} icon={playIcon} func={()=>{
+                                    cleanQuery()
+                                    navigate(`/clipview?clip_id=${clipId}`)
+                                }} success={'Смотреть клип'}/>
                             ) : 
                             (<></>)}
                         </span>
                         {clipId && resize === 'standart' ? (
                             <div className='comm-head-button'>
-                                <CustomButton text={'Смотреть клип'} icon={playIcon} func={() => dispatch(updateVideoPlayerValue(api + `api/music-clip/${clipId}/file`))} success={'Смотреть клип'}/>
+                                <CustomButton text={'Смотреть клип'} icon={playIcon} func={()=>{
+                                    cleanQuery()
+                                    navigate(`/clipview?clip_id=${clipId}`)
+                                }} success={'Смотреть клип'}/>
                             </div>
                         ) : 
                         (<></>)}
@@ -234,12 +243,12 @@ const Commentaries = ({clip}) => {
 
                     <div className="artist-card-menu">
                         <a onClick={() => handleChangePage(0)} 
-                            className={currPage === 0 ? 'artist-card-menu-item account-page-active' : 'artist-card-menu-item'}>
+                            className={currPage === 0 ? 'artist-card-menu-item artist-card-menu-item-active' : 'artist-card-menu-item'}>
                             <img src={commentsIcon}/>
                             Обсуждение
                         </a>
                         <a onClick={() => handleChangePage(1)} 
-                            className={currPage === 1 ? 'artist-card-menu-item account-page-active' : 'artist-card-menu-item'}>
+                            className={currPage === 1 ? 'artist-card-menu-item artist-card-menu-item-active' : 'artist-card-menu-item'}>
                             <img src={burgerIcon}/>
                             Текст
                         </a>

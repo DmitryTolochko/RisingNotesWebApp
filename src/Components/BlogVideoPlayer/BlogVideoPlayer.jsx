@@ -172,7 +172,7 @@ function VertVideoPlayer() {
                             </div>
 
                             <div className='blog-comments'>
-                                {comments?.map(e => (<div key={e.id} className='comment-wrapper'><Comment data={e} songId={vertVideoInfo.relatedSongId} setIsDataUpdated={setIsDataUpdated} isDataUpdated={isDataUpdated}/></div>))}
+                                {comments?.map(e => (<div key={e.id} className='comment-wrapper'><Comment data={e} songId={vertVideoInfo.relatedSongId} setIsDataUpdated={setIsDataUpdated} isDataUpdated={isDataUpdated} isMobile={true}/></div>))}
                             </div>
                             
                         </div>
@@ -191,7 +191,7 @@ function VertVideoPlayer() {
                     <button className='player-exit-button' onClick={() => {
                         dispatch(updateVertVideoPlayerValue(false))
                         }}><img src={closeButton}/></button>
-                    <video className='vertvideo-player' src={vertvideo} autoPlay={false} type="video/mp4" loop/>
+                    <video className='vertvideo-player' src={vertvideo} autoPlay={true} type="video/mp4" loop/>
                 </div>
                 : <></>
             }
