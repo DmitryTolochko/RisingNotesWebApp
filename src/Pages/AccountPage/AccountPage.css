@@ -573,11 +573,16 @@
     align-items: center;
     position: fixed;
     z-index: 5;
+    top: 20%;
 
     @media screen and (max-width: 720px){ 
         width:90%;
         top: 90px;
         height: 80%
+    }
+
+    @media screen and (max-height: 870px){ 
+        top: 90px;
     }
 }
 
