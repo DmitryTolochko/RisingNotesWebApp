@@ -1,0 +1,181 @@
+.start-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: start;
+    width: 100%;
+
+    padding-top: var(--header-height);
+    padding-left: var(--sidebar-width);
+
+    margin: 0 60px;
+}
+
+.start-page-first-block, .start-page-features, .start-page-second-block {
+    text-align: start;
+    margin-bottom: 190px;
+    padding-top: 190px;
+
+    width: 100%;
+    max-width: 1220px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    align-items: start;
+    z-index: 2;
+    
+    @media screen and (max-width: 720px){ 
+        padding-top: 40px;
+        margin-bottom: 40px;
+        height: fit-content;
+    }
+}
+
+.start-page-wrapper {
+    height: 800px;
+    min-height: 0;
+    @media screen and (max-width: 720px){ 
+        height: fit-content;
+    }
+}
+
+.start-page-features {
+    padding-top: 0;
+    margin-bottom: 128px;
+}
+
+.start-page-second-block {
+    padding-top: 73px;
+    margin-bottom: 229px;
+}
+
+.start-page-h {
+    font-size: 72px;
+    font-weight: 700;
+    width: 100%;
+    text-wrap: wrap;
+
+    @media screen and (max-width: 720px){ 
+        font-size: 40px;
+    }
+}
+
+.colored {
+    color: #FE1170;
+}
+
+.start-page-p {
+    font-size: 32px;
+    max-width: 1000px;
+    width: 100%;
+    text-wrap: wrap;
+    @media screen and (max-width: 720px){ 
+        font-size: 24px;
+    }
+}
+
+.start-page-buttons {
+    display: flex;
+    gap: 24px;
+    padding-top: 56px;
+}
+
+.start-page-bg {
+    position: absolute;
+    width: 100%;
+    height: 800px;
+    object-fit: cover;
+
+    @media screen and (max-width: 720px){ 
+        height: 500px
+    }
+}
+
+.start-page-feature {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    gap: 48px;
+
+    @media screen and (max-width: 720px){ 
+        flex-direction: column;
+        gap: 24px;
+    }
+}
+
+.start-page-h2 {
+    font-size: 48px;
+    width: 100%;
+    text-wrap: wrap;
+    @media screen and (max-width: 720px){ 
+        font-size: 32px;
+    }
+}
+
+.start-page-feature-text > h3 {
+    font-size: 40px;
+    font-weight: 600;
+    width: 100%;
+    text-wrap: wrap;
+    @media screen and (max-width: 720px){ 
+        font-size: 24px;
+    }
+}
+
+.start-page-feature-text> p {
+    font-size: 24px;
+    width: 100%;
+    text-wrap: wrap;
+    @media screen and (max-width: 720px){ 
+        font-size: 16px;
+    }
+}
+
+.start-page-feature-text {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    justify-content: start;
+    padding: 24px 32px;
+    gap: 8px;
+    min-height: 395px;
+    height: fit-content;
+
+    border: #FE1170 2px solid;
+    border-radius: 16px;
+    background: radial-gradient(65.46% 97.33% at 38% 97%,rgba(255, 255, 255, 0.3),rgba(255, 255, 255, 0) 100%)/* warning: gradient uses a rotation that is not supported by CSS and may not behave as expected */;
+    backdrop-filter: blur(21px);   
+
+    @media screen and (max-width: 720px){ 
+        min-height: 0;
+        padding-bottom: 64px;
+    }
+}
+
+.start-page-third-block {
+    font-size: 64px; 
+    max-width: 950px;
+    width: 100%;
+    @media screen and (max-width: 720px){ 
+        font-size: 40px;
+    }
+}
+
+.start-page-feature > img {
+    object-fit:scale-down;
+    width: 100%;
+    max-width: 395px;
+
+    @media screen and (max-width: 720px){ 
+        max-width: 100%;
+        object-fit: contain;
+    }
+}
+
+.down-stripe-start-page {
+    width: 100%;
+    height: fit-content;
+    margin-bottom: -5px;
+}

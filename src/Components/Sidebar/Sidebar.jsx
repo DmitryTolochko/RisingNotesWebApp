@@ -133,7 +133,7 @@ function Sidebar(props) {
                <ul className="nav-links" onClick={() => dispatch(updatePlayerQueueVisibility(false))}>
                   <li>
                      <NavLink draggable='false' onClick={sidebarClickHandler} className ={({ isActive }) => (isActive ? 'nav-link wave active' : 'nav-link wave' )} 
-                     to={'/'} 
+                     to={cookies.role ? '/' : 'explore'} 
                      style={({ isActive }) => (isActive ? {color: '#FE1170'} : {color: '#787885'})}>
                         <img src={wave} alt="" className="nav-icon" draggable='false' />
                         <span>Моя волна</span>

@@ -12,10 +12,12 @@ import { updateValue } from '../../../Redux/slices/searchSlice';
 
 import './SidebarCollapser.css';
 import { updatePlayerQueueVisibility } from '../../../Redux/slices/playerQueueSlice';
+import { useCookies } from 'react-cookie';
 
 function SidebarCollapser(props){
    
    const resize = useSelector((state)=> state.resize.value)
+   const [cookies, setCookies] = useCookies(['accessToken', 'refreshToken', 'authorId', 'role', 'userId']);
    const [searchQuery, setSearchQuery] = useState('')
    const dispatch = useDispatch()
 
@@ -42,7 +44,7 @@ function SidebarCollapser(props){
             <ul className="nav-links-collapser" onClick={() => dispatch(updatePlayerQueueVisibility(false))}>
                <li>
                   <NavLink onClick={clearQuery} className ={({ isActive }) => (isActive ? 'nav-link wave active' : 'nav-link wave' )} 
-                  to={'/'} 
+                  to={cookies.role ? '/' : 'explore'} 
                   style={({ isActive }) => (isActive ? {color: '#FE1170'} : {color: '#787885'})}>
                      <img src={wave} alt="" className="nav-icon" />
                   </NavLink>

@@ -44,6 +44,7 @@ import MusicExplorer from '../../Pages/MusicExplorer/MusicExplorer.jsx';
 
 import moment from "moment";
 import 'moment/locale/ru'
+import StartPage from '../../Pages/StartPage/StartPage.jsx';
 
 export const api = 'https://rn-app.tw1.su/';
 // axios.defaults.headers.post['Access-Control-Allow-Origin'] = 'rn-api-storage.s3.yandexcloud.net';
@@ -278,6 +279,16 @@ function App() {
             <Players/>
             <PlayerQueue/>
             <Routes>
+                {!cookies.role ? (<>
+                    <Route path={'/'} element={<StartPage/>}/>
+                    <Route path={'/featured'} element={<Login/>}/>
+                    <Route path={'/messenger'} element={<Login/>}/>
+                </>) : (<></>)}
+                {cookies.role === 'admin' ? (<>
+                    <Route path={'/'} element={<AdminPanel/>}/>
+                    <Route path={'/account'} element={<AccountPage/>}/>
+                </>) : (<></>)}
+                <Route path={'/explore'} element={<MusicExplorer/>}/>
                 <Route path={'/login'} element={<Login/>}/>
                 <Route path={'/registration'} element={<Registration/>}/>
                 <Route path={'/artist/:id'} element={<ArtistCard/>}/>
@@ -286,11 +297,8 @@ function App() {
                 <Route path={'/uploadmusic/:id'} element={<UploadMusic/>}/>
                 <Route path={'/clipview'} element={<ClipPage/>}/>
                 <Route path={'*'} element={<ErrorPage/>}/>
-                {cookies.role === 'admin' ? (<>
-                    <Route path={'/'} element={<AdminPanel/>}/>
-                    <Route path={'/account'} element={<AccountPage/>}/>
-                </>) : (
-                <>
+                {cookies.role && cookies.role !== 'admin' ? (<>
+                    <Route path={'/startpage'} element={<StartPage/>}/>
                     <Route path={'/'} element={<MusicExplorer/>}/>
                     <Route path={'/featured'} element={<Featured/>}/>
                     <Route path={'/account'} element={<AccountPage/>}/>
@@ -298,8 +306,7 @@ function App() {
                     <Route path={'/uploadvideo'} element={<UploadVideo/>}/>
                     <Route path={'/uploadvertvideo'} element={<InstallVerticalVideo/>}/>
                     <Route path={'/messenger'} element={<Messenger/>}/>
-                </>
-                )}
+                </>) : (<></>)}
             </Routes>  
             <Footer/>
         </div>
