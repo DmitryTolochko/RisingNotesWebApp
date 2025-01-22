@@ -5,8 +5,8 @@ import CustomButton from "../CustomButton/CustomButton";
 import saveIcon from '../../Images/account-page/save-icon.svg';
 
 function PasswordWindow({visibility, func}) {
-    const [oldPassword, setOldPassword] = useState(undefined);
-    const [newPassword, setNewPassword] = useState(undefined);
+    const [oldPassword, setOldPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
     const [isVisible, setVisibility] = useState(visibility);
 
     const changeUserPassword = async () => {

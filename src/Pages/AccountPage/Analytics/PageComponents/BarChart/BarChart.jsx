@@ -13,9 +13,10 @@ function Bar({
     colorTo=null,
     barId=null,
     onRangeUpdate=null,
+    fromPeriod=30,
     height=300
 }) {
-    const [selectedPeriod, setSelectedPeriod] = useState(30)
+    const [selectedPeriod, setSelectedPeriod] = useState(fromPeriod)
 
     const options = {
         title:title,
@@ -37,9 +38,6 @@ function Bar({
     useEffect(()=>{
         if(onRangeUpdate)
             onRangeUpdate(selectedPeriod)
-
-        console.log(options);
-        
     },[selectedPeriod])
     
     return ( 

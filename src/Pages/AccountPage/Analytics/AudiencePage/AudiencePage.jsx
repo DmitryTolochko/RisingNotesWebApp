@@ -4,6 +4,7 @@ import CountriesList from "../PageComponents/CountriesList/CountriesList";
 import ChartPeriodSelector from "../PageComponents/LineChart/ChartPeriodSelector";
 import { useEffect, useState } from "react";
 import './AudiencePage.css'
+import { axiosAuthorized } from "../../../../Components/App/App";
 
 function AudiencePage() {
     const [selectedPeriod, setSelectedPeriod] = useState(30)
@@ -11,6 +12,19 @@ function AudiencePage() {
     useEffect(()=>{
         //Обновлять данные по изменеию периода
     },[selectedPeriod])
+
+
+    // 500 ERROR
+    // const getGenderDistribution = async () =>{
+    //     await axiosAuthorized.get('/api/analytics/song/audition/gender-distribution')
+    //         .then(response => console.log(response))
+    //         .catch(error => console.log(error))
+    // }
+
+    // useEffect(()=>{
+    //     getGenderDistribution()
+    // },[])
+
 
     //Данные для пола
     const genderData = [
@@ -37,7 +51,7 @@ function AudiencePage() {
             <p>***Данные могут быть неверны***</p>
             <ChartPeriodSelector currentPeriod={selectedPeriod} setNewPeriod={setSelectedPeriod}/>
             <div className="audience-top-row">
-                <Pie data={genderData}colors={genderColors}/>
+                <Pie data={genderData} colors={genderColors}/>
                 <CountriesList data={countriesData}/>
             </div>
             <Bar 

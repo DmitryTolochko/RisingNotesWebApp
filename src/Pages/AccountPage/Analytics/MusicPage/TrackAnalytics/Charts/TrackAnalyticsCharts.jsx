@@ -62,7 +62,7 @@ function TrackAnalyticsCharts({
                     title={'Добавили в избранное'}
                     colorFrom={'rgba(1, 179, 255, 1)'}
                     colorTo={'rgba(1, 179, 255, 0)'}
-                    onRangeUpdate={()=>console.log('second chart update')}
+                    onRangeUpdate={()=>{}}
                 />
         </div>
     )
