@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import heart from '../../Images/controller/heart.svg';
 import redHeart from '../../Images/red-heart.svg';
-import message from '../../Images/controller/Chat_Dots.png';
 import dislike from '../../Images/controller/thumbs-down.svg';
 import redDislike from '../../Images/controller/dislike-red.svg';
 import list from '../../Images/player/plus.svg';
 import placeholder from '../../Images/main-placeholder.png';
 import selectedIcon from '../../Images/song/Volume.svg';
 import hoverIcon from '../../Images/song/Play.svg';
+import { ReactComponent as DeleteIcon } from '../../Images/x.svg';
 
 import { api, axiosAuthorized, axiosPictures, axiosUnauthorized } from '../App/App';
 import useSearchClean from '../../Hooks/useSearchClean/useSearchClean';
@@ -23,7 +23,17 @@ import { updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlic
 import PlaylistModalMenu from '../PlaylistModalMenu/PlaylistModalMenu';
 import { updatePlayerQueueVisibility } from '../../Redux/slices/playerQueueSlice';
 
-function Song({id, onClick=undefined, duration, artist, genres, name}) {
+function Song({
+    id, 
+    onClick=undefined, 
+    duration, 
+    artist, 
+    genres, 
+    name, 
+    isAttachedToMessage=false, 
+    isPicked=false,
+    deleteFunc=undefined
+}) {
     const [modalIsHidden, setModalIsHidden] = useState(true);
     const [formatedDuration, setDuration] = useState(0);
     const [avatar, setAvatar] = useState(placeholder);
@@ -114,6 +124,7 @@ function Song({id, onClick=undefined, duration, artist, genres, name}) {
         cleanQuery();
     };
 
+    if (!isAttachedToMessage)
     return (
         <>
             <div className={currentSong === id ? 'track selected-track' : 'track'}>
@@ -145,7 +156,6 @@ function Song({id, onClick=undefined, duration, artist, genres, name}) {
                         <a onClick={handleToFavorite}><img alt='like' src={featured.includes(id) ? redHeart : heart}/></a>
                         <a><img alt='list' src={list} onClick={changeModalState}/></a>
                         <a onClick={handleToExcluded}><img alt='dislike' src={excluded.includes(id) ? redDislike : dislike}/></a>
-                        {/* <Link to={`/commentaries/${id}`} onClick={hideAllModals}><img alt='comment' src={message}/></Link> */}
                     </div>
                 ): (
                     <a onClick={handleToFavorite}><img alt='like' src={featured.includes(id) ? redHeart : heart}/></a>
@@ -155,6 +165,31 @@ function Song({id, onClick=undefined, duration, artist, genres, name}) {
             </div>
         </>
     )
+    else {
+        return(
+        <div className={isPicked ? 'track selected-track' : 'track'} onClick={onClick}>
+            <div className='song-img' onMouseOver={() => setIsHoverOn(true)}
+            onMouseLeave={() => setIsHoverOn(false)}>
+                {isHoverOn ? (
+                    <>
+                        <img onClick={handleAddToSongs} className='song-img-icon' alt='cover' src={currentSong === id ? selectedIcon : hoverIcon} draggable='false'/>
+                        <div className='song-img hover'></div>
+                    </>
+                ) : (<></>)}
+                <img onClick={handleAddToSongs} className='song-img' alt='cover' src={avatar} draggable='false'/>
+            </div>
+            <Link className='song-title-t' style={{maxWidth: 'none'}}>{name}
+                <p className='songAuthor'>{artist}</p>
+            </Link>
+            
+            {isPicked && deleteFunc ? (
+                <DeleteIcon className="message-input-file-delete" style={{position: 'relative'}} onClick={deleteFunc}/>
+            ) : (
+                <a onClick={handleToFavorite}><img alt='like' src={featured.includes(id) ? redHeart : heart}/></a>
+            )}
+        </div>
+        ) 
+    }
 }
 
 export default Song

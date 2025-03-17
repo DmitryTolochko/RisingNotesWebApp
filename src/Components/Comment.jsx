@@ -9,7 +9,7 @@ import xIcon from '../Images/commentaries/x-icon.svg';
 import { ResizeContext, api, axiosPictures, axiosUnauthorized } from './App/App';
 import { axiosAuthorized } from './App/App';
 import { useSelector } from 'react-redux';
-import { shortenText } from './ArtistCardComponents/ArtistInfo/ArtistInfo';
+import { shortenText } from '../Tools/Tools';
 
 const Comment = (props) => {
     const [isDeleted, setIsDeleted] = useState(false);

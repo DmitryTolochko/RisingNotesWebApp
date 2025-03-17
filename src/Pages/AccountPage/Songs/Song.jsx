@@ -5,7 +5,7 @@ import message from '../../../Images/controller/Chat_Dots.png';
 import statsIcon from '../../../Images/account-page/stats-icon.svg';
 import { api, axiosAuthorized, axiosUnauthorized } from '../../../Components/App/App';
 import cover from '../../../Images/main-placeholder.png';
-import { shortenText } from '../../../Components/ArtistCardComponents/ArtistInfo/ArtistInfo';
+import { shortenText } from '../../../Tools/Tools';
 
 const statusType = {
     0: 'Нет файлов',

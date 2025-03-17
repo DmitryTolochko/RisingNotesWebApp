@@ -11,22 +11,13 @@ import { api, axiosAuthorized, axiosPictures } from "../../App/App"
 import { useNavigate, useParams } from "react-router-dom"
 import { useDispatch, useSelector } from "react-redux"
 import { updateSubscriptionsValue } from "../../../Redux/slices/subscriptionsSlice"
+import { getWordSpelling, shortenText } from "../../../Tools/Tools"
+import { updateChatInfo } from "../../../Redux/slices/socketInfoSlice"
+import { ChatTypes } from "../../../Pages/Messenger/Messenger"
+import { getChatInfoForUser } from "../../../Pages/Messenger/ApiCallers"
 
 function getSubsText(number) {
-    if (number % 10 > 4 || number === 0) {
-        return number + ' подписчиков';
-    } else if (number === 1) {
-        return number + ' подписчик';
-    } else {
-        return number + ' подписчика';
-    }
-}
-
-export function shortenText(text, numberOfSymbols) {
-    // Сократить сообщение
-    if (text?.length > numberOfSymbols)
-        return text.slice(0, numberOfSymbols) + '...';
-    return text;
+   return getWordSpelling(number, 'подписчик')
 }
 
 function ArtistInfo(props) {
@@ -85,6 +76,24 @@ function ArtistInfo(props) {
     function checkIfSubscribed() {
         setIsSubscribed(subscriptions.includes(props.artist.artistId));
     }
+    
+    async function handleClickOnMessage() {
+        let info = {
+            id: undefined,
+            hostUserId: undefined,
+            chatType: ChatTypes.private,
+            chatName: artistName,
+            photoLink: avatar,
+            createdAt: undefined,
+            userId: userId
+        }
+        let newInfo = await getChatInfoForUser(userId);
+        if (newInfo) {
+            info = newInfo;
+        }
+        dispatch(updateChatInfo(info));
+        navigate(`/messenger`);
+    }
 
     return(
         <div className="info-container">
@@ -93,7 +102,7 @@ function ArtistInfo(props) {
                 <div className="row-top">
                     <a className="artist-name" onClick={() =>  navigate(`/artist/${props.artist.artistId}`)}>{shortenText(artistName, 30)}</a>
                     <div className="artist-btns">
-                    <button className="artist-message-btn" onClick={() =>  navigate(`/messenger?id=${userId}`)} >
+                    <button className="artist-message-btn" onClick={handleClickOnMessage} >
                         <img alt='message' src={messageIcon}/>
                         <span>Сообщение</span>
                     </button>
@@ -144,9 +153,6 @@ function ArtistInfo(props) {
                                 <p>{resize === 'standart' ? 'Я.Музыка' : ''}</p>
                             </a>: 
                         <></>}
-                        
-                        
-                        
                     </div>
                 </div>
             </div>

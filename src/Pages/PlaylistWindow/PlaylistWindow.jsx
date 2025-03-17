@@ -16,7 +16,7 @@ import { updateSongsValue } from '../../Redux/slices/songsSlice';
 import { updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlice';
 import { showError } from '../../Redux/slices/errorMessageSlice';
 import { updatePlayerQueueName } from '../../Redux/slices/playerQueueSlice';
-import { shortenText } from '../../Components/ArtistCardComponents/ArtistInfo/ArtistInfo';
+import { shortenText } from '../../Tools/Tools';
 
 function PlaylistWindow(){
     const imageSetterRef = useRef(null);

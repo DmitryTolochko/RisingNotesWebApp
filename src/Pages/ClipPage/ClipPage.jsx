@@ -11,9 +11,9 @@ import { api } from "../../Components/App/App";
 import CustomControls from "./CustomControl/CustomControls";
 import Skeleton from "react-loading-skeleton";
 import { Link } from "react-router-dom";
-import { shortenText } from "../../Components/ArtistCardComponents/ArtistInfo/ArtistInfo";
 import BackButton from "../../Components/BackButton";
 import defaultAvatar from '../../Images/image-placeholder/user_logo_small_placeholder.png';
+import { shortenText } from "../../Tools/Tools";
 
 function ClipPage() {
     const [searchParams, setSearchParams] = useSearchParams();

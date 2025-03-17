@@ -1,5 +1,4 @@
 import errorImg from '../../Images/error.svg';
-import { shortenText } from '../ArtistCardComponents/ArtistInfo/ArtistInfo';
 import './CustomInput.css';
 
 function CustomInput({   

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { api, axiosAuthorized, axiosPictures, axiosUnauthorized } from '../App/App';
 import { updatePlaylistsValue } from '../../Redux/slices/playlistsSlice';
-import { shortenText } from '../ArtistCardComponents/ArtistInfo/ArtistInfo';
+import { shortenText } from '../../Tools/Tools';
 
 function PlaylistModalMenu({songAuthor, songName, id}) {
     const dispatch = useDispatch();

@@ -25,8 +25,8 @@ import { updateCurrentSongValue } from '../../Redux/slices/currentSongSlice';
 import { updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlice';
 import { updateFeaturedValue } from '../../Redux/slices/featuredSlice';
 import PlaylistModalMenu from '../../Components/PlaylistModalMenu/PlaylistModalMenu';
-import { shortenText } from '../../Components/ArtistCardComponents/ArtistInfo/ArtistInfo';
 import useSearchClean from '../../Hooks/useSearchClean/useSearchClean';
+import { shortenText } from '../../Tools/Tools';
 
 const Commentaries = ({clip}) => {
     const params = useParams();

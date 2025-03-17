@@ -27,7 +27,7 @@ export async function fetchInput(input){
     return searchResult
 }
 
- async function fetchArtists(input){
+export async function fetchArtists(input){
     if(input == '')
         return
     
@@ -44,21 +44,61 @@ export async function fetchInput(input){
     }
 }
 
-async function fetchTracks(input){
-    if(input == '')
-        return 
+// export async function fetchTracks(input){
+//     if(input == '')
+//         return 
 
-    try{
-        const response = await axios({
-            method:'GET',
-            url: api + `api/song/list?NamePart=${input}`,
-            responseType: 'application/json',
-        })
-        const result = JSON.parse(response.data).songList
-        return result
-    }
-    catch(err){
-        console.log('Something wrong occured when trying to fetch songs data');
+//     try{
+//         const response = await axios({
+//             method:'GET',
+//             url: api + `api/song/list?NamePart=${input}`,
+//             responseType: 'application/json',
+//         })
+//         const result = JSON.parse(response.data).songList
+//         return result
+//     }
+//     catch(err){
+//         console.log('Something wrong occured when trying to fetch songs data');
+//     }
+// }
+
+export async function fetchTracks(input) {
+    if (input === '') return [];
+    
+    const cache = new Map();
+    
+    const fetchWithCache = async (searchTerm, searchType) => {
+        const cacheKey = `${searchType}_${searchTerm}`;
+        
+        if (cache.has(cacheKey)) {
+            return cache.get(cacheKey);
+        }
+        
+        try {
+            const response = await axios({
+                method: 'GET',
+                url: api + `api/song/list?${searchType}=${encodeURIComponent(searchTerm)}`,
+                responseType: 'application/json',
+            });
+            
+            const result = JSON.parse(response.data).songList;
+            cache.set(cacheKey, result);
+            return result;
+        } catch (err) {
+            console.error(`Ошибка при поиске ${searchType}:`, err);
+            return [];
+        }
+    };
+    
+    try {
+        const songResults = await fetchWithCache(input, 'NamePart');
+        const artistResults = await fetchWithCache(input, 'AuthorNamePart');
+        
+        const combinedResults = [...new Set([...songResults, ...artistResults])];
+        return combinedResults;
+    } catch (err) {
+        console.error('Произошла ошибка при получении данных:', err);
+        return [];
     }
 }
 

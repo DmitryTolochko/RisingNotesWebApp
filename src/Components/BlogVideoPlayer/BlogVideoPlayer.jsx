@@ -11,7 +11,7 @@ import Comment from '../Comment';
 import sendIcon from '../../Images/controller/sendIcon.svg';
 import CustomButton from '../CustomButton/CustomButton';
 import { useSearchParams } from 'react-router-dom';
-import { shortenText } from '../ArtistCardComponents/ArtistInfo/ArtistInfo';
+import { shortenText } from '../../Tools/Tools';
 
 function VertVideoPlayer() {
     const videoRef = useRef();

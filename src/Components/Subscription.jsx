@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import defaultAvatar from '../Images/main-placeholder.png';
 import { useEffect, useState } from 'react';
 import { api, axiosPictures, axiosUnauthorized } from './App/App';
-import { shortenText } from './ArtistCardComponents/ArtistInfo/ArtistInfo';
+import { shortenText } from '../Tools/Tools';
 
 function Subscription (props) {
     const [name, setName] = useState('');

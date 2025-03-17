@@ -45,8 +45,9 @@ import MusicExplorer from '../../Pages/MusicExplorer/MusicExplorer.jsx';
 import moment from "moment";
 import 'moment/locale/ru'
 import StartPage from '../../Pages/StartPage/StartPage.jsx';
+import SocketConfig from '../SocketConfig/SocketConfig.jsx';
 
-export const api = 'https://rn-app.tw1.su/';
+export const api = 'https://www.rising-notes.tw1.su/';
 // axios.defaults.headers.post['Access-Control-Allow-Origin'] = 'rn-api-storage.s3.yandexcloud.net';
 
 export const axiosAuthorized = axios.create({
@@ -97,6 +98,7 @@ function App() {
     const songs_ = useSelector((state) => state.songs.value)
     const playerQueueName_ = useSelector((state) =>  state.playerQueue.currentQueue)
     const filters_ = useSelector((state) => state.filters.value)
+    const notifications_ = useSelector((state) => state.socketInfo.notifications)
     
     const navigate = useNavigate();
     const [cookies, setCookies] = useCookies(['accessToken', 'refreshToken', 'authorId', 'role', 'userId']);
@@ -147,9 +149,9 @@ function App() {
             return Promise.reject(error.response);
         }
         else if (error.response?.status === 401) {
-            dispatch(showError({errorText: 'Вы не авторизированы'}))
-            window.location.replace('/login');
-            return Promise.reject(error.response);
+            // dispatch(showError({errorText: 'Вы не авторизированы'}))
+            // // window.location.replace('/login');
+            // return Promise.reject(error.response);
         }
         else if (error.response?.status === 400) {
             dispatch(showError({errorText: error.message}))
@@ -219,7 +221,7 @@ function App() {
                 setCookies('userId', decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"], { path: '/' });
                 setCookies('role', decoded.role, { path: '/' });
                 setCookies('authorId', decoded?.authorId, { path: '/' });
-                if (decoded.exp > new Date().getTime() / 1000)
+                if (decoded.exp >= new Date().getTime() / 1000)
                     config.headers['Authorization'] = 'Bearer ' + accessToken;
                 else {
                     config.headers['Authorization'] = await refreshTokens(config);
@@ -229,7 +231,7 @@ function App() {
                 config.headers['Authorization'] = await refreshTokens(config);
             }
             else {
-                navigate("/login");
+                // navigate("/login");
             }
             return config;
         },
@@ -268,7 +270,8 @@ function App() {
         localStorage.setItem('RESIZE', JSON.stringify(resize_));
         localStorage.setItem('CURR_QUEUE', JSON.stringify(playerQueueName_));
         localStorage.setItem('FILTERS', JSON.stringify(filters_));
-    }, [songs_, currentSong_, subscriptions_, featured_, excluded_, playlists_, resize_, playerQueueName_, filters_]);
+        localStorage.setItem('NOTIFICATIONS', JSON.stringify(notifications_));
+    }, [songs_, currentSong_, subscriptions_, featured_, excluded_, playlists_, resize_, playerQueueName_, filters_, notifications_]);
 
     return (
         <div className="App">
@@ -278,6 +281,7 @@ function App() {
             <ErrorMessage/>
             <Players/>
             <PlayerQueue/>
+            <SocketConfig/>
             <Routes>
                 {!cookies.role ? (<>
                     <Route path={'/'} element={<StartPage/>}/>
@@ -319,6 +323,7 @@ const Players = () => {
             <VertVideoPlayer />
             <MusicPlayer/>
             <VideoPlayer />
+            {/* VideoPlayer - outdated */}
         </>
     )
 }

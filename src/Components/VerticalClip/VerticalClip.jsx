@@ -10,7 +10,7 @@ import { updateVertVideoPlayerValue } from '../../Redux/slices/vertVideoPlayerSl
 import { updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlice'
 import defaultAvatar from '../../Images/image-placeholder/user_logo_small_placeholder.png';
 import { useSearchParams } from 'react-router-dom'
-import { shortenText } from '../ArtistCardComponents/ArtistInfo/ArtistInfo'
+import { shortenText } from '../../Tools/Tools'
 
 function VerticalClip(props) {
     const [dataFetched, setDataFetched] = useState(false);

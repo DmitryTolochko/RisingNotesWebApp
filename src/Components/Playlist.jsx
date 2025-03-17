@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api, axiosPictures, axiosUnauthorized } from './App/App';
 import useSearchClean from '../Hooks/useSearchClean/useSearchClean';
-import { shortenText } from './ArtistCardComponents/ArtistInfo/ArtistInfo';
+import { shortenText } from '../Tools/Tools';
 
 
 function Playlist(props) {

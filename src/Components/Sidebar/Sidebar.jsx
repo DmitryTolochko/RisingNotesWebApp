@@ -21,7 +21,7 @@ import useMenuToggle from '../../Hooks/useMenuToggle/useMenuToggle';
 
 import './Sidebar.css';
 import { updatePlayerQueueVisibility } from '../../Redux/slices/playerQueueSlice'
-import { shortenText } from '../ArtistCardComponents/ArtistInfo/ArtistInfo'
+import { shortenText } from '../../Tools/Tools'
 
 
 function Sidebar(props) {

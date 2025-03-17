@@ -103,6 +103,16 @@
     margin-right: 12px;
 }
 
+.notifications-bell {
+    transition: all .2s ease;
+}
+
+.notifications-bell:hover {
+    cursor: pointer;
+    transform: scale(1.05);
+    transition: all .2s ease;
+}
+
 .menu-h {
     font-size: 12px;
     font-weight: 500;
@@ -117,4 +127,50 @@
     font-size: 12px;
     font-weight: 500;
     padding: 24px;
+}
+
+.notification-message {
+    width: 100%;
+    height: fit-content;
+    border-bottom: 1px solid #2C323D;
+    display: flex;
+    gap: 8px;
+    padding: 12px 0px;
+    cursor: pointer;
+}
+
+.notification-message:hover {
+    transform: scale(1.1);
+    transition: all .2s ease;
+}
+
+.notification-message > img {
+    width: 24px;
+    height: 24px;
+    object-fit: cover;
+    border-radius: 100px;
+}
+
+.notification-message-user-name {
+    font-size: 10px;
+    font-weight: 500;
+}
+
+.notification-message-text {
+    font-size: 8px;
+    color: #787885;
+    font-weight: 400;
+}
+
+.notification-message > span {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.notification-messages {
+    width: 100%;
+    padding: 0 24px;
+    max-height: 120px;
+    overflow-y: scroll;
 }

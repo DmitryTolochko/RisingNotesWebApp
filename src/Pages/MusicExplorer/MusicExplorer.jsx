@@ -10,10 +10,11 @@ import songCoverTemplate from '../../Images/main-placeholder.png';
 import { api, axiosAuthorized, axiosPictures, axiosUnauthorized } from '../../Components/App/App';
 import rewind_forwrad from '../../Images/controller/rewind.svg';
 import rewind_backward from '../../Images/controller/rewind-1.svg';
-import ArtistInfo, { shortenText } from '../../Components/ArtistCardComponents/ArtistInfo/ArtistInfo';
+import ArtistInfo from '../../Components/ArtistCardComponents/ArtistInfo/ArtistInfo';
 import { updateSubscriptionsValue } from '../../Redux/slices/subscriptionsSlice';
 import { updateCurrentSongValue } from '../../Redux/slices/currentSongSlice';
 import FilterNotificationPopup from '../../Components/Player/FilterComponent/FilterElements/FilterNotificationPopup';
+import { shortenText } from '../../Tools/Tools';
 
 function MusicExplorer() {
     const [iconColor, setIconColor] = useState('#000000');

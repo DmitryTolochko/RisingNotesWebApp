@@ -8,7 +8,7 @@ import { axiosUnauthorized } from "../../Components/App/App";
 import Song from "../../Components/Song/Song";
 import './PlayerQueue.css';
 import { updatePlayerQueueVisibility } from "../../Redux/slices/playerQueueSlice";
-import { shortenText } from "../../Components/ArtistCardComponents/ArtistInfo/ArtistInfo";
+import { shortenText } from "../../Tools/Tools";
 
 export default function PlayerQueue () {
     const dispatch = useDispatch();

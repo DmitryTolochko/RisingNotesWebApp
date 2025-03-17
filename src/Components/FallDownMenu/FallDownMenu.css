@@ -38,3 +38,34 @@
 .fall-down-menu-ref:hover, .logout-button:hover {
     background: #222832;
 }
+
+.fall-down-menu-option {
+    width: 186px;
+    padding: 10px 24px;
+    color: #787885;
+    font-size: 16px;
+}
+
+.fall-down-menu-option:hover {
+    background-color: #222832;
+    cursor: pointer;
+}
+
+.message-input-file-delete {
+    position: absolute;
+    margin-top: 4px;
+    margin-left: 4px;
+    border-radius: 100px;
+    min-width: 24px;
+    width: 24px;
+    height: 24px;
+    aspect-ratio: 1/1;
+    object-fit: fill;
+    background-color: rgba(15, 20, 29, 0.8);
+    stroke: #FE1170;
+}
+
+.message-input-file-delete:hover {
+    background-color: rgba(62, 68, 80, 0.8);
+    cursor: pointer;
+}

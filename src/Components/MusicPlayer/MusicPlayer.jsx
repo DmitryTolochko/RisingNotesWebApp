@@ -31,7 +31,7 @@ import PlaylistModalMenu from '../PlaylistModalMenu/PlaylistModalMenu';
 import filtersToggle from '../../Hooks/filtersToggle';
 import { updatePlayerQueueVisibility } from '../../Redux/slices/playerQueueSlice';
 import usePrevious from '../../Hooks/usePrevious/usePrevious';
-import { shortenText } from '../ArtistCardComponents/ArtistInfo/ArtistInfo';
+import { shortenText } from '../../Tools/Tools';
 
 const MusicPlayer = () => {
     const [playerQueueButtonColor, setPlayerQueueButtonColor] = useState('#FFFFFF');

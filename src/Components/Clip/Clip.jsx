@@ -18,7 +18,7 @@ import { updateCurrentSongValue } from '../../Redux/slices/currentSongSlice';
 import { updateSongsValue } from '../../Redux/slices/songsSlice';
 import { updateVideoPlayerValue } from '../../Redux/slices/videoPlayerSlice';
 import { axiosUnauthorized } from '../App/App';
-import { shortenText } from '../ArtistCardComponents/ArtistInfo/ArtistInfo';
+import { shortenText } from '../../Tools/Tools';
 
 const statusType = {
     0: 'Неизвестно',

@@ -10,7 +10,7 @@ import {  api, axiosAuthorized, axiosPictures, axiosUnauthorized } from '../../.
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { showError } from '../../../Redux/slices/errorMessageSlice';
-import { shortenText } from '../../../Components/ArtistCardComponents/ArtistInfo/ArtistInfo';
+import { shortenText } from '../../../Tools/Tools';
 
 export default function AccountHead (props) {
     const dispatch = useDispatch();

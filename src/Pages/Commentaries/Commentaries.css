@@ -385,7 +385,7 @@ h2 {
 .comment-btn-offset {
     position: absolute;
     right: 30px;
-    filter: brightness(0) saturate(100%) invert(32%) sepia(10%) saturate(7304%) hue-rotate(302deg) brightness(100%) contrast(94%);
+    /* filter: brightness(0) saturate(100%) invert(32%) sepia(10%) saturate(7304%) hue-rotate(302deg) brightness(100%) contrast(94%); */
 }
 
 .song-comments {
