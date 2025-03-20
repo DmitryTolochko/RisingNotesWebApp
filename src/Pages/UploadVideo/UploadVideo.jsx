@@ -2,25 +2,29 @@ import React, { useEffect } from 'react';
 import BackButton from '../../Components/BackButton';
 import VideoPrewiew from '../../Images/installvideo/videoprewiew.svg';
 import { useState, useRef } from 'react'
-import { axiosAuthorized } from '../../Components/App/App';
 import bigEdit from '../../Images/account-page/edit-big.svg';
 import closeImg from '../../Images/x.svg';
 import uploadImg from '../../Images/upload.svg';
 import playImg from '../../Images/play.svg';
 import pauseImg from '../../Images/Pause.svg';
-
 import './UploadVideo.css';
 import CustomButton from '../../Components/CustomButton/CustomButton';
 import { useDropzone } from 'react-dropzone';
 import InputSongs from './InputSongs';
-import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateVideoPlayerValue } from '../../Redux/slices/videoPlayerSlice';
 import CustomInput from '../../Components/CustomInput/CustomInput';
 import { showError } from '../../Redux/slices/errorMessageSlice';
+import { changeClipRequestStatus, createNewClipRequest, deleteClipRequest, getClipRequestInfo, startUploadClip, submitClipRequestForReview, uploadClipFilePart, uploadClipLogo } from '../../Api/ClipPublish';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useCookies } from 'react-cookie';
+import trashIcon from '../../Images/trash.svg'
 
 function UploadVideo(){
-    const dispatch = useDispatch()
+    const navigate = useNavigate();
+    const params = useParams();
+    const dispatch = useDispatch();
+
     const skinSetterRef = useRef(null);
     const [imageFile, setImageFile] = useState(undefined);
     const [image, setImage] = useState(VideoPrewiew);
@@ -31,12 +35,16 @@ function UploadVideo(){
     const [description, setDescription] = useState(undefined);
     const [songId, setSongId] = useState(undefined);
     const [title, setTitle] = useState(undefined);
+    const [comment, setComment] = useState('');
 
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
     const [isSent, setIsSent] = useState(false);
     const resize = useSelector((state)=> state.resize.value);
 
+    const [cookies, setCookies] = useCookies(['accessToken', 'refreshToken', 'authorId', 'role', 'subscriptions', 'userId']);
+
     useEffect(() => {
+        getAllInfo();
         if (!isSent)
             setIsButtonDisabled(checkInputs());
     }, [imageFile, videoFile, songId])
@@ -51,13 +59,7 @@ function UploadVideo(){
             }
         })
         return flag;
-    }
-
-    useEffect(() => {
-        if (videoFile !== undefined)
-            console.log(videoFile.size);
-    }, [videoFile]);
-    
+    }    
 
     function handleChoosenSong(id, title) {
         setTitle(title);
@@ -66,74 +68,40 @@ function UploadVideo(){
 
     async function uploadVideo() {
         // загрузка видео
-        let formData = new FormData();
-        let clipId = undefined;
+        let clipRequestId = undefined;
         let uploadId = undefined;
         let fileExtension = '.' + videoFile.type.split('/')[1];
 
         setIsButtonDisabled(true);
         setIsSent(true);
-        
-        formData.append('Title', title);
-        formData.append('Description', description);
-        formData.append('SongId', songId);
 
-        await axiosAuthorized.post('api/music-clip', formData, {
-            headers: {
-                "Content-Type": "multipart/form-data",
+        clipRequestId = await createNewClipRequest(title, description, songId);
+        try {
+            await uploadClipLogo(imageFile, clipRequestId);    
+            uploadId = await startUploadClip(clipRequestId, fileExtension);
+    
+            if (videoFile.size <= 50 * 1024 * 1024) {
+                // загрузка видео размером не больше 50 мб.
+                await uploadClipFilePart(videoFile, 1, true, uploadId, clipRequestId);
             }
-        })
-        .then(response => clipId = response.data.id)
-        .catch(err => {return Promise.reject(err)});
-
-        formData = new FormData();
-        formData.append('File', imageFile);
-
-        await axiosAuthorized.patch('api/music-clip/' + clipId + '/preview', formData, {
-            headers: {
-                "Content-Type": "multipart/form-data",
+            else {
+                // загрузка видео по частям
+                let totalSize = videoFile.size;
+                let currentPart = 0;
+                const chunkSize = 6 * 1024 * 1024;
+                const totalParts = Math.ceil(totalSize/chunkSize);
+    
+                for (let start = 0; start < totalSize; start+=chunkSize) {
+                    currentPart += 1;
+                    const chunk = videoFile.slice(start, start + chunkSize);
+                    await uploadClipFilePart(chunk, currentPart, currentPart === totalParts, uploadId, clipRequestId);
+                }
             }
-        })
-        .catch(err => {return Promise.reject(err)});        
-
-        await axiosAuthorized.post('api/music-clip/' + clipId + '/file/start-upload', {
-            fileExtension: fileExtension
-        })
-        .then(response => uploadId = response.data.uploadId)
-        .catch(err => {return Promise.reject(err)});
-
-        if (videoFile.size <= 50 * 1024 * 1024) {
-            // загрузка видео размером не больше 50 мб.
-            await uploadFilePart(videoFile, 1, true, uploadId, clipId);
+    
+            await submitClipRequestForReview(title, description, clipRequestId);
+        } catch {
+            await deleteClipRequest(clipRequestId);
         }
-        else {
-            // загрузка видео по частям
-            let totalSize = videoFile.size;
-            let currentPart = 0;
-            const chunkSize = 6 * 1024 * 1024;
-            const totalParts = Math.ceil(totalSize/chunkSize);
-
-            for (let start = 0; start < totalSize; start+=chunkSize) {
-                currentPart += 1;
-                const chunk = videoFile.slice(start, start + chunkSize);
-                await uploadFilePart(chunk, currentPart, currentPart === totalParts, uploadId, clipId);
-            }
-        }
-    }
-
-    async function uploadFilePart(filePart, partNumber, isLast, uploadId, clipId) {
-        // загрузка куска видео
-        let formData = new FormData();
-        formData.append('File', filePart);
-        formData.append('UploadId', uploadId);
-        formData.append('PartNumber', partNumber);
-        formData.append('IsLastPart', isLast);
-        await axiosAuthorized.post('api/music-clip/' + clipId + '/file/upload-part', formData, {
-            headers: {
-                "Content-Type": "multipart/form-data",
-            }
-        })
-        .catch(err => {return Promise.reject(err)});
     }
 
     function handlePlayVideo() {
@@ -149,7 +117,6 @@ function UploadVideo(){
             setVideofile(event.target.files[0]);
         }
     }
-
 
     const handleSkinInput = () => {
         skinSetterRef.current.click();
@@ -195,6 +162,41 @@ function UploadVideo(){
         videoSetterRef.current.click();
     }
 
+    async function getAllInfo() {
+        if (params?.id) {
+            let info = await getClipRequestInfo(params?.id);
+            setTitle(info.title);
+            setDescription(info.description);
+            setSongId(info.songId);
+            setVideoFileName(info.title);
+            setImage(info.logoFileLink);
+            setVideofile(info.clipFileLink);
+        }
+    }
+
+    const acceptClip = async () => {
+        // Одобрение заявки
+        await changeClipRequestStatus(3, comment, params.id);
+        navigate(-1);        
+    }
+    
+    const declineClip = async () => {
+        // Отклонение заявки
+        await changeClipRequestStatus(4, comment, params.id);
+        navigate(-1);
+    }
+
+    const deleteClip = async () => {
+        // Удаление песни
+        if (cookies.role === 'admin' ) {
+            await changeClipRequestStatus(5, comment, params.id);
+        }
+        else if (cookies.role === 'author') {
+            await deleteClipRequest(params?.id);
+        }
+        navigate(-1);
+    }
+
     return (
         <section className='comment-page-wrapper'>
             <div className='featured'>
@@ -205,7 +207,7 @@ function UploadVideo(){
                         <img draggable='false' className='video-prewiew' alt='video prewiew' src={image}/> 
                     </div>
                     <span className='song-info'>
-                        <h1 className='newtrack-h1'>Новый клип</h1>
+                        <h1 className='newtrack-h1'>{params?.id ? title : 'Новый клип'}</h1>
                         {videoFile ? <button className='close-button' onClick={() => setVideofile(undefined)}><img src={closeImg}/></button> : <></>}
                         <div className={videoFile ? 'uploadtrack-div red-border' : 'uploadtrack-div'}>
                             {videoFile ? (
@@ -241,7 +243,8 @@ function UploadVideo(){
                             heading={'Связанный трек'}
                             setSong={handleChoosenSong} 
                             isClipFree={false}
-                            isRequired={true}/>
+                            isRequired={true}
+                            defaultSong={title}/>
                     </div> 
                     <div className='column1-2'>
                         <CustomInput
@@ -255,15 +258,46 @@ function UploadVideo(){
                     </div>
                 </div>
                 <div className='video-information-3' >
-                    <div className='button-and-text'>
-                        <CustomButton 
-                            text={'Опубликовать'} 
-                            func={() => uploadVideo()} 
-                            success={'Опубликовано'} 
-                            icon={uploadImg}
-                            disabled={isButtonDisabled}/>
-                    </div>
-                    {/* <text className='warning-upload'>*перед публикацией видео будет отправлено на модерацию</text> */}
+
+                    {cookies.role === 'author' && !params?.id ? <div>
+                        <div className='button-and-text'>
+                            <CustomButton 
+                                text={'Опубликовать*'} 
+                                func={() => uploadVideo()} 
+                                success={'Отправлено на модерацию'} 
+                                icon={uploadImg}
+                                disabled={isButtonDisabled}/>
+                        </div>
+                        <text className='warning-upload'>*перед публикацией трек будет отправлен на модерацию</text>
+                    </div> : ''}
+
+                    {cookies.role === 'admin' ? <div>
+                        <div className='button-and-text'>
+                            <CustomButton text={'Одобрить'} success={'Одобрено'} icon={uploadImg} func={acceptClip}/>
+                            <button className='save-installmusic' onClick={declineClip}><img src={closeImg}/>Отклонить</button>
+                        </div>
+                        <h2 className='column1-h2'>Комментарий</h2>
+                        <input id='myinput' value={comment} onChange={event => setComment(event.target.value)} className='inp-column1' placeholder={'Введите комментарий...'}/>
+                    </div>: ''}
+
+                    {cookies.role === 'author' && params?.id ? <div>
+                        <div className='button-and-text'>
+                            <button className='save-installmusic' onClick={deleteClip}><img src={trashIcon}/>Удалить</button>
+                        </div>
+                            {cookies.role === 'admin' ? ( 
+                            <>
+                                <h2 className='column1-h2'>Комментарий модератора</h2>
+                                <input id='myinput' value={comment} onChange={event => setComment(event.target.value)} className='inp-column1' placeholder={'Введите комментарий...'}/>
+                            </> 
+                            ) : (<></>)}
+
+                            {cookies.role !== 'admin' && comment !== '' ? (
+                                <>
+                                    <h2 className='column1-h2'>Комментарий модератора</h2>
+                                    <p className='inp-column1' style={{padding: '10px 16px'}}>{comment}</p>
+                                </>
+                            ) : (<></>)}
+                    </div> : ''}
 
                     <input type='file' accept=".jpg,.png" className='input-file' ref={skinSetterRef} onChange={changeSkin}></input>
                     <input type='file' accept=".mp4,.avi,.mkv,.mov" className='input-file' ref={videoSetterRef} onChange={changeVideo}></input>

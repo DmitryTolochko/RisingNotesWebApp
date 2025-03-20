@@ -2,58 +2,27 @@ import { Link } from "react-router-dom";
 import Clip from "../../../Components/Clip/Clip";
 import plus from '../../../Images/account-page/plus-icon.svg';
 import { useCookies } from "react-cookie";
-import { api, axiosAuthorized } from "../../../Components/App/App";
 import { useEffect,useState } from "react";
-import axios from "axios";
+import { deleteClipRequest, getClipRequestInfo, getClipRequestsForAuthor } from "../../../Api/ClipPublish";
 
 export default function Clips() {
-    const [cookies] = useCookies(['authorId']);
     const [clips, setClips] = useState(undefined)
 
-    const getAuthorClips = async ()=> {
-        try{
-            const response = await axios({
-                method:'GET',
-                url: api + 'api/music-clip/by-author/' + cookies.authorId,
-                responseType: 'application/json'
-            })
-            let result = JSON.parse(response.data).musicClipList
-            return result
-        }
-        catch(err){
-            return Promise.reject(err);
-        }
-    }
-
     useEffect(()=>{
-        getAuthorClips()
-            .then(res=>setClips(res))
-            .catch(err=>console.log(err))
-    }, [])
+        getClipRequestsForAuthor()
+        .then(list => getAllRequestsInfo(list));
+    }, []);
 
-    const deleteClip = async (id) => {
-        let resp = await axiosAuthorized.delete('api/music-clip/' + id);
-        if (resp) {
-            getAuthorClips()
-                .then(res=>setClips(res))
-                .catch(err=>console.log(err))
+    async function getAllRequestsInfo(list) {
+        let infoList = [];
+        for (let el of list) {
+            let newInfo = await getClipRequestInfo(el.id);
+            if (newInfo) {
+                infoList.push({ ...el, ...newInfo });
+            }
         }
-        // try{
-        //     const response = await axios({
-        //         method:'DELETE',
-        //         url: api + 'api/music-clip/' + id,
-        //     })
-        //     if(response){
-        //         getAuthorClips()
-        //             .then(res=>setClips(res))
-        //             .catch(err=>console.log(err))
-        //     }
-        // }
-        // catch(err){
-        //     return Promise.reject(err);
-        // }
+        setClips(infoList);
     }
-
 
     return (
         <div className="account-page-user">
@@ -61,15 +30,16 @@ export default function Clips() {
             <Link to={'/uploadvideo'} className='account-page-add-song'><img alt='icon' src={plus}/>Новый видеоклип</Link>
 
             <div className="artist-clips">
-                {clips?.map( (clip,index) => (
+                {clips?.map((clip,index) => (
                     <Clip 
                         key={index} 
-                        clipId={clip.id} 
-                        authorId={clip.uploaderId} 
+                        clipId={clip.clipId} 
+                        clipRequestId={clip.id}
+                        authorId={clip.authorId} 
                         songId={clip.songId} 
                         name={clip.title} 
-                        deleteFunc={deleteClip}
-                        isArtist={true}/>
+                        isArtist={true}
+                        status={clip.status}/>
                 ))}
             </div>
         </div>

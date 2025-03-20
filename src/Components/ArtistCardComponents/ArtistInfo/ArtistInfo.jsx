@@ -14,7 +14,7 @@ import { updateSubscriptionsValue } from "../../../Redux/slices/subscriptionsSli
 import { getWordSpelling, shortenText } from "../../../Tools/Tools"
 import { updateChatInfo } from "../../../Redux/slices/socketInfoSlice"
 import { ChatTypes } from "../../../Pages/Messenger/Messenger"
-import { getChatInfoForUser } from "../../../Pages/Messenger/ApiCallers"
+import { getChatInfoForUser } from "../../../Api/Messenger"
 
 function getSubsText(number) {
    return getWordSpelling(number, 'подписчик')

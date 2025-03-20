@@ -1,9 +1,6 @@
 import './Clip.css';
 import viewsIcon from '../../Images/account-page/stats-icon.svg';
-import editIcon from '../../Images/account-page/edit-icon.svg';
-import trashIcon from '../../Images/trash.svg'
-import { api } from '../App/App';
-import axios from 'axios';
+import editIcon from '../../Images/pencil.svg';
 import { useEffect, useState, useRef } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import useSearchClean from '../../Hooks/useSearchClean/useSearchClean';
@@ -11,14 +8,16 @@ import { handleVideoEnter, handleVideoHover, handleVideoLeave, handleVideoMove }
 import Skeleton from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
 import { useNavigate } from 'react-router-dom';
-import { useSearchParams } from 'react-router-dom';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { updateCurrentSongValue } from '../../Redux/slices/currentSongSlice';
 import { updateSongsValue } from '../../Redux/slices/songsSlice';
-import { updateVideoPlayerValue } from '../../Redux/slices/videoPlayerSlice';
-import { axiosUnauthorized } from '../App/App';
 import { shortenText } from '../../Tools/Tools';
+import { getSongLogo } from '../../Api/Song';
+import { getAuthorInfo } from '../../Api/Author';
+import { getClipFile, getClipPreview, getClipViews } from '../../Api/Clip';
+import { getClipRequestFile, getClipRequestPreview } from '../../Api/ClipPublish';
+import { updateVideoPlayerValue } from '../../Redux/slices/videoPlayerSlice';
 
 const statusType = {
     0: 'Неизвестно',
@@ -38,17 +37,23 @@ const statusColor = {
     5: 'red'
 }
 
-function Clip({key, clipId, authorId, songId, name, deleteFunc=undefined, isArtist=false}) {
+function Clip({
+    clipId=undefined, 
+    clipRequestId=undefined,
+    authorId, 
+    songId, 
+    name,
+    isArtist=false, 
+    status=0
+}) {
     const [videoLoaded, setVideoLoaded] = useState(false)
     const [authorName, setAuthorName] = useState('')
-    const [deletePopupVisible, setDeletePopupVisible] = useState(false)
-    const [searchParams, setSearchParams] = useSearchParams();
     const videoPreviewRef = useRef(undefined)
     const previewRef = useRef(undefined)
     const {cleanQuery} = useSearchClean()
     const navigate = useNavigate()
 
-    let status = 0, views=0;
+    const [views, setViews] = useState(0); 
     
     const songs = useSelector((state)=>state.songs.value)
     const [clipLink, setClipLink] = useState(undefined);
@@ -57,74 +62,44 @@ function Clip({key, clipId, authorId, songId, name, deleteFunc=undefined, isArti
     const dispatch = useDispatch()
 
     useEffect(() => {
-        getClipLink()
-            .then(response => setClipLink(response));
-        getPreviewLink()
-            .then(response => setPreviewLink(response));
-        getSongCoverLink()
+        if (clipId) {
+            getClipPreview(clipId)
+                .then(response => setPreviewLink(response));
+            getClipFile(clipId)
+                .then(response => setClipLink(response));
+            getClipViews(clipId)
+                .then(response => setViews(response));
+        } else {
+            getClipRequestPreview(clipRequestId)
+                .then(response => setPreviewLink(response));
+            getClipRequestFile(clipRequestId)
+                .then(response => setClipLink(response));
+        }
+        
+        getSongLogo(songId)
             .then(response => setCoverLink(response));
-    }, []);
-
-    async function getClipLink() {
-        let response = await axiosUnauthorized.get('api/music-clip/' + clipId + '/file/link')
-        .catch(err => Promise.reject(err));
-
-        return response?.data?.presignedLink;
-    }
-
-    async function getPreviewLink() {
-        let response = await axiosUnauthorized.get('api/music-clip/' + clipId + '/preview/link')
-        .catch(err => Promise.reject(err));
-
-        return response?.data?.presignedLink;
-    }
-
-    async function getSongCoverLink() {
-        let response = await axiosUnauthorized.get('api/song/' + songId + '/logo/link')
-        .catch(err => Promise.reject(err));
-
-        return response?.data?.presignedLink;
-    }
-    
-    const getAuthorName = async (id) =>{
-        try{
-            const response = await axios({
-                method:'GET',
-                url: api + 'api/author/' + id,
-                responseType: 'application/json'
-            })
-            let result = JSON.parse(response.data)
-            return result.name
-        }
-        catch(err){
-            return Promise.reject(err);
-        }
-    }
+        getAuthorInfo(authorId, undefined)
+            .then(res => setAuthorName(res.name));
+    }, [clipId, clipRequestId]);
 
     const handleSongClick = () =>{
         dispatch(updateSongsValue([...songs, songId]))
         dispatch(updateCurrentSongValue(songId))
     }
 
-    useEffect(()=>{
-        getAuthorName(authorId)
-            .then(res=>setAuthorName(res))
-            .catch(err=>console.log(err))
-    },[])
-
-
-    // () =>dispatch(updateVideoPlayerValue(api + `api/music-clip/${clipId}/file`))
-
     return ( 
-        <div key={key} className="clip-wrapper">
+        <div className="clip-wrapper">
             {videoLoaded ? <></>:  <>  
                 <Skeleton baseColor='#0F141D' highlightColor="#2C323D"  height={200}/>
                 <Skeleton baseColor='#0F141D' highlightColor="#2C323D" count={2} />
             </>}
             <div className="cover-wrapper" style={videoLoaded?{display:'block'}:{display:'none'}}>
                 <div className="clip-video" onClick={()=>{
-                    cleanQuery()
-                    navigate(`/clipview?clip_id=${clipId}`)
+                    cleanQuery();
+                    if (clipId)
+                        navigate(`/clipview?clip_id=${clipId}`);
+                    else 
+                        dispatch(updateVideoPlayerValue(clipLink));
                 }} 
                         onMouseOver={() => handleVideoHover(videoPreviewRef, clipLink)}
                         onMouseEnter={() => handleVideoEnter(previewRef)}
@@ -166,23 +141,9 @@ function Clip({key, clipId, authorId, songId, name, deleteFunc=undefined, isArti
                         <div className={'song-status-dot ' + statusColor[status]}></div>
                         {statusType[status]}
                     </p>
-                    <button title='Удалить клип' onClick={()=>setDeletePopupVisible(true)}>
-                        <img alt='list' src={trashIcon} />
-                    </button>
-
-                    <div className={deletePopupVisible ? "delete-popup" : "delete-popup hidden-popup"}>
-                        <p>Вы действительно хотите удалить этот клип?</p>
-                        <div className="popup-actions">
-                            <button onClick={() => {if(deleteFunc) deleteFunc(clipId)}}>
-                                <img src={trashIcon} alt=""/>
-                                <span>Да</span>
-                            </button>
-                            <button className='primary' onClick={()=>setDeletePopupVisible(false)}>
-                                <span>Нет</span>
-                            </button>
-                        </div>
-                    </div>
-
+                    <Link to={'/uploadvideo/' + clipRequestId}>
+                        <img alt='list' src={editIcon} />
+                    </Link>
                 </div>
             ) : (<></>)}
         </div>

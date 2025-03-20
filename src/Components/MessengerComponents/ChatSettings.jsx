@@ -4,7 +4,7 @@ import {ReactComponent as CloseIcon } from '../../Images/x.svg';
 import addUserIcon from '../../Images/addUser.png';
 import defaultAvatar from '../../Images/main-placeholder.png';
 import { useDispatch, useSelector } from "react-redux";
-import { updateChatInfo, updateChatMemberList, updateIsChatSettingsVisible, updateIsCreatingNewChat, updateIsModalContactsVisibe } from "../../Redux/slices/socketInfoSlice";
+import { updateChatImages, updateChatInfo, updateChatMemberList, updateIsChatSettingsVisible, updateIsCreatingNewChat, updateIsModalContactsVisibe } from "../../Redux/slices/socketInfoSlice";
 import pencilIcon from '../../Images/pencil.svg';
 import CustomInput from "../CustomInput/CustomInput";
 import { ChatTypes } from "../../Pages/Messenger/Messenger";
@@ -12,9 +12,16 @@ import bigEdit from '../../Images/account-page/edit-big.svg';
 import CustomButton from "../CustomButton/CustomButton";
 import { showError } from "../../Redux/slices/errorMessageSlice";
 import { axiosAuthorized } from "../App/App";
-import { changeChatLogo, changeChatName, createNewChat, deleteUsersFromChat, getChatInfo, getChatMembers } from "../../Pages/Messenger/ApiCallers";
+import { changeChatLogo, changeChatName, createNewChat, deleteUsersFromChat, getChatAttachments, getChatInfo, getChatMembers } from "../../Api/Messenger";
 import { getWordSpelling } from "../../Tools/Tools";
 import { useCookies } from "react-cookie";
+import { getSongInfo } from "../../Api/Song";
+import Song from "../Song/Song";
+
+const AttachmentTypes = {
+    song: 1,
+    image: 2
+}
 
 function ChatSettings() {
     const imageSetterRef = useRef(null);
@@ -32,6 +39,9 @@ function ChatSettings() {
     const [avatar, setAvatar] = useState(defaultAvatar);
     const [logofile, setLogofile] = useState(undefined);
     const [membersCount, setMembersCount] = useState('');
+    const [chatImages, setChatImages] = useState([]);
+    const [chatSongs, setChatSongs] = useState([]);
+
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -45,7 +55,23 @@ function ChatSettings() {
         else if (chatInfo?.chatType === ChatTypes.public) {
             setCurrPage(0);
         }
-    }, [chatInfo?.id, isCreatingNewChat])
+    }, [chatInfo?.id, isCreatingNewChat]);
+
+    useEffect(() => {
+        if (chatInfo?.id) {
+            if (currPage === 1) {
+                getChatSongs();
+                setChatImages([]);
+            } else if (currPage === 2) {
+                getChatImages();
+                setChatSongs([]);
+            } else {
+                setChatSongs([]);
+                setChatImages([]);
+            }
+        }
+        
+    }, [currPage, chatInfo?.id, isCreatingNewChat]);
 
     const handleChangePage = (id) => {
         // смена страницы в лк
@@ -137,6 +163,22 @@ function ChatSettings() {
         setMembersCount(getWordSpelling(chatMemberList.length, 'участник'));
     }, [chatMemberList]);
 
+    async function getChatImages() {
+        let list = await getChatAttachments(chatInfo?.id, AttachmentTypes.image);
+        setChatImages(list.filter(el => el.attachmentType === AttachmentTypes.image).map(el => el.attachmentFileLink));
+    }
+
+    async function getChatSongs() {
+        let attachments = await getChatAttachments(chatInfo?.id, AttachmentTypes.song);
+
+        let ids = attachments.filter(el => el.attachmentType === AttachmentTypes.song).map(el => el.attachmentFileId);
+        let list = await Promise.all(ids
+        .map(async id => {
+            return await getSongInfo(undefined, id);
+        }));
+        setChatSongs(list);
+    }
+
     if (isVisible || isCreatingNewChat)
     return(
         <div className="chat-settings">
@@ -191,13 +233,14 @@ function ChatSettings() {
                     </a>
                     <a onClick={() => handleChangePage(2)} 
                         className={currPage === 2 ? 'artist-card-menu-item artist-card-menu-item-active' : 'artist-card-menu-item chat-settings-menu-color'}>
-                        Вложения
+                        Изображения
                     </a>
                 </div>
                 ) : (<></>)}
                 
 
                 {currPage === 0 ? (
+                <>
                 <div className="chat-settings-contacts">
                     {cookies.userId === chatInfo?.hostUserId ? (
                         <div className="add-user-to-group" onClick={handleOpenModalContacts}>
@@ -216,8 +259,32 @@ function ChatSettings() {
                             deleteFunction={() => deleteMemberFromChat(el.userId)}/>
                     ))}
                 </div>
-                ) : (<></>)}
                 {isCreatingNewChat ? <CustomButton text={'Создать группу'} func={createNewGroupChat}/> : <></>}
+                </>
+                ) : (<></>)}
+
+                {currPage === 1 ? (
+                <div className="tracks" style={{paddingTop: '24px'}}>
+                    {chatSongs.map((el, index) => (
+                        <Song
+                            key={index}
+                            id={el.id}
+                            name={el.name}
+                            artist={el.authorName}
+                            isAttachedToMessage={true}
+                        />
+                    ))}
+                </div>
+                ) : (<></>)}
+
+                {currPage === 2 ? (
+                <div className="chat-setting-images">
+                    {chatImages.map((el, index) => (
+                        <img src={el} key={index} onClick={() => dispatch(updateChatImages([el]))}/>
+                    ))}
+                </div>
+                ) : (<></>)}
+                
             </div>
             <input type='file' accept=".jpg,.png" className='input-file' ref={imageSetterRef} onChange={uploadLogo}></input>
         </div>

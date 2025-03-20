@@ -44,24 +44,6 @@ export async function fetchArtists(input){
     }
 }
 
-// export async function fetchTracks(input){
-//     if(input == '')
-//         return 
-
-//     try{
-//         const response = await axios({
-//             method:'GET',
-//             url: api + `api/song/list?NamePart=${input}`,
-//             responseType: 'application/json',
-//         })
-//         const result = JSON.parse(response.data).songList
-//         return result
-//     }
-//     catch(err){
-//         console.log('Something wrong occured when trying to fetch songs data');
-//     }
-// }
-
 export async function fetchTracks(input) {
     if (input === '') return [];
     

@@ -7,7 +7,7 @@ import Loader from "../../Components/Loader/Loader";
 import { updateChatInfo, updateCurrentChatMessages, updateIsChatSettingsVisible, updateIsCreatingNewChat } from "../../Redux/slices/socketInfoSlice";
 import ChatSettings from "../../Components/MessengerComponents/ChatSettings";
 import ModalContacts from "../../Components/MessengerComponents/ModalContacts";
-import { getChatInfo, getUserInfo } from "./ApiCallers";
+import { getChatInfo, getUserInfo } from "../../Api/Messenger";
 import ChatImage from "../../Components/MessengerComponents/ChatImage";
 import ModalSongs from "../../Components/MessengerComponents/ModalSongs";
 

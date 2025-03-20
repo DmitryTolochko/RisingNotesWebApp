@@ -12,7 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { updateAttachedSongs, updateChatInfo, updateCurrentChatMessages, updateIsChatSettingsVisible, updateIsModalSongsVisibe, updateRecentChats, updateRecentFilteredChats } from "../../Redux/slices/socketInfoSlice";
 import { ChatTypes } from "../../Pages/Messenger/Messenger";
 import { getWordSpelling, shortenText } from "../../Tools/Tools";
-import { createNewChat, getChatInfo, getMessages, getRecentChatsList, sendMessage } from "../../Pages/Messenger/ApiCallers";
+import { createNewChat, getChatInfo, getMessages, getRecentChatsList, sendMessage } from "../../Api/Messenger";
 import { useCookies } from "react-cookie";
 import { ReactComponent as PaperclipIcon } from '../../Images/controller/paperclip.svg';
 import { showError } from "../../Redux/slices/errorMessageSlice";

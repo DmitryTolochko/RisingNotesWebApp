@@ -9,6 +9,7 @@ import Song from "../../Components/Song/Song";
 import './PlayerQueue.css';
 import { updatePlayerQueueVisibility } from "../../Redux/slices/playerQueueSlice";
 import { shortenText } from "../../Tools/Tools";
+import { getSongInfo } from "../../Api/Song";
 
 export default function PlayerQueue () {
     const dispatch = useDispatch();
@@ -29,11 +30,9 @@ export default function PlayerQueue () {
     async function getSongs() {
         let array = [];
         for (var id of songs) {
-            await axiosUnauthorized.get(`api/song/${id}`)
-            .then(response => {
-                array.push(response.data);
-            })
-            .catch(err => {console.log(err)});
+            let info = await getSongInfo(id);
+            if (info)
+                array.push(info);
         }
         setSongsInfo(array);
     };

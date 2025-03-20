@@ -29,11 +29,11 @@ export default function RequestSong ({info}) {
     return (
         <Link to={'/uploadmusic/' + info.id}>
             <div className='track'>
-                <img alt='cover' className='song-img' src={info.logo} draggable='false'/>
-                <p className='song-title-t'>{info.name}
+                <img alt='cover' className='song-img' src={info.logoFileLink} draggable='false'/>
+                <p className='song-title-t'>{info.songName}
                     <p className='songAuthor'>{info.authorName}</p>
                 </p>
-                {resize === 'standart' ? <p className='song-genre'>{info.genre}</p> : <></>}
+                {resize === 'standart' ? <p className='song-genre'>{info.genreList[0]}</p> : <></>}
 
                 <p className='song-status'>
                     <div className={'song-status-dot ' + statusColor[info.status]}></div>
@@ -41,8 +41,8 @@ export default function RequestSong ({info}) {
                 </p>
 
                 <span className='track-buttons'>
-                    { info.publishedId ? 
-                        <Link draggable='false' to={`/commentaries/${info.publishedId}`}><img draggable='false' alt='comment' src={message}/></Link> : 
+                    { info.publishedSongId ? 
+                        <Link draggable='false' to={`/commentaries/${info.publishedSongId}`}><img draggable='false' alt='comment' src={message}/></Link> : 
                         <Link draggable='false' to={`/`}><img alt='comment' draggable='false' src={message} style={{opacity: 0.2}}/></Link>
                     }
                     <a href={`/uploadmusic/${info.id}`}><img alt='list' src={editIcon} /></a>

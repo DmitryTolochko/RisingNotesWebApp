@@ -1,4 +1,4 @@
-import { axiosAuthorized } from "../../Components/App/App";
+import { axiosAuthorized } from "../Components/App/App";
 
 export async function createNewChat(name, chatType, members, logoFile=undefined) {
     // Создать новый чат, вернуть id
@@ -142,4 +142,15 @@ export async function getChatInfoForUser(userId) {
     .catch(err => console.log(err));
 
     return response?.data;
+}
+
+export async function getChatAttachments(chatId, attachmentType) {
+    let response = await axiosAuthorized.get(`api/chat-message/${chatId}/attachment/list?attachmentType=${attachmentType}`)
+    .catch(err => console.log(err));
+
+    if (response) {
+        return response.data.attachmentList;
+    } else {
+        return [];
+    }
 }

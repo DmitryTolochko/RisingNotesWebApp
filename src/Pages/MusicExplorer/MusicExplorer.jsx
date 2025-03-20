@@ -15,6 +15,7 @@ import { updateSubscriptionsValue } from '../../Redux/slices/subscriptionsSlice'
 import { updateCurrentSongValue } from '../../Redux/slices/currentSongSlice';
 import FilterNotificationPopup from '../../Components/Player/FilterComponent/FilterElements/FilterNotificationPopup';
 import { shortenText } from '../../Tools/Tools';
+import { getSongInfo, getSongLogo } from '../../Api/Song';
 
 function MusicExplorer() {
     const [iconColor, setIconColor] = useState('#000000');
@@ -82,29 +83,20 @@ function MusicExplorer() {
 
     const getCurrentTrackInfo = async () => {
         // подгрузка информации о текущем треке
-        let imageLink = songCoverTemplate;
+        let imageLink = await getSongLogo(currentSong);
         let info = {};
-
-        await axiosUnauthorized.get(`api/song/` + currentSong + `/logo/link`)
-        .then(response => {
-            imageLink = response.data.presignedLink;
-        })
-        .catch(err => {imageLink = songCoverTemplate});
 
         setBgImage(imageLink);
 
-        await axiosUnauthorized.get(`api/song/` + currentSong)
-        .then(response => {
-            info = {
-                id: response.data.id,
-                authorId: response.data.authorId,
-                trackName: response.data.name,
-                authors: [response.data.authorName],
-                tags: [...response.data.genreList, ...response.data.languageList, ...response.data.vibeList],
-                trackCover: imageLink
-            }
-        })
-        .catch(err => {console.log(err)});
+        let songInfo = await getSongInfo(currentSong, undefined);
+        info = {
+            id: songInfo.id,
+            authorId: songInfo.authorId,
+            trackName: songInfo.name,
+            authors: [songInfo.authorName],
+            tags: [...songInfo.genreList, ...songInfo.languageList, ...songInfo.vibeList],
+            trackCover: imageLink
+        }
 
         await axiosPictures.get(`api/author/` + info.authorId + `/logo/link`)
         .then(response => {

@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { updateChatMemberList, updateIsModalContactsVisibe } from "../../Redux/slices/socketInfoSlice";
 import { useEffect, useState } from "react";
 import { axiosAuthorized } from "../App/App";
-import { addUsersToChat } from "../../Pages/Messenger/ApiCallers";
+import { addUsersToChat } from "../../Api/Messenger";
 
 function ModalContacts() {
     const isVisible = useSelector((state)=> state.socketInfo.isModalContactsVisibe);

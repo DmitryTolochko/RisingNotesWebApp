@@ -8,9 +8,13 @@ import './AdminPanel.css';
 import UserCard from '../../Components/UserCard/UserCard';
 import ChosenUser from '../../Components/ChosenUser/ChosenUser';
 import Loader from '../../Components/Loader/Loader';
+import { getClipRequestInfo, getClipRequestsListForReview } from '../../Api/ClipPublish';
+import { getSongRequestInfo, getSongRequestsListForReview } from '../../Api/SongPublish';
+import Clip from '../../Components/Clip/Clip';
 
 function AdminPanel() {
-    const [requestsList, setRequestsList] = useState([]);
+    const [songRequestsList, setSongRequestsList] = useState([]);
+    const [clipRequestsList, setClipRequestsList] = useState([]);
     const [currPage, setCurrPage] = useState(0);
     const [isLoaded, setIsLoaded] = useState(false);
     const [search, setSearch] = useState(searchIcon);
@@ -20,7 +24,9 @@ function AdminPanel() {
 
     useEffect(() => {
         if (currPage === 0)
-            getRequestsList();
+            getSongRequestsList();
+        else if (currPage === 1)
+            getClipRequestsList();
         else 
             getUsersList();
     }, [currPage, searchQuery]);
@@ -31,34 +37,46 @@ function AdminPanel() {
         setIsLoaded(false);
     };
 
-    async function getRequestsList() {
+    async function getSongRequestsList() {
         // получение заявок с песнями
-        let list = [];
+        let list = await getSongRequestsListForReview();
         let correctList = [];
-        await axiosAuthorized.get('api/song/upload-request/list/for-review')
-        .then(response => {
-            list = response?.data?.publishRequestShortInfoList;
-        });
 
         for (var el of list) {
             try {
-                let response = await axiosAuthorized.get('/api/song/upload-request/' + el.id);
-                correctList = [...correctList, {
-                    name: response.data.songName,
-                    logo: api + 'api/song/upload-request/' + el.id + '/logo',
-                    genre: response.data.genreList[0],
-                    id: el.id,
-                    status: el.status,
-                    authorName: el.authorName,
-                    publishedId: response.data.publishedSongId
-                }];
+                let info = await getSongRequestInfo(el.id);
+                info.id = el.id;
+                info.status = el?.status;
+                info.authorName = el?.authorName;
+
+                correctList = [...correctList, info];
             }
             catch (err) {
                 console.log(err);
             }
         }
 
-        setRequestsList(correctList);
+        setSongRequestsList(correctList);
+        setIsLoaded(true);
+    };
+
+    async function getClipRequestsList() {
+        // получение заявок с песнями
+        let list = await getClipRequestsListForReview();
+        let correctList = [];
+
+        for (var el of list) {
+            try {
+                let info = await getClipRequestInfo(el.id);
+                console.log(info);
+                correctList = [...correctList, {...info, ...el}];
+            }
+            catch (err) {
+                console.log(err);
+            }
+        }
+        console.log(correctList);
+        setClipRequestsList(correctList);
         setIsLoaded(true);
     };
 
@@ -73,33 +91,52 @@ function AdminPanel() {
         setIsLoaded(true);
     }
 
-    if (isLoaded)
+    // if (isLoaded)
     return (
         <div className='comment-page-wrapper'>
             <div className='featured'>
                 <BackButton/>
                 <div className='search-element'>
-                    <h2 className='sub-h2'>Панель администратора</h2>
+                    <h2 className='sub-h2'>Заявки на модерацию</h2>
                 </div>
 
                 <div className="account-page-menu">
                         <a onClick={() => handleChangePage(0)} 
                             className={currPage === 0 ? 'account-page-menu-item account-page-active' : 'account-page-menu-item'}>
-                            Уведомления
+                            Музыка
                         </a>
                         <a onClick={() => handleChangePage(1)} 
                             className={currPage === 1 ? 'account-page-menu-item account-page-active' : 'account-page-menu-item'}>
+                            Клипы
+                        </a>
+                        <a onClick={() => handleChangePage(2)} 
+                            className={currPage === 2 ? 'account-page-menu-item account-page-active' : 'account-page-menu-item'}>
                             Пользователи
                         </a>
                 </div>
 
                 {currPage === 0 ? (
                     <div className=''>
-                        {requestsList.map(el => <RequestSong info={el} key={el.id}/>)}
+                        {songRequestsList.map(el => <RequestSong info={el} key={el.id}/>)}
+                    </div>
+                ) : (<></>)}
+
+                {currPage === 1 ? (
+                    <div className="artist-clips">
+                        {clipRequestsList?.map((clip,index) => (
+                            <Clip 
+                                key={index} 
+                                clipRequestId={clip.id}
+                                authorId={clip.authorId} 
+                                songId={clip.songId} 
+                                name={clip.title} 
+                                isArtist={true}
+                                status={clip.status}/>
+                        ))}
                     </div>
                 ) : (<></>)}
                 
-                {currPage === 1 ? (
+                {currPage === 2 ? (
                     <div className='admin-users'>
                         <div className='admin-users-list'>
                             <div className="searchbar-container">
@@ -125,19 +162,6 @@ function AdminPanel() {
             </div>
         </div>
     )
-    else {
-        return(
-            <div className='comment-page-wrapper'>
-                <div className='featured'>
-                    <BackButton/>
-                    <div className='search-element'>
-                        <h2 className='sub-h2'>Панель администратора</h2>
-                    </div>
-                    <Loader/>
-                </div>
-            </div>
-        )
-    }
 }
 
 export default AdminPanel

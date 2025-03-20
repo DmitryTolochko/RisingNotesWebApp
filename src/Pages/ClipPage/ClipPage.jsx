@@ -19,7 +19,6 @@ function ClipPage() {
     const [searchParams, setSearchParams] = useSearchParams();
     const videoRef = useRef(null)
     const videoWrapperRef = useRef(null)
-    const navigate = useNavigate()
     const dispatch = useDispatch()
     const [canPlay, setCanPlay] = useState(false)
     const [link, setLink] = useState(null)
@@ -124,17 +123,21 @@ function ClipPage() {
                             canPlay={canPlay}
                             isPlaying={isPlaying}
                             setIsPlaying={setIsPlaying}
+                            clipId={clipId}
                         />
-                        <h2 className="clip-page-song-name">{shortenText(title, 30)}</h2>
-                        {author ?                 
-                            <Link to={`/artist/${authorId}`} className="clip-page-author-wrapper">
-                                <img src={artistAvatar} alt="" className="clip-page-author-avatar" />
-                                <span className="clip-page-author-name">{shortenText(author, 25)}</span>
-                            </Link> 
-                                :
-                                <></>
-                            // <Skeleton baseColor='#0F141D' highlightColor="#2C323D"  height={200}/>
-                        }
+                        <span id={'clip-page-names'}>
+                            <h2 className="clip-page-song-name">{shortenText(title, 30)}</h2>
+                            {author ?                 
+                                <Link to={`/artist/${authorId}`} className="clip-page-author-wrapper">
+                                    <img src={artistAvatar} alt="" className="clip-page-author-avatar" />
+                                    <span className="clip-page-author-name">{shortenText(author, 25)}</span>
+                                </Link> 
+                                    :
+                                    <></>
+                                // <Skeleton baseColor='#0F141D' highlightColor="#2C323D"  height={200}/>
+                            }
+                        </span>
+                        
                     </div>
                 </div>
                 </div>

@@ -7,7 +7,7 @@ import Contact from './Contact';
 import { updateChatInfo, updateIsChatSettingsVisible, updateIsCreatingNewChat, updateRecentFilteredChats } from '../../Redux/slices/socketInfoSlice';
 import { ChatTypes } from '../../Pages/Messenger/Messenger';
 import { useCookies } from 'react-cookie';
-import { getUnreadCount } from '../../Pages/Messenger/ApiCallers';
+import { getUnreadCount } from '../../Api/Messenger';
 
 const Contacts = ({
     setChat

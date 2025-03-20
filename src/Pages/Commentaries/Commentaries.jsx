@@ -27,6 +27,8 @@ import { updateFeaturedValue } from '../../Redux/slices/featuredSlice';
 import PlaylistModalMenu from '../../Components/PlaylistModalMenu/PlaylistModalMenu';
 import useSearchClean from '../../Hooks/useSearchClean/useSearchClean';
 import { shortenText } from '../../Tools/Tools';
+import { deleteSongComment, getSongComments, sendSongComment } from '../../Api/SongComment';
+import { addSongToFavorite, deleteSongFromFavorite, getSongInfo, getSongLogo } from '../../Api/Song';
 
 const Commentaries = ({clip}) => {
     const params = useParams();
@@ -82,29 +84,14 @@ const Commentaries = ({clip}) => {
                 });
         }
         else{
-            await axiosUnauthorized.get(`api/song/${params.id}/comment/list`)
-                .then(response => {
-                    let arr = response.data.commentList;
-                    arr.reverse();
-                    setComments(arr);
-                })
-                .catch(err=>{
-                    console.log(err);
-                });
+            setComments(await getSongComments(params.id));
             
-            await axiosUnauthorized.get(`api/song/${params.id}`)
-                .then(response => {
-                    setSongName(response.data.name);
-                    setGenres(response.data.genreList);
-                    setSongAuthor(response.data.authorName);
-                    setText(response.data?.lyrics !== 'undefined' && response.data.lyrics ? response.data.lyrics : 'Мы не знаем текст этой песни :(');
-                    authorId = response.data.authorId;
-                    setAuthorId(authorId);
-                })
-                .catch(err => {
-                    console.log(err);
-                    throw err;
-                });
+            let songInfo = await getSongInfo(params.id);
+            setSongName(songInfo.name);
+            setGenres(songInfo.genreList);
+            setSongAuthor(songInfo.authorName);
+            setText(songInfo?.lyrics !== 'undefined' && songInfo.lyrics ? songInfo.lyrics : 'Мы не знаем текст этой песни :(');
+            setAuthorId(songInfo.authorId);
 
             await axiosPictures.get('api/author/' + authorId + '/logo/link')
                 .then(response => {
@@ -122,45 +109,32 @@ const Commentaries = ({clip}) => {
                     setClipId(undefined);
                 })
 
-            setSongLogo(await axiosPictures.get(api + `api/song/${params.id}/logo/link`)
-            .then(resp => {return resp?.data?.presignedLink})
-            .catch(err => {return placeholder}));
+            setSongLogo(await getSongLogo(params.id));
         }
     }
 
-    const handleSendComment = () => {
+    const handleSendComment = async () => {
         // отправить комментарий
         
         if(clip){
             if (comment !== '') {
-                axiosAuthorized.post(`/api/music-clip/${clipId}/comment`, {text: comment})
-                .then(response => {
-                    setIsDataUpdated(!isDataUpdated);
-                    setComment('');
-                })
+                await axiosAuthorized.post(`/api/music-clip/${clipId}/comment`, {text: comment})
                 .catch(err => {
                     console.log(err);
                 })
             }
-            else {
+            else
                 return Promise.reject(Error);
-            }
         }
         else{
-            if (comment !== '') {
-                axiosAuthorized.post(`api/song/${params.id}/comment`, {text: comment})
-                .then(response => {
-                    setIsDataUpdated(!isDataUpdated);
-                    setComment('');
-                })
-                .catch(err => {
-                    console.log(err);
-                })
-            }
-            else {
+            if (comment !== '')
+                await sendSongComment(params.id, comment);
+            else
                 return Promise.reject(Error);
-            }
         }
+
+        setIsDataUpdated(!isDataUpdated);
+        setComment('');
     };
 
     const handleChangePage = (id) => {
@@ -186,14 +160,12 @@ const Commentaries = ({clip}) => {
     async function handleToFavorite() {
         // добавление и удаление из избранных
         if (featured.includes(params.id)) {
-            await axiosAuthorized.delete(api + `api/song/favorite/${params.id}`).then(resp => {
-                dispatch(updateFeaturedValue(featured.filter(el => el != params.id)))
-            });
+            await deleteSongFromFavorite(params.id);
+            dispatch(updateFeaturedValue(featured.filter(el => el != params.id)));
         }
         else {
-            await axiosAuthorized.patch(api + `api/song/favorite/${params.id}`).then(resp => {
-                dispatch(updateFeaturedValue([...featured, params.id]))
-            });
+            await addSongToFavorite(params.id);
+            dispatch(updateFeaturedValue([...featured, params.id]));
         }
     };
 
@@ -209,7 +181,7 @@ const Commentaries = ({clip}) => {
                     <BackButton/>
                     <div className='comm-head'>
                         <div className='comm-img-hover'>
-                            <a onClick={handleToFavorite}><img draggable='false' src={featured.includes(currentSong) ? redHeart : heartIcon}/></a>
+                            <a onClick={handleToFavorite}><img draggable='false' src={featured.includes(params.id) ? redHeart : heartIcon}/></a>
                             <a onClick={handlePlaySong}><img src={playButtonIcon} draggable='false'/></a>
                             <a onClick={changeModalState}><img src={listIcon} draggable='false'/></a>
                             {!modalIsHidden ? (<PlaylistModalMenu songAuthor={songAuthor} songName={songName} id={params.id}/>) : (<></>)}

@@ -1,21 +1,21 @@
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useCallback, useEffect, useState } from 'react';
 import placeholder from '../Images/image-placeholder/user_logo_small_placeholder.png';
 import { useCookies, withCookies } from 'react-cookie';
 import trashIcon from '../Images/commentaries/trash-icon.svg';
 import trashRedIcon from '../Images/commentaries/trash-red-icon.svg';
 import xIcon from '../Images/commentaries/x-icon.svg';
 
-import { ResizeContext, api, axiosPictures, axiosUnauthorized } from './App/App';
-import { axiosAuthorized } from './App/App';
 import { useSelector } from 'react-redux';
 import { shortenText } from '../Tools/Tools';
+import { deleteSongComment, sendSongComment } from '../Api/SongComment';
+import { deleteClipComment, sendClipComment } from '../Api/ClipComment';
+import { getUserLogo } from '../Api/User';
 
 const Comment = (props) => {
     const [isDeleted, setIsDeleted] = useState(false);
     const [comment, setComment] = useState(props.data.text);
     const [cookies, setCookies] = useCookies(['userId']);
-    const clipId = props.clipId
+    const clipId = props.clipId;
 
     const resize = useSelector((state)=> state.resize.value)
     const [avatar, setAvatar] = useState(placeholder);
@@ -24,48 +24,27 @@ const Comment = (props) => {
         getAavatar();
     }, []);
 
-    const handleDeleteComment = () => {
+    const handleDeleteComment = async () => {
         if(clipId)
-            axiosAuthorized.delete(`api/music-clip/comment/${props.data.id}`);
+            await deleteClipComment(props.data.id);
         else
-            axiosAuthorized.delete(`api/song/comment/${props.data.id}`);
+            await deleteSongComment(props.data.id);
 
         setIsDeleted(true);
     }
 
-    const handleSendComment = () => {
-        if(clipId){
-            axiosAuthorized.post(`api/music-clip/${clipId}/comment`, {text: comment})
-                .then(response => {
-                    setIsDeleted(false);
-                    props.setIsDataUpdated(!props.isDataUpdated);
-                })
-                .catch(err => {
-                    console.log(err);
-                    throw err;
-                })
-        }
-        else{
-            axiosAuthorized.post(`api/song/${props.songId}/comment`, {text: comment})
-                .then(response => {
-                    setIsDeleted(false);
-                    props.setIsDataUpdated(!props.isDataUpdated);
-                })
-                .catch(err => {
-                    console.log(err);
-                    throw err;
-                })
-        }
+    const handleSendComment = async () => {
+        if(clipId)
+            await sendClipComment(clipId, comment);
+        else
+            await sendSongComment(props.songId, comment);
+
+        setIsDeleted(false);
+        props.setIsDataUpdated(!props.isDataUpdated);
     }
 
-    const getAavatar = useCallback(() => {
-        axiosPictures.get(api + 'api/user/' + props.data.authorId + '/logo/link')
-        .then(response => {
-            setAvatar(response?.data?.presignedLink);
-        })
-        .catch(err => {
-            setAvatar(placeholder);
-        })
+    const getAavatar = useCallback(async () => {
+        setAvatar(await getUserLogo(props.data.authorId));
     }, [])
 
     return (

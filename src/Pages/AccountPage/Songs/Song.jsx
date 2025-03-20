@@ -26,6 +26,7 @@ const statusColor = {
 }
 
 export default function Song (props) {
+    // TODO: дубль RequestSong
     const [songName, setSongName] = useState('');
     const [duration, setDuration] = useState(0);
     const [songId, setSongId] = useState(undefined); 

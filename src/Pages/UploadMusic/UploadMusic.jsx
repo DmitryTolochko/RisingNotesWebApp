@@ -4,7 +4,6 @@ import PlaylistInstallSkin from '../../Images/main-placeholder.png';
 import CustomInputWithTags from '../../Components/CustomInput/CustomInputWithTags';
 import { useState, useEffect, useRef } from 'react'
 import CustomSwitch from './CustomSwitch';
-import { api, axiosAuthorized, axiosUnauthorized } from '../../Components/App/App';
 import { useCookies } from 'react-cookie';
 import { useNavigate, useParams } from 'react-router-dom';
 import bigEdit from '../../Images/account-page/edit-big.svg';
@@ -19,10 +18,12 @@ import './UploadMusic.css';
 import CustomButton from '../../Components/CustomButton/CustomButton';
 import CustomInput from '../../Components/CustomInput/CustomInput';
 import { useDispatch, useSelector } from 'react-redux';
-import { showError, showErrorWithTimeout, updateErrorMessageValue } from '../../Redux/slices/errorMessageSlice';
+import { showError } from '../../Redux/slices/errorMessageSlice';
+import { changeSongRequestStatus, createNewSongRequest, deleteSongRequest, getSongRequestInfo } from '../../Api/SongPublish';
+import { getGenres, getLanguages, getMoods } from '../../Api/CommonData';
 
 function UploadMusic(){
-    const navigate = useNavigate()
+    const navigate = useNavigate();
     const params = useParams();
     const imageSetterRef = useRef(null);
     const songSetterRef = useRef(null);
@@ -56,8 +57,6 @@ function UploadMusic(){
     const dispatch = useDispatch();
     const resize = useSelector((state)=> state.resize.value);
 
-    const formData = new FormData();
-
     useEffect(() => {
         if (!isSent)
             setIsButtonDisabled(checkInputs());
@@ -85,52 +84,10 @@ function UploadMusic(){
 
         setIsButtonDisabled(true);
         setIsSent(true);
-
-        let id = undefined;
-        formData.append('Name', name);
-        formData.append('Lyrics', lyrics);
-        formData.append('Instrumental', isLyricsExist);
-        formData.append('DurationMsec', duration);
-
-        vibe.forEach((item, index) => {
-            formData.append(`VibeList[${index}]`, item);
-        });
-
-        if (isLyricsExist)
-        language.forEach((item, index) => {
-            formData.append(`LanguageList[${index}]`, item);
-        });
-        
-        genre.forEach((item, index) => {
-            formData.append(`GenreList[${index}]`, item);
-        });
-        formData.append('VocalGenderList', gender);
-
-        if (!(role === "authoredit" && typeof songfile === 'string')) {
-            formData.append('SongFile.File', songfile);
-        }
-
-        formData.append('LogoFile.File', logofile);
-
         if (role === 'author') {
             // новая песня
-            await axiosAuthorized.post(`/api/song/upload-request`, formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                }
-            })
-            .then(response => id = response.data.id)
-            .catch(err => {return Promise.reject(err)});
-        }
-        else if (role === 'authoredit') {
-            // редактирование песни
-            await axiosAuthorized.patch(`/api/song/upload-request/${params.id}/author`, formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                }
-            })
-            .then(response => {navigate('/account')})
-            .catch(err => {return Promise.reject(err)});
+            await createNewSongRequest(name, lyrics, isLyricsExist, 
+                duration, vibe, genre, role, songfile, logofile, gender, language);
         }
     }
 
@@ -208,81 +165,33 @@ function UploadMusic(){
         if (params?.id)
             await getInfo();
 
-        await getGenreList();
-        await getLanguageList();
-        await getVibeList();
+        setGenreList(await getGenres());
+        setLanguageList(await getLanguages());
+        setVibeList(await getMoods());
         setIsLoaded(true);
     }
 
-    const acceptSong = () => {
+    const acceptSong = async () => {
         // Одобрение заявки
-        axiosAuthorized.patch(`/api/song/upload-request/${params.id}/admin`, {
-            status: 3, 
-            comment: comment
-        })
-        .then( response => {navigate(-1)})
-        .catch(err => console.log(err));
-        
+        await changeSongRequestStatus(3, comment, params.id);
+        navigate(-1);        
     }
 
-    const declineSong = () => {
+    const declineSong = async () => {
         // Отклонение заявки
-        axiosAuthorized.patch(`/api/song/upload-request/${params.id}/admin`, {
-            status: 4, 
-            comment: comment
-        })
-        .then( response => {navigate(-1)})
-        .catch(err => console.log(err));
+        await changeSongRequestStatus(4, comment, params.id);
+        navigate(-1);
     }
 
-    const deleteSong = () => {
+    const deleteSong = async () => {
         // Удаление песни
         if (role === 'admin' ) {
-            axiosAuthorized.patch(`/api/song/upload-request/${params.id}/admin`, {
-                status: 5, 
-                comment: comment
-            })
-            .then( response => {navigate(-1)})
-            .catch(err => console.log(err));
+            await changeSongRequestStatus(5, comment, params.id);
         }
         else if (role === 'authoredit') {
-            axiosAuthorized.delete(`api/song/upload-request/` + params.id)
-            .then( response => {navigate(-1)})
-            .catch(err => console.log(err));
+            await deleteSongRequest(params.id);
         }
-    }
-
-    async function getGenreList() {
-        // Получение списка жанров
-        try {
-            let response = await axiosUnauthorized.get('api/common-data/genre/list');
-            setGenreList(response.data.genreList);
-        }
-        catch (err) {
-            setGenreList([]);
-        }
-    }
-
-    async function getLanguageList() {
-        // Получение списка языков
-        try {
-            let response = await axiosUnauthorized.get('api/common-data/language/list');
-            setLanguageList(response.data.languageList);
-        }
-        catch (err) {
-            setLanguageList([]);
-        }
-    }
-
-    async function getVibeList() {
-        // Получение списка настроений
-        try {
-            let response = await axiosUnauthorized.get('api/common-data/vibe/list');
-            setVibeList(response.data.vibeList);
-        }
-        catch (err) {
-            setVibeList([]);
-        }
+        navigate(-1);
     }
 
     function redirect() {
@@ -299,26 +208,24 @@ function UploadMusic(){
 
     async function getInfo() {
         // Подгрузка информации о заявке
-        await axiosAuthorized.get(`/api/song/upload-request/${params.id}`).then(response => {
-            setName(response?.data?.songName);
-            setLyrics(response?.data.lyrics);
-            setIsLyricsExist(response?.data.instrumental);
-            setGender(response?.data.vocalGenderList[0]);
-            setGenre(response?.data.genreList);
-            setVibe(response?.data.vibeList);
-            setLanguage(response?.data.languageList);
-            setSongFileName(response?.data?.songName);
-            setCurrentImage(response?.data?.logoFileLink);
-            setSongfile(response?.data?.songFileLink);
-            setDuration(response?.data?.durationMs);
-            
-            if (cookies?.role !== 'admin'){
-                setRole('authoredit');
-                setTitle('Редактирование трека');
-            }
-            setComment(response?.data?.reviewerComment);
-        })
-        .catch(err => {console.log(err)});
+        let songRequestInfo = await getSongRequestInfo(params.id);
+        setName(songRequestInfo.songName);
+        setLyrics(songRequestInfo.lyrics);
+        setIsLyricsExist(songRequestInfo.instrumental);
+        setGender(songRequestInfo.vocalGenderList[0]);
+        setGenre(songRequestInfo.genreList);
+        setVibe(songRequestInfo.vibeList);
+        setLanguage(songRequestInfo.languageList);
+        setSongFileName(songRequestInfo.songName);
+        setCurrentImage(songRequestInfo.logoFileLink);
+        setSongfile(songRequestInfo.songFileLink);
+        setDuration(songRequestInfo.durationMs);
+        setComment(songRequestInfo.reviewerComment);
+        
+        if (cookies?.role !== 'admin'){
+            setRole('authoredit');
+            setTitle('Редактирование трека');
+        }
     }
 
     const { getRootProps: getInputFile } = useDropzone({
@@ -481,7 +388,6 @@ function UploadMusic(){
                         <div className='button-and-text'>
                             <CustomButton text={'Одобрить'} func={acceptSong} success={'Одобрено'} icon={uploadImg}/>
                             <button className='save-installmusic' onClick={declineSong}><img src={closeImg}/>Отклонить</button>
-                            {/* <button className='save-installmusic' onClick={deleteSong}><img src={trashImg}/>Удалить</button> */}
                         </div>
                         <h2 className='column1-h2'>Комментарий</h2>
                         <input id='myinput' value={comment} onChange={event => setComment(event.target.value)} className='inp-column1' placeholder={'Введите комментарий...'}/>
@@ -489,19 +395,20 @@ function UploadMusic(){
 
                     {role === 'authoredit' ? <div>
                         <div className='button-and-text'>
-                            {/* <CustomButton text={'Сохранить*'} func={uploadToModeration} success={'Сохранено'} icon={uploadImg}/> */}
                             <button className='save-installmusic' onClick={deleteSong}><img src={trashImg}/>Удалить</button>
                         </div>
-                        <h2 className='column1-h2'>Комментарий модератора</h2>
                             {role === 'admin' ? (
+                            <>
+                                <h2 className='column1-h2'>Комментарий модератора</h2>
                                 <input id='myinput' value={comment} onChange={event => setComment(event.target.value)} className='inp-column1' placeholder={'Введите комментарий...'}/>
+                            </>  
                             ) : (<></>)}
 
                             {role !== 'admin' && comment !== '' ? (
-                                <>
-                                    <p className='inp-column1' style={{padding: '10px 16px'}}>{comment}</p>
-                                    {/* <text className='warning-upload'>*перед публикацией трек будет отправлен на модерацию</text> */}
-                                </>
+                            <>
+                                <h2 className='column1-h2'>Комментарий модератора</h2>
+                                <p className='inp-column1' style={{padding: '10px 16px'}}>{comment}</p>
+                            </>
                             ) : (<></>)}
                     </div> : ''}
 

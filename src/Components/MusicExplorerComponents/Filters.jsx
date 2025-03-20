@@ -2,7 +2,7 @@ import { ReactComponent as FilterIcon } from '../../Images/player/FilterBtn.svg'
 import closeIcon from '../../Images/music-explorer/close.svg';
 import './Filters.css';
 import { useEffect, useState } from 'react';
-import { getGenres, getLanguages, getMoods } from '../Player/FilterComponent/APICallers/FiltersGetter';
+import { getGenres, getLanguages, getMoods } from '../../Api/CommonData';
 import CustomButton from '../CustomButton/CustomButton';
 import FilterElement from './FilterElement';
 import { useDispatch, useSelector } from 'react-redux';

@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { axiosAuthorized } from "../../../Components/App/App";
 import { Link } from "react-router-dom";
 import Song from "./Song";
 import plus from '../../../Images/account-page/plus-icon.svg';
 import Loader from "../../../Components/Loader/Loader";
+import { getSongRequestsList } from "../../../Api/SongPublish";
 
 export default function Songs(props) {
     const [uploads, setUploads] = useState([]);
@@ -11,15 +11,12 @@ export default function Songs(props) {
 
     useEffect(() => {
         // получение списка заявок
-        axiosAuthorized.get(`api/song/upload-request/list`)
-        .then(response => {
-            setUploads(response?.data.publishRequestShortInfoList);
-            setIsLoaded(true);
-        });
-
+        getSongRequestsList()
+        .then(requests => setUploads(requests));
+        setUploads();
     }, []);
 
-    if (isLoaded)
+    if (uploads !== undefined)
     return (
         <div className="account-page-user">
             <h2>Все треки</h2>

@@ -12,6 +12,7 @@ import sendIcon from '../../Images/controller/sendIcon.svg';
 import CustomButton from '../CustomButton/CustomButton';
 import { useSearchParams } from 'react-router-dom';
 import { shortenText } from '../../Tools/Tools';
+import { addSongToFavorite, deleteSongFromFavorite } from '../../Api/Song';
 
 function VertVideoPlayer() {
     const videoRef = useRef();
@@ -82,14 +83,12 @@ function VertVideoPlayer() {
     async function handleToFavorite(id) {
         // добавление и удаление из избранных
         if (featured.includes(id)) {
-            await axiosAuthorized.delete(api + `api/song/favorite/${id}`).then(resp => {
-                dispatch(updateFeaturedValue(featured.filter(el => el != id)))
-            });
+            await deleteSongFromFavorite(id);
+            dispatch(updateFeaturedValue(featured.filter(el => el != id)));
         }
         else {
-            await axiosAuthorized.patch(api + `api/song/favorite/${id}`).then(resp => {
-                dispatch(updateFeaturedValue([...featured, id]))
-            });
+            await addSongToFavorite(id);
+            dispatch(updateFeaturedValue([...featured, id]));
         }
     };
 

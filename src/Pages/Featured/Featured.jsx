@@ -1,27 +1,18 @@
 import React, { useEffect, useState} from 'react';
 import { useNavigate } from 'react-router-dom';
-
-
-import { api, axiosUnauthorized} from '../../Components/App/App';
 import { useCookies } from 'react-cookie';
-
 import Playlists from './Playlists';
 import Subscriptions from './Subscriptions';
 import Tracks from './Tracks';
-
 import heartIcon from '../../Images/featured/Heart_01.svg'
 import copyIcon from '../../Images/featured/Copy.svg'
 import tracksIcon from '../../Images/featured/Vector.svg'
 import subsIcon from '../../Images/featured/Subs.svg'
-
-
 import { useSelector, useDispatch } from 'react-redux'
-
-
 import Loader from '../../Components/Loader/Loader';
 import BackButton from '../../Components/BackButton';
-
 import './Featured.css';
+import { getSongInfo } from '../../Api/Song';
 
 export default function Featured() {
     const navigate = useNavigate();
@@ -50,11 +41,7 @@ export default function Featured() {
     async function getSongs() {
         let array = [];
         for (var id of featured) {
-            await axiosUnauthorized.get(api + `api/song/${id}`)
-            .then(response => {
-                array.push(response.data);
-            })
-            .catch(err => {console.log(err)});
+            array.push(await getSongInfo(id, undefined));
         }
         setSongs(array);
         setIsLoaded(true);

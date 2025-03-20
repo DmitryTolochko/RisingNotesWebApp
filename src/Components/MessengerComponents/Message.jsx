@@ -67,7 +67,7 @@ const Message = ({senderId, text, sentAt, readAt, messageId, attachments=[]}) =>
                         ) : (<></>)}
 
                         {songs?.length !== 0 ? (
-                            <div className="tracks">
+                            <div className="tracks" style={{margin: 0}}>
                                 {songs.map((el, index) => (
                                     <Song
                                         id={el.id} key={index}
@@ -105,8 +105,8 @@ const Message = ({senderId, text, sentAt, readAt, messageId, attachments=[]}) =>
                         ) : (<></>)}
 
                         {songs?.length !== 0 ? (
-                            <div className="tracks">
-                                {songs.map((index, el) => (
+                            <div className="tracks" style={{margin: 0}}>
+                                {songs.map((el, index) => (
                                     <Song
                                         id={el.id} key={index}
                                         name={el.name}

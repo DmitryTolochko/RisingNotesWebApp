@@ -3,7 +3,6 @@ import {Link, useLocation} from "react-router-dom";
 
 import heart from '../../Images/controller/heart.svg';
 import redHeart from '../../Images/red-heart.svg';
-import message from '../../Images/controller/Chat_Dots.png';
 import play from '../../Images/play.svg';
 import pause from '../../Images/Pause.svg';
 import rewind_forwrad from '../../Images/controller/rewind.svg';
@@ -28,10 +27,10 @@ import { updateCurrentSongValue } from '../../Redux/slices/currentSongSlice';
 import { updateSongsValue } from '../../Redux/slices/songsSlice';
 import { updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlice';
 import PlaylistModalMenu from '../PlaylistModalMenu/PlaylistModalMenu';
-import filtersToggle from '../../Hooks/filtersToggle';
 import { updatePlayerQueueVisibility } from '../../Redux/slices/playerQueueSlice';
-import usePrevious from '../../Hooks/usePrevious/usePrevious';
 import { shortenText } from '../../Tools/Tools';
+import { addSongAudition, addSongToExcluded, addSongToFavorite, deleteSongFromExcluded, deleteSongFromFavorite, getSongFile, getSongInfo, getSongLogo } from '../../Api/Song';
+import { getAuthorInfo } from '../../Api/Author';
 
 const MusicPlayer = () => {
     const [playerQueueButtonColor, setPlayerQueueButtonColor] = useState('#FFFFFF');
@@ -97,19 +96,19 @@ const MusicPlayer = () => {
             getSongLink();
             getCoverLink();
             stopAuditionTimer();
-            axiosUnauthorized.get(`api/song/${currentSong}`)
-            .then(response => {
-                setSongName(response.data.name);
-                setAuthorId(response.data.authorId);
-                axiosUnauthorized.get(`api/author/${response.data.authorId}`)
-                    .then(resp => {
-                        setSongAuthor(resp.data.name);
-                    })
-                    .catch(err => {
-                        console.log(err);
-                        dispatch(updateSongsValue(songs.filter(e => e !== currentSong)))
-                        dispatch(updateCurrentSongValue(''))
-                    })
+            getSongInfo(currentSong, undefined)
+            .then(songInfo => {
+                setSongName(songInfo.name);
+                setAuthorId(songInfo.authorId);
+                getAuthorInfo(songInfo.authorId)
+                .then(info => {
+                    setSongAuthor(info.name);
+                })
+                .catch(err => {
+                    console.log(err);
+                    dispatch(updateSongsValue(songs.filter(e => e !== currentSong)))
+                    dispatch(updateCurrentSongValue(''))
+                });                    
             })
             .catch(err => {
                 console.log(err);
@@ -188,7 +187,7 @@ const MusicPlayer = () => {
     }
 
     async function appendAudition() {
-        await axiosUnauthorized.patch('api/song/' + currentSong + '/audition/count');
+        await addSongAudition(currentSong);
         setIsAuditionAppended(true);
     }
 
@@ -199,17 +198,12 @@ const MusicPlayer = () => {
 
     async function getSongLink() {
         // получить прямую ссылку на файл песни 
-        await axiosUnauthorized.get(`api/song/${currentSong}/file/link`).then(response => {
-            audioRef.current.src = response.data.presignedLink;
-        })
-        .catch(err => {audioRef.current.src = ''});
+        let file = await getSongFile(currentSong);
+        audioRef.current.src = file;
     }
 
     async function getCoverLink() {
-        await axiosUnauthorized.get(`api/song/${currentSong}/logo/link`).then(response => {
-            setCoverLink(response.data.presignedLink);
-        })
-        .catch(err => {setCoverLink(cover)});
+        setCoverLink(await getSongLogo(currentSong));
     }
 
     const handleNextSong = () => {
@@ -309,16 +303,13 @@ const MusicPlayer = () => {
     async function handleToFavorite() {
         // добавление в избранное
         if (currentSong !== '' ) {
-            
             if (featured.includes(currentSong)) {
-                await axiosAuthorized.delete(api + `api/song/favorite/${currentSong}`).then(resp => {
-                    dispatch(updateFeaturedValue(featured.filter(el => el != currentSong)))
-                });
+                await deleteSongFromFavorite(currentSong);
+                dispatch(updateFeaturedValue(featured.filter(el => el != currentSong)));
             }
             else {
-                await axiosAuthorized.patch(api + `api/song/favorite/${currentSong}`).then(resp => {
-                    dispatch(updateFeaturedValue([...featured, currentSong]))
-                });
+                await addSongToFavorite(currentSong);
+                dispatch(updateFeaturedValue([...featured, currentSong]));
             }
         }
     };
@@ -327,14 +318,12 @@ const MusicPlayer = () => {
         // добавление в исключенное
         if (currentSong !== '' ) {
             if (excluded.includes(currentSong)) {
-                await axiosAuthorized.delete(api + `api/excluded-track/${currentSong}`).then(resp => {
-                    dispatch(updateExcludedValue(excluded.filter(el => el != currentSong)))
-                });
+                await deleteSongFromExcluded(currentSong);
+                dispatch(updateExcludedValue(excluded.filter(el => el != currentSong)));
             }
             else {
-                await axiosAuthorized.post(api + `api/excluded-track/${currentSong}`).then(resp => {
-                    dispatch(updateExcludedValue([...excluded, currentSong]))
-                });
+                await addSongToExcluded(currentSong);
+                dispatch(updateExcludedValue([...excluded, currentSong]));
             }
         }
     };

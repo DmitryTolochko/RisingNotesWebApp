@@ -3,14 +3,16 @@ import { useEffect, useState } from "react"
 import { useCookies, withCookies } from 'react-cookie';
 import { api, axiosAuthorized, axiosPictures, axiosUnauthorized } from '../../Components/App/App';
 import errorImg from '../../Images/error.svg';
+import { getSongInfo } from '../../Api/Song';
 
 function InputSongs({ 
     setSong, 
     isClipFree=true, 
     heading, 
     alertMessage='Поле обязательно для заполнения',
-    isRequired=false}){
-
+    isRequired=false,
+    defaultSong=undefined
+}){
     const [songs, setSongs] = useState([]);
     const [choosen, setChoosenSong] = useState(undefined);
     const [cookies, setCookies] = useCookies(['authorId']);
@@ -54,7 +56,7 @@ function InputSongs({
     // Вызов функции при монтировании компонента
     useEffect(() => {
       fetchSongs();
-    }, []);
+    }, [defaultSong]);
 
     function isValidValue() {
         if (!isRequired) {
@@ -77,10 +79,17 @@ function InputSongs({
                 
             </span>
             <select className='choose-track-for-video' onChange={event => handleChangeSong(event.target.value)}>
-                <option value={''}>Не выбрано</option>
-                {songs.map(song => (
-                    <option key={song.id} value={song.id}>{song.name}</option>
-                ))}
+                {defaultSong ? (
+                    <option value={''}>{defaultSong}</option>
+                ) : (
+                    <>
+                    <option value={''}>Не выбрано</option>
+                    {songs.map(song => (
+                        <option key={song.id} value={song.id}>{song.name}</option>
+                    ))}
+                    </>
+                )}
+                
             </select>  
         </div>
     )

@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { axiosUnauthorized } from "../../App/App";
 import Song from "../../Song/Song";
 import '../TopTracks/TopTracks.css';
 import { useDispatch } from "react-redux";
 import { updateSongsValue } from "../../../Redux/slices/songsSlice";
 import { updateMusicIsPlayingValue } from "../../../Redux/slices/musicIsPlayingSlice";
 import { updatePlayerQueueName } from "../../../Redux/slices/playerQueueSlice";
+import { getAuthorSongs } from "../../../Api/Author";
 
 function Songs({artist, count=0, offset=0}) {
     const params = useParams();
@@ -14,17 +14,11 @@ function Songs({artist, count=0, offset=0}) {
     const dispatch = useDispatch();
 
     useEffect(() =>{
-        getSongs()
-            .then(res => setSongs(res))
+        getSongs();
     }, [params]);
 
     async function getSongs() {
-        let response = await axiosUnauthorized.get(`api/author/${params.id}/song/list`  + (count == 0 ? '' : `?count=${count}&offset=${offset}`))
-        .catch(err => {
-            throw err;
-        })
-        let result = response?.data.songInfoList;
-        return result;
+        setSongs(await getAuthorSongs(params.id, count, offset));
     }
 
     function updatePlayableList (startId) {
@@ -37,19 +31,17 @@ function Songs({artist, count=0, offset=0}) {
     }
 
     return (
-        <div className="top-tracks-container">
-            <div className="tracks">
-                {songs?.map(el => (
-                    <Song 
-                    key={el.id} 
-                    id={el.id} 
-                    name={el.name} 
-                    duration={el.durationMs} 
-                    artist={artist.artistName} 
-                    genres={el.genreList}
-                    onClick={updatePlayableList}/>
-                ))}
-            </div>
+        <div className="tracks">
+            {songs?.map(el => (
+                <Song 
+                key={el.id} 
+                id={el.id} 
+                name={el.name} 
+                duration={el.durationMs} 
+                artist={artist.artistName} 
+                genres={el.genreList}
+                onClick={updatePlayableList}/>
+            ))}
         </div>
     )
 }

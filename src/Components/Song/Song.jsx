@@ -10,7 +10,6 @@ import selectedIcon from '../../Images/song/Volume.svg';
 import hoverIcon from '../../Images/song/Play.svg';
 import { ReactComponent as DeleteIcon } from '../../Images/x.svg';
 
-import { api, axiosAuthorized, axiosPictures, axiosUnauthorized } from '../App/App';
 import useSearchClean from '../../Hooks/useSearchClean/useSearchClean';
 
 import { useSelector, useDispatch } from 'react-redux';
@@ -22,6 +21,7 @@ import './Song.css';
 import { updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlice';
 import PlaylistModalMenu from '../PlaylistModalMenu/PlaylistModalMenu';
 import { updatePlayerQueueVisibility } from '../../Redux/slices/playerQueueSlice';
+import { addSongToExcluded, addSongToFavorite, deleteSongFromExcluded, deleteSongFromFavorite, getSongLogo } from '../../Api/Song';
 
 function Song({
     id, 
@@ -77,28 +77,24 @@ function Song({
     async function handleToFavorite() {
         // добавление и удаление из избранных
         if (featured.includes(id)) {
-            await axiosAuthorized.delete(api + `api/song/favorite/${id}`).then(resp => {
-                dispatch(updateFeaturedValue(featured.filter(el => el != id)))
-            });
+            await deleteSongFromFavorite(id);
+            dispatch(updateFeaturedValue(featured.filter(el => el != id)));
         }
         else {
-            await axiosAuthorized.patch(api + `api/song/favorite/${id}`).then(resp => {
-                dispatch(updateFeaturedValue([...featured, id]))
-            });
+            await addSongToFavorite(id);
+            dispatch(updateFeaturedValue([...featured, id]));
         }
     };
 
     async function handleToExcluded() {
         // добавление и удаление из исключенных
         if (excluded.includes(id)) {
-            await axiosAuthorized.delete(api + `api/excluded-track/${id}`).then(resp => {
-                dispatch(updateExcludedValue(excluded.filter(el => el != id)))
-            });
+            await deleteSongFromExcluded(id);
+            dispatch(updateExcludedValue(excluded.filter(el => el != id)));
         }
         else {
-            await axiosAuthorized.post(api + `api/excluded-track/${id}`).then(resp => {
-                dispatch(updateExcludedValue([...excluded, id]))
-            });
+            await addSongToExcluded(id);
+            dispatch(updateExcludedValue([...excluded, id]));
         }
     };
 
@@ -114,9 +110,7 @@ function Song({
     };
 
     async function getAvatar() {
-        await axiosPictures.get(api + `api/song/${id}/logo/link`)
-        .then(resp => {setAvatar(resp?.data?.presignedLink)})
-        .catch(err => {setAvatar(placeholder)});
+        setAvatar(await getSongLogo(id));
     };
 
     function hideAllModals() {

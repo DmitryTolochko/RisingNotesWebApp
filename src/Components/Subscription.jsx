@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom';
 import defaultAvatar from '../Images/main-placeholder.png';
 import { useEffect, useState } from 'react';
-import { api, axiosPictures, axiosUnauthorized } from './App/App';
 import { shortenText } from '../Tools/Tools';
+import { getAuthorInfo } from '../Api/Author';
+import { getUserLogo } from '../Api/User';
 
 function Subscription (props) {
     const [name, setName] = useState('');
@@ -10,19 +11,16 @@ function Subscription (props) {
     const [avatar, setAvatar] = useState(defaultAvatar);
 
     useEffect(() => {
-        axiosUnauthorized.get(api + `api/author/${props.authorId}`)
-        .then(response => {
-            setName(response.data.name);
-            setUserId(response.data.userId);
-            getAvatar(response.data.userId);
-        })
-        .catch(err =>{console.log(err)});
+        getAuthorInfo(props.authorId)
+        .then(info => {
+            setName(info.name);
+            setUserId(info.userId);
+            getAvatar(info.userId);
+        });
     }, []);
 
     async function getAvatar(id) {
-        await axiosPictures.get(api + `api/user/${id}/logo/link`)
-        .then(resp => {setAvatar(resp?.data?.presignedLink)})
-        .catch(err => {setAvatar(defaultAvatar)});
+        setAvatar(await getUserLogo(id));
     }
 
     return (

@@ -299,6 +299,7 @@ function App() {
                 <Route path={'/commentaries/:id'} element={<Commentaries/>}/>
                 <Route path={'/playlist/:id'} element={<PlaylistWindow/>}/>
                 <Route path={'/uploadmusic/:id'} element={<UploadMusic/>}/>
+                <Route path={'/uploadvideo/:id'} element={<UploadVideo/>}/>
                 <Route path={'/clipview'} element={<ClipPage/>}/>
                 <Route path={'*'} element={<ErrorPage/>}/>
                 {cookies.role && cookies.role !== 'admin' ? (<>

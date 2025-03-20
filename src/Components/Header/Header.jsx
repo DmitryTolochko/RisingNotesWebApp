@@ -15,7 +15,7 @@ import { ReactComponent as BellImage} from '../../Images/controller/bell.svg';
 import './Header.css';
 import { clearNotification, updateChatInfo } from '../../Redux/slices/socketInfoSlice';
 import { shortenText } from '../../Tools/Tools';
-import { getChatInfo } from '../../Pages/Messenger/ApiCallers';
+import { getChatInfo } from '../../Api/Messenger';
 
 
 function Header() {

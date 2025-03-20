@@ -813,3 +813,19 @@
     width: 48px;
     height: 48px;
 }
+
+.chat-setting-images {
+    padding-top: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 2%;
+    width: 100%;
+}
+
+.chat-setting-images > img {
+    aspect-ratio: 1/1;
+    width: 23.5%;
+    border-radius: 16px;
+    object-fit: cover;
+    cursor: pointer;
+}

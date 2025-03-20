@@ -8,21 +8,23 @@ import Skeleton from 'react-loading-skeleton';
 import SettingsWidget from '../SettingsWidget/SettingsWidget';
 
 import './CustomControls.css'
+import { addClipViews } from '../../../Api/Clip';
 
-function CustomControls({video, wrapper, canPlay, isPlaying, setIsPlaying}) {
-    const [volume, setVolume] = useState(0.5)
-    const [fullscreen, setFullscreen] = useState(false)
-    const [currentVideoTime, setCurrentVideoTime] = useState(0)
-    const [maxVideoTime, setMaxVideoTime] = useState('')
-    const [videoDuration, setVideoDuration] = useState(0)
+function CustomControls({video, wrapper, canPlay, isPlaying, setIsPlaying, clipId}) {
+    const [addedView, setAddedView] = useState(false);
+    const [volume, setVolume] = useState(0.5);
+    const [fullscreen, setFullscreen] = useState(false);
+    const [currentVideoTime, setCurrentVideoTime] = useState(0);
+    const [maxVideoTime, setMaxVideoTime] = useState('');
+    const [videoDuration, setVideoDuration] = useState(0);
     const [videoTimeLabel, setVideoTimeLabel] = useState({
         minutes:0,
         seconds:0
-    })
-    const [settingsEnabled, setSettingsEnabled] = useState(false)
-    const [settingsType, setSettingsType] = useState('default')
-    const [curQuality, setCurQuality] = useState('720')
-    const [curSpeed, setCurSpeed] = useState(1)
+    });
+    const [settingsEnabled, setSettingsEnabled] = useState(false);
+    const [settingsType, setSettingsType] = useState('default');
+    const [curQuality, setCurQuality] = useState('720');
+    const [curSpeed, setCurSpeed] = useState(1);
 
     useEffect(()=>{
         //on video load
@@ -65,6 +67,7 @@ function CustomControls({video, wrapper, canPlay, isPlaying, setIsPlaying}) {
         if(!video || !videoWrapper) return
         
         if(fullscreen){
+            document.getElementById('clip-page-names').style.display = 'none';
             if (videoWrapper.requestFullscreen) 
                 videoWrapper.requestFullscreen();
             else if (videoWrapper.webkitRequestFullscreen)
@@ -73,15 +76,21 @@ function CustomControls({video, wrapper, canPlay, isPlaying, setIsPlaying}) {
                 videoWrapper.msRequestFullScreen()
         }
         else{
+            document.getElementById('clip-page-names').style.display = 'block';
             if (document.fullscreenElement)
                 document.exitFullscreen();
         }
 
     },[fullscreen])
 
-    const onPlayButtonClick = () =>{
+    const onPlayButtonClick = async () =>{
         isPlaying ? video?.pause() : video?.play()
-        setIsPlaying(!isPlaying)
+        setIsPlaying(!isPlaying);
+
+        if (!addedView) {
+            await addClipViews(clipId);
+            setAddedView(true);
+        }
     }
 
     const onVolumeInputChange = (e) =>{

@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateChatInfo, updateCurrentChatMessages, updateNotifications, updateRecentChats, updateRecentFilteredChats } from "../../Redux/slices/socketInfoSlice";
-import { getMessages, getUnreadCount } from "../../Pages/Messenger/ApiCallers";
+import { getMessages, getUnreadCount } from "../../Api/Messenger";
 import { jwtDecode } from "jwt-decode";
 
 export default function SocketConfig() {

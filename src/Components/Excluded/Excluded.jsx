@@ -1,10 +1,9 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import BackButton from '../../Components/BackButton';
 import Song from '../../Components/Song/Song';
-import { axiosUnauthorized } from '../../Components/App/App';
 import { useCookies } from 'react-cookie';
 import { useSelector } from 'react-redux';
+import { getSongInfo } from '../../Api/Song';
 
 function Excluded () {
     const navigate = useNavigate();
@@ -23,11 +22,7 @@ function Excluded () {
     async function getSongs() {
         let array = [];
         for (var id of excluded) {
-            await axiosUnauthorized.get(`api/song/${id}`)
-            .then(response => {
-                array.push(response.data);
-            })
-            .catch(err => {console.log(err)});
+            array.push(await getSongInfo(id, undefined));
         }
         setSongs(array);
     }

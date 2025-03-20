@@ -1,16 +1,16 @@
 import { useState } from 'react'
 import './VerticalClip.css'
 import { useEffect, useRef } from 'react'
-import { api, axiosPictures, axiosUnauthorized } from '../App/App'
+import { api, axiosUnauthorized } from '../App/App'
 import Skeleton from 'react-loading-skeleton'
 import { handleVideoEnter, handleVideoHover, handleVideoLeave, handleVideoMove } from '../Clip/handlers/ClipHandlers';
 import { useDispatch } from 'react-redux'
 import { updateVertVideoInfoValue } from '../../Redux/slices/vertVideoInfoSlice'
-import { updateVertVideoPlayerValue } from '../../Redux/slices/vertVideoPlayerSlice'
 import { updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlice'
-import defaultAvatar from '../../Images/image-placeholder/user_logo_small_placeholder.png';
 import { useSearchParams } from 'react-router-dom'
 import { shortenText } from '../../Tools/Tools'
+import { getSongLogo } from '../../Api/Song'
+import { getAuthorInfo, getAuthorLogo } from '../../Api/Author'
 
 function VerticalClip(props) {
     const [dataFetched, setDataFetched] = useState(false);
@@ -45,28 +45,13 @@ function VerticalClip(props) {
         .catch(err => Promise.reject(err));
         let result = response.data;
 
-        response = await axiosPictures.get(api + 'api/author/' + result.uploaderId + '/logo/link')
-        .catch(err => console.log(err));
+        await getAuthorLogo(result.uploaderId)
+        result.authorAvatar = await getAuthorLogo(result.uploaderId);
+        result.songLogo =  await getSongLogo(result.relatedSongId);
 
-        if (response?.status === 200) {
-            result.authorAvatar = response?.data?.presignedLink;
-        } else {
-            result.authorAvatar = defaultAvatar;
-        }
+        let info = getAuthorInfo(result.uploaderId, undefined);
+        result.authorName = info.name;
 
-        response = await axiosPictures.get(api + 'api/song/' + result.relatedSongId + '/logo/link')
-        .catch(err => console.log(err));
-
-        if (response?.status === 200) {
-            result.songLogo = response?.data?.presignedLink;
-        } else {
-            result.songLogo = defaultAvatar;
-        }
-
-        response = await axiosUnauthorized.get(api + 'api/author/' + result.uploaderId)
-        .catch(err => Promise.reject(err));
-
-        result.authorName = response.data.name;
         return result;
     }
 
@@ -87,9 +72,6 @@ function VerticalClip(props) {
     const handleVertClick = () =>{
         dispatch(updateMusicIsPlayingValue(false));
         setSearchParams({'short_view':clipLink})
-        // dispatch(updateVertVideoPlayerValue(
-        //     api + `api/short-video/${props.id}/file`
-        // ))
         dispatch(updateVertVideoInfoValue(vertData));
     }
 

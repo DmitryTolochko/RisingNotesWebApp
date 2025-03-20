@@ -18,6 +18,7 @@ import { updateVertVideoInfoValue } from '../../Redux/slices/vertVideoInfoSlice'
 import { updateVertVideoPlayerValue } from '../../Redux/slices/vertVideoPlayerSlice';
 import CustomInput from '../../Components/CustomInput/CustomInput';
 import { showError } from '../../Redux/slices/errorMessageSlice';
+import { getSongInfo } from '../../Api/Song';
 
 function InstallVerticalVideo(){
     const vertskinSetterRef = useRef(null);
@@ -58,10 +59,10 @@ function InstallVerticalVideo(){
 
     useEffect(() => {
         if (!(songId === undefined || songId === '')) {
-            axiosUnauthorized.get(`/api/song/${songId}`)
-            .then(response => {
-                setAuthorName(response.data.authorName);
-                setSongName(response.data.name);
+            getSongInfo(songId)
+            .then(songInfo => {
+                setAuthorName(songInfo.authorName);
+                setSongName(songInfo.name);
             });
         }
     }, [songId]);
