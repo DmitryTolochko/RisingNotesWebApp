@@ -1,14 +1,16 @@
 import { axiosAuthorized, axiosUnauthorized } from "../Components/App/App";
 
-export async function getClipRequestsListForReview() {
-    let response = await axiosAuthorized.get('api/clip/upload-request/list/for-review');
+export async function getClipRequestsListForReview(isShortVideo=false) {
+    let routePath = isShortVideo ? 'short-video' : 'clip';
+    let response = await axiosAuthorized.get(`api/${routePath}/upload-request/list/for-review`);
     if (response) {
         return response?.data?.publishRequestShortInfoList;
     }
 }
 
-export async function getClipRequestInfo(id) {
-    let response = await axiosAuthorized.get('api/clip/upload-request/' + id);
+export async function getClipRequestInfo(id, isShortVideo=false) {
+    let routePath = isShortVideo ? 'short-video' : 'clip';
+    let response = await axiosAuthorized.get(`api/${routePath}/upload-request/` + id);
     if (response) {
         return response?.data;
     } else {
@@ -16,8 +18,9 @@ export async function getClipRequestInfo(id) {
     }
 }
 
-export async function getClipRequestsForAuthor() {
-    let response = await axiosAuthorized.get(`api/clip/upload-request/list`);
+export async function getClipRequestsForAuthor(isShortVideo=false) {
+    let routePath = isShortVideo ? 'short-video' : 'clip';
+    let response = await axiosAuthorized.get(`api/${routePath}/upload-request/list`);
     if (response) {
         return response.data?.publishRequestShortInfoList;
     } else {
@@ -25,8 +28,9 @@ export async function getClipRequestsForAuthor() {
     }
 }
 
-export async function getClipRequestPreview(id) {
-    let response = await axiosAuthorized.get('api/clip/upload-request/' + id + '/logo/link');
+export async function getClipRequestPreview(id, isShortVideo=false) {
+    let routePath = isShortVideo ? 'short-video' : 'clip';
+    let response = await axiosAuthorized.get(`api/${routePath}/upload-request/` + id + '/logo/link');
     if (response) {
         return response?.data.presignedLink;
     } else {
@@ -34,25 +38,29 @@ export async function getClipRequestPreview(id) {
     }
 }
 
-export async function getClipRequestFile(id) {
-    let response = await axiosUnauthorized.get('api/clip/upload-request/' + id + '/file/link')
+export async function getClipRequestFile(id, isShortVideo=false) {
+    let routePath = isShortVideo ? 'short-video' : 'clip';
+    let response = await axiosUnauthorized.get(`api/${routePath}/upload-request/` + id + '/file/link')
     .catch(err => Promise.reject(err));
 
     return response?.data?.presignedLink;
 }
 
-export async function deleteClipRequest(id) {
-    await axiosAuthorized.delete('api/clip/upload-request/' + id);
+export async function deleteClipRequest(id, isShortVideo=false) {
+    let routePath = isShortVideo ? 'short-video' : 'clip';
+    await axiosAuthorized.delete(`api/${routePath}/upload-request/` + id);
 }
 
-export async function uploadClipFilePart(filePart, partNumber, isLast, uploadId, clipId) {
+export async function uploadClipFilePart(filePart, partNumber, isLast, uploadId, clipId, isShortVideo=false) {
     // загрузка куска видео
+    let routePath = isShortVideo ? 'short-video' : 'clip';
+
     let formData = new FormData();
     formData.append('File', filePart);
     formData.append('UploadId', uploadId);
     formData.append('PartNumber', partNumber);
     formData.append('IsLastPart', isLast);
-    await axiosAuthorized.post('api/clip/upload-request/' + clipId + '/file/upload-part', formData, {
+    await axiosAuthorized.post(`api/${routePath}/upload-request/` + clipId + '/file/upload-part', formData, {
         headers: {
             "Content-Type": "multipart/form-data",
         }
@@ -60,14 +68,15 @@ export async function uploadClipFilePart(filePart, partNumber, isLast, uploadId,
     .catch(err => {return Promise.reject(err)});
 }
 
-export async function createNewClipRequest(title, description, songId) {
-    let formData = new FormData();
+export async function createNewClipRequest(title, description, songId, isShortVideo=false) {
+    let routePath = isShortVideo ? 'short-video' : 'clip';
 
+    let formData = new FormData();
     formData.append('Name', title);
     formData.append('Description', description);
-    formData.append('SongId', songId);
-
-    let id = await axiosAuthorized.post('api/clip/upload-request', formData, {
+    if (songId)
+        formData.append('SongId', songId);
+    let id = await axiosAuthorized.post(`api/${routePath}/upload-request`, formData, {
         headers: {
             "Content-Type": "multipart/form-data",
         }
@@ -78,13 +87,14 @@ export async function createNewClipRequest(title, description, songId) {
     return id;
 }
 
-export async function uploadClipLogo(imageFile, clipRequestId) {
-    let formData = new FormData();
+export async function uploadClipLogo(imageFile, clipRequestId, isShortVideo=false) {
+    let routePath = isShortVideo ? 'short-video' : 'clip';
 
+    let formData = new FormData();
     formData.append('LogoFile', imageFile);
     formData.append('PublishRequestId', clipRequestId);
 
-    await axiosAuthorized.patch('api/clip/upload-request/logo', formData, {
+    await axiosAuthorized.patch(`api/${routePath}/upload-request/logo`, formData, {
         headers: {
             "Content-Type": "multipart/form-data",
         }
@@ -92,8 +102,10 @@ export async function uploadClipLogo(imageFile, clipRequestId) {
     .catch(err => {return Promise.reject(err)});   
 }
 
-export async function startUploadClip(clipRequestId, fileExtension) {
-    let uploadId = await axiosAuthorized.post('api/clip/upload-request/' + clipRequestId + '/file/start-upload', {
+export async function startUploadClip(clipRequestId, fileExtension, isShortVideo=false) {
+    let routePath = isShortVideo ? 'short-video' : 'clip';
+
+    let uploadId = await axiosAuthorized.post(`api/${routePath}/upload-request/` + clipRequestId + '/file/start-upload', {
         fileExtension: fileExtension
     })
     .then(response => {return response.data.uploadId})
@@ -102,14 +114,15 @@ export async function startUploadClip(clipRequestId, fileExtension) {
     return uploadId;
 }
 
-export async function submitClipRequestForReview(title, description, clipRequestId) {
-    let formData = new FormData();
+export async function submitClipRequestForReview(title, description, clipRequestId, isShortVideo=false) {
+    let routePath = isShortVideo ? 'short-video' : 'clip';
 
+    let formData = new FormData();
     formData.append('Name', title);
     formData.append('Description', description);
     formData.append('SubmitForReview', true);
 
-    await axiosAuthorized.patch(`api/clip/upload-request/${clipRequestId}/author`, formData, {
+    await axiosAuthorized.patch(`api/${routePath}/upload-request/${clipRequestId}/author`, formData, {
         headers: {
             "Content-Type": "multipart/form-data",
         }
@@ -117,8 +130,10 @@ export async function submitClipRequestForReview(title, description, clipRequest
     .catch(err => {return Promise.reject(err)});
 }
 
-export async function changeClipRequestStatus(status, comment, clipRequestId) {
-    await axiosAuthorized.patch(`api/clip/upload-request/${clipRequestId}/admin`, {
+export async function changeClipRequestStatus(status, comment, clipRequestId, isShortVideo=false) {
+    let routePath = isShortVideo ? 'short-video' : 'clip';
+
+    await axiosAuthorized.patch(`api/${routePath}/upload-request/${clipRequestId}/admin`, {
         status: status,
         comment: comment
     });

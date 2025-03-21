@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import './VerticalClip.css'
 import { useEffect, useRef } from 'react'
-import { api, axiosUnauthorized } from '../App/App'
 import Skeleton from 'react-loading-skeleton'
 import { handleVideoEnter, handleVideoHover, handleVideoLeave, handleVideoMove } from '../Clip/handlers/ClipHandlers';
 import { useDispatch } from 'react-redux'
@@ -11,8 +10,10 @@ import { useSearchParams } from 'react-router-dom'
 import { shortenText } from '../../Tools/Tools'
 import { getSongLogo } from '../../Api/Song'
 import { getAuthorInfo, getAuthorLogo } from '../../Api/Author'
+import { getClipFile, getClipInfo, getClipPreview, getClipViews } from '../../Api/Clip'
+import { getClipRequestFile, getClipRequestInfo, getClipRequestPreview } from '../../Api/ClipPublish'
 
-function VerticalClip(props) {
+function VerticalClip({clipId, clipRequestId}) {
     const [dataFetched, setDataFetched] = useState(false);
     const [vertData, setVertData] = useState(undefined);
     const [videoLoaded, setVideoLoaded] = useState(false);
@@ -26,25 +27,36 @@ function VerticalClip(props) {
 
     useEffect(()=>{
         getVertData()
-            .then(res=>{
-                setVertData(res)
-                setDataFetched(true)
-            })
-            .catch(err=>console.log(err))
+        .then(res=>{
+            setVertData(res);
+            setDataFetched(true);
+        })
+        .catch(err=>console.log(err));
     },[]);
 
     useEffect(() => {
-        getClipLink()
-            .then(response => setClipLink(response));
-        getPreviewLink()
-            .then(response => setPreviewLink(response));
+        if (clipId) {
+            getClipPreview(clipId, true)
+                .then(response => setPreviewLink(response));
+            getClipFile(clipId, true)
+                .then(response => setClipLink(response));
+            // getClipViews(clipId)
+            //     .then(response => setViews(response));
+        } else {
+            getClipRequestPreview(clipRequestId, true)
+                .then(response => setPreviewLink(response));
+            getClipRequestFile(clipRequestId, true)
+                .then(response => setClipLink(response));
+        }
     }, []);
 
     const getVertData = async () =>{
-        let response = await axiosUnauthorized.get(api + `api/short-video/${props.id}`)
-        .catch(err => Promise.reject(err));
-        let result = response.data;
-
+        let result = undefined;
+        if (clipId) {
+            result = await getClipInfo(clipId, true);
+        } else {
+            result = await getClipRequestInfo(clipRequestId, true);
+        }
         await getAuthorLogo(result.uploaderId)
         result.authorAvatar = await getAuthorLogo(result.uploaderId);
         result.songLogo =  await getSongLogo(result.relatedSongId);
@@ -53,20 +65,6 @@ function VerticalClip(props) {
         result.authorName = info.name;
 
         return result;
-    }
-
-    async function getClipLink() {
-        let response = await axiosUnauthorized.get('api/short-video/' + props.id + '/file/link')
-        .catch(err => Promise.reject(err));
-
-        return response?.data?.presignedLink;
-    }
-
-    async function getPreviewLink() {
-        let response = await axiosUnauthorized.get('api/short-video/' + props.id + '/preview/link')
-        .catch(err => Promise.reject(err));
-
-        return response?.data?.presignedLink;
     }
 
     const handleVertClick = () =>{

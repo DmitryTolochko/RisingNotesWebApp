@@ -18,7 +18,7 @@ import { showError } from '../../Redux/slices/errorMessageSlice';
 import { changeClipRequestStatus, createNewClipRequest, deleteClipRequest, getClipRequestInfo, startUploadClip, submitClipRequestForReview, uploadClipFilePart, uploadClipLogo } from '../../Api/ClipPublish';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
-import trashIcon from '../../Images/trash.svg'
+import trashIcon from '../../Images/trash.svg';
 
 function UploadVideo(){
     const navigate = useNavigate();

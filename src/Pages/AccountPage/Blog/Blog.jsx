@@ -6,28 +6,14 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { api } from '../../../Components/App/App';
 import VerticalClip from '../../../Components/VerticalClip/VerticalClip';
+import { getClipRequestsForAuthor } from '../../../Api/ClipPublish';
 
 function Blog(params) {
     const [cookies] = useCookies(['authorId']);
     const [verts, setVerts] = useState(undefined)
 
-    const getAuthorClips = async ()=> {
-        try{
-            const response = await axios({
-                method:'GET',
-                url: api + 'api/short-video/by-author/' + cookies.authorId,
-                responseType: 'application/json'
-            })
-            let result = JSON.parse(response.data).shortVideoList
-            return result
-        }
-        catch(err){
-            return Promise.reject(err);
-        }
-    }
-
     useEffect(()=>{
-        getAuthorClips()
+        getClipRequestsForAuthor(true)
             .then(res=>setVerts(res))
             .catch(err=>console.log(err))
     }, [])
@@ -41,7 +27,7 @@ function Blog(params) {
 
             <div className="blog">
                 {verts?.map(video=>(
-                    <VerticalClip id={video.id}/>
+                    <VerticalClip clipRequestId={video.id}/>
                 ))}
             </div>
         </div>
