@@ -12,30 +12,12 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateCurrentSongValue } from '../../Redux/slices/currentSongSlice';
 import { updateSongsValue } from '../../Redux/slices/songsSlice';
-import { shortenText } from '../../Tools/Tools';
+import { shortenText, statusColor, statusType } from '../../Tools/Tools';
 import { getSongLogo } from '../../Api/Song';
 import { getAuthorInfo } from '../../Api/Author';
 import { getClipFile, getClipPreview, getClipViews } from '../../Api/Clip';
 import { getClipRequestFile, getClipRequestPreview } from '../../Api/ClipPublish';
 import { updateVideoPlayerValue } from '../../Redux/slices/videoPlayerSlice';
-
-const statusType = {
-    0: 'Неизвестно',
-    1: 'На модерации',
-    2: 'На доработке',
-    3: 'Опубликовано',
-    4: 'Отклонено',
-    5: 'Отозвано'
-};
-
-const statusColor = {
-    0: 'yellow',
-    1: 'yellow',
-    2: 'yellow',
-    3: 'green',
-    4: 'red',
-    5: 'red'
-}
 
 function Clip({
     clipId=undefined, 

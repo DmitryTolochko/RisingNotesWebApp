@@ -1,10 +1,7 @@
 import { Link } from 'react-router-dom';
-import VerticalVideoPreview from '../../../Components/Blog/VerticalVideoPreview';
 import plus from '../../../Images/account-page/plus-icon.svg';
 import { useCookies } from 'react-cookie';
 import { useState, useEffect } from 'react';
-import axios from 'axios';
-import { api } from '../../../Components/App/App';
 import VerticalClip from '../../../Components/VerticalClip/VerticalClip';
 import { getClipRequestsForAuthor } from '../../../Api/ClipPublish';
 
@@ -27,7 +24,7 @@ function Blog(params) {
 
             <div className="blog">
                 {verts?.map(video=>(
-                    <VerticalClip clipRequestId={video.id}/>
+                    <VerticalClip clipRequestId={video.id} status={video.status} authorId={video.authorId} authorName={video.authorName}                    />
                 ))}
             </div>
         </div>

@@ -57,14 +57,6 @@ function VertVideoPlayer() {
 
             await videoRef.current.play();
             await placeholderVideoRef.current.play();
-            
-            // try {
-            //     await videoRef.current.play();
-            //     await placeholderVideoRef.current.play();
-            // } 
-            // catch (err) {
-            //     console.log(err)
-            // }
 
             setIsPlaying(true);
         }

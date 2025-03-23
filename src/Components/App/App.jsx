@@ -18,7 +18,7 @@ import PlaylistWindow from '../../Pages/PlaylistWindow/PlaylistWindow';
 import SearchResults from '../SearchResults/SearchResults';
 import UploadMusic from '../../Pages/UploadMusic/UploadMusic.jsx';
 import UploadVideo from '../../Pages/UploadVideo/UploadVideo.jsx';
-import InstallVerticalVideo from '../../Pages/UploadVerticalVideo/UploadVertVideo.jsx';
+import UploadVerticalVideo from '../../Pages/UploadVerticalVideo/UploadVertVideo.jsx';
 import ErrorPage from '../../Pages/404Page/404Page';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
@@ -300,6 +300,7 @@ function App() {
                 <Route path={'/playlist/:id'} element={<PlaylistWindow/>}/>
                 <Route path={'/uploadmusic/:id'} element={<UploadMusic/>}/>
                 <Route path={'/uploadvideo/:id'} element={<UploadVideo/>}/>
+                <Route path={'/uploadvertvideo/:id'} element={<UploadVerticalVideo/>}/>
                 <Route path={'/clipview'} element={<ClipPage/>}/>
                 <Route path={'*'} element={<ErrorPage/>}/>
                 {cookies.role && cookies.role !== 'admin' ? (<>
@@ -309,7 +310,7 @@ function App() {
                     <Route path={'/account'} element={<AccountPage/>}/>
                     <Route path={'/uploadmusic'} element={<UploadMusic/>}/>
                     <Route path={'/uploadvideo'} element={<UploadVideo/>}/>
-                    <Route path={'/uploadvertvideo'} element={<InstallVerticalVideo/>}/>
+                    <Route path={'/uploadvertvideo'} element={<UploadVerticalVideo/>}/>
                     <Route path={'/messenger'} element={<Messenger/>}/>
                 </>) : (<></>)}
             </Routes>  

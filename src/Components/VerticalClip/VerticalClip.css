@@ -1,9 +1,6 @@
 .vertical-clip{
     position: relative;
-    width: 18%;
-    @media screen and (max-width: 890px){ 
-        width: 31%;
-    }
+    width: 100%;
     height: auto;
     aspect-ratio: 9/16;
     margin-bottom: 3%;
@@ -47,4 +44,11 @@
     background: -moz-linear-gradient(180deg, rgba(2,0,36,0) 0%, rgba(15,20,29,1) 100%);
     background: -webkit-linear-gradient(180deg, rgba(2,0,36,0) 0%, rgba(15,20,29,1) 100%);
     background: linear-gradient(180deg, rgba(2,0,36,0) 0%, rgba(15,20,29,1) 100%);
+}
+
+.vertical-clip-wrapper {
+    width: 18%;
+    @media screen and (max-width: 890px){ 
+        width: 31%;
+    }
 }

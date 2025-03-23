@@ -51,3 +51,21 @@ export function shortenText(text, numberOfSymbols) {
         return text.slice(0, numberOfSymbols) + '...';
     return text;
 }
+
+export const statusType = {
+    0: 'Неизвестно',
+    1: 'На модерации',
+    2: 'На доработке',
+    3: 'Опубликовано',
+    4: 'Отклонено',
+    5: 'Отозвано'
+};
+
+export const statusColor = {
+    0: 'yellow',
+    1: 'yellow',
+    2: 'yellow',
+    3: 'green',
+    4: 'red',
+    5: 'red'
+}

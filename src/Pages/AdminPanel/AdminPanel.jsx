@@ -11,10 +11,12 @@ import Loader from '../../Components/Loader/Loader';
 import { getClipRequestInfo, getClipRequestsListForReview } from '../../Api/ClipPublish';
 import { getSongRequestInfo, getSongRequestsListForReview } from '../../Api/SongPublish';
 import Clip from '../../Components/Clip/Clip';
+import VerticalClip from '../../Components/VerticalClip/VerticalClip';
 
 function AdminPanel() {
     const [songRequestsList, setSongRequestsList] = useState([]);
     const [clipRequestsList, setClipRequestsList] = useState([]);
+    const [blogsRequestsList, setBlogsRequestsList] = useState([]);
     const [currPage, setCurrPage] = useState(0);
     const [isLoaded, setIsLoaded] = useState(false);
     const [search, setSearch] = useState(searchIcon);
@@ -27,6 +29,8 @@ function AdminPanel() {
             getSongRequestsList();
         else if (currPage === 1)
             getClipRequestsList();
+        else if (currPage === 3)
+            getBlogsRequestsList();
         else 
             getUsersList();
     }, [currPage, searchQuery]);
@@ -91,7 +95,11 @@ function AdminPanel() {
         setIsLoaded(true);
     }
 
-    // if (isLoaded)
+    async function getBlogsRequestsList() {
+        let list = await getClipRequestsListForReview(true);
+        setBlogsRequestsList(list);
+    }
+
     return (
         <div className='comment-page-wrapper'>
             <div className='featured'>
@@ -108,6 +116,10 @@ function AdminPanel() {
                         <a onClick={() => handleChangePage(1)} 
                             className={currPage === 1 ? 'account-page-menu-item account-page-active' : 'account-page-menu-item'}>
                             Клипы
+                        </a>
+                        <a onClick={() => handleChangePage(3)} 
+                            className={currPage === 3 ? 'account-page-menu-item account-page-active' : 'account-page-menu-item'}>
+                            Блоги
                         </a>
                         <a onClick={() => handleChangePage(2)} 
                             className={currPage === 2 ? 'account-page-menu-item account-page-active' : 'account-page-menu-item'}>
@@ -157,6 +169,14 @@ function AdminPanel() {
                             
                         </div>
                         <ChosenUser info={currentUser}/>
+                    </div>
+                ) : (<></>)}
+
+                {currPage === 3 ? (
+                    <div className="blog">
+                        {blogsRequestsList?.map(video=>(
+                            <VerticalClip clipRequestId={video.id} status={video.status} authorId={video.authorId} authorName={video.authorName}                    />
+                        ))}
                     </div>
                 ) : (<></>)}
             </div>

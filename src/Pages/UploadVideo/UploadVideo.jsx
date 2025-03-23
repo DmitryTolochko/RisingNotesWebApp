@@ -158,7 +158,6 @@ function UploadVideo(){
     }
 
     const handleVideoInput = (e) => {
-        e.preventDefault();
         videoSetterRef.current.click();
     }
 
@@ -171,6 +170,8 @@ function UploadVideo(){
             setVideoFileName(info.title);
             setImage(info.logoFileLink);
             setVideofile(info.clipFileLink);
+            if (info.reviewerComment !== null)
+                setComment(info.reviewerComment);
         }
     }
 

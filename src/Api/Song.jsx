@@ -1,4 +1,4 @@
-import { axiosAuthorized, axiosUnauthorized } from "../Components/App/App";
+import { axiosAuthorized, axiosPictures, axiosUnauthorized } from "../Components/App/App";
 import cover from '../Images/main-placeholder.png';
 
 export async function getSongInfo(songId=undefined, fileId=undefined) {
@@ -35,7 +35,7 @@ export async function deleteSongFromExcluded(songId) {
 
 export async function getSongLogo(songId) {
     let avatar = undefined;
-    let response = await axiosUnauthorized.get('api/song/' + songId + '/logo/link')
+    let response = await axiosPictures.get('api/song/' + songId + '/logo/link')
     .catch(err => {avatar = cover});
 
     if (response) {

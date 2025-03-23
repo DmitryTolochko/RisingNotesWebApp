@@ -22,8 +22,9 @@ import { getSongInfo } from '../../Api/Song';
 import { changeClipRequestStatus, createNewClipRequest, deleteClipRequest, getClipRequestInfo, startUploadClip, submitClipRequestForReview, uploadClipFilePart, uploadClipLogo } from '../../Api/ClipPublish';
 import { useCookies } from 'react-cookie';
 import { useNavigate, useParams } from 'react-router-dom';
+import { updateVideoPlayerValue } from '../../Redux/slices/videoPlayerSlice';
 
-function InstallVerticalVideo(){
+function UploadVerticalVideo(){
     const params = useParams();
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -39,7 +40,7 @@ function InstallVerticalVideo(){
     const [songId, setSongId] = useState(undefined);
     const [title, setTitle] = useState(undefined);
     const [comment, setComment] = useState('');
-    const [songName, setSongName] = useState('Песня не указана');
+    const [songName, setSongName] = useState(undefined);
     const [authorName, setAuthorName] = useState('Автор не указан');
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
     const [isSent, setIsSent] = useState(false);
@@ -48,9 +49,10 @@ function InstallVerticalVideo(){
     const [cookies, setCookies] = useCookies(['accessToken', 'refreshToken', 'authorId', 'role', 'subscriptions', 'userId']);
 
     useEffect(() => {
+        getAllInfo();
         if (!isSent)
             setIsButtonDisabled(checkInputs());
-    }, [imageFile, videoFile, description])
+    }, [imageFile, videoFile, description]);
 
     function checkInputs() {
         let arr = [imageFile, videoFile, description];
@@ -65,7 +67,7 @@ function InstallVerticalVideo(){
     }
 
     useEffect(() => {
-        if (!(songId === undefined || songId === '')) {
+        if (!(songId === undefined || songId === '' || songId === null)) {
             getSongInfo(songId)
             .then(songInfo => {
                 setAuthorName(songInfo.authorName);
@@ -98,7 +100,6 @@ function InstallVerticalVideo(){
     }
 
     function handleChoosenSong(id, title) {
-        setTitle(title);
         setSongId(id);
     }
 
@@ -137,7 +138,6 @@ function InstallVerticalVideo(){
                     await uploadClipFilePart(chunk, currentPart, currentPart === totalParts, uploadId, clipRequestId, true);
                 }
             }
-    
             await submitClipRequestForReview(title, description, clipRequestId, true);
         } catch {
             await deleteClipRequest(clipRequestId, true);
@@ -146,13 +146,7 @@ function InstallVerticalVideo(){
 
     function handlePlayVideo() {
         // плеер видео
-        dispatch(updateVertVideoInfoValue({
-            description: description,
-            title: songName,
-            author: authorName,
-            songId: songId
-        }))
-        dispatch(updateVertVideoPlayerValue(videoFile))
+        dispatch(updateVideoPlayerValue(videoFile));
     }
 
     const changeVideo = (event) => {
@@ -163,7 +157,6 @@ function InstallVerticalVideo(){
             setVideofile(event.target.files[0]);
         }
     }
-
 
     const { getRootProps: getInputFile } = useDropzone({
         // обработка файла закинутого drag & drop
@@ -182,7 +175,6 @@ function InstallVerticalVideo(){
     });   
 
     const handleVideoInput = (e) => {
-        e.preventDefault();
         videoSetterRef.current.click();
     }
 
@@ -194,7 +186,9 @@ function InstallVerticalVideo(){
             setSongId(info.songId);
             setVideoFileName(info.title);
             setImage(info.logoFileLink);
-            setVideofile(info.clipFileLink);
+            setVideofile(info.shortVideoFileLink);
+            if (info.reviewerComment !== null)
+                setComment(info.reviewerComment);
         }
     }
 
@@ -248,7 +242,7 @@ function InstallVerticalVideo(){
                                         <p className='uploadtrack-p2'>.mp4 или .mkv, макс. 100ГБ</p>
                                     </div>
                                     <p className='or'>или</p>
-                                    <CustomButton text={'Выберите файл'} func={() => getInputFile()} success={'Изменить'} icon={uploadImg}/>
+                                    <CustomButton text={'Выберите файл'} func={handleVideoInput} success={'Изменить'} icon={uploadImg}/>
                                 </div>
                             ) : (<></>)}
 
@@ -262,10 +256,22 @@ function InstallVerticalVideo(){
                 </div>
                 <div className='video-information-2'>
                     <div className='column1-2'>
+                        <CustomInput
+                            heading={'Название'}
+                            placeholder={'Назовите свое видео...'} 
+                            value={title} 
+                            onChange={e => setTitle(e.target.value)}
+                            isRequired={true}
+                            maxLength={50}
+                            />
+                    </div>
+                    <div className='column1-2'>
                         <InputSongs 
                             heading={'Cвязанный трек'}
                             placeholder={"Выберите связанный трек..."} 
-                            setSong={handleChoosenSong}/>
+                            setSong={handleChoosenSong}
+                            defaultSong={songName}
+                            />
                     </div> 
                     <div className='column1-2'>
                         <CustomInput
@@ -329,4 +335,4 @@ function InstallVerticalVideo(){
 }
 
 
-export default InstallVerticalVideo;
+export default UploadVerticalVideo;

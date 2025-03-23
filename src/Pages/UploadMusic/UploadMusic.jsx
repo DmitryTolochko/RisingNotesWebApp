@@ -220,7 +220,8 @@ function UploadMusic(){
         setCurrentImage(songRequestInfo.logoFileLink);
         setSongfile(songRequestInfo.songFileLink);
         setDuration(songRequestInfo.durationMs);
-        setComment(songRequestInfo.reviewerComment);
+        if (songRequestInfo.reviewerComment !== null)
+            setComment(songRequestInfo.reviewerComment);
         
         if (cookies?.role !== 'admin'){
             setRole('authoredit');
