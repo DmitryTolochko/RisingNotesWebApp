@@ -239,7 +239,7 @@ function UploadVerticalVideo(){
                                 <div className='div-track' {...getInputFile()}> 
                                     <div className='uploadtrack-div-inf'>
                                         <p className='uploadtrack-p1'>Перетащите свое видео сюда</p>
-                                        <p className='uploadtrack-p2'>.mp4 или .mkv, макс. 100ГБ</p>
+                                        <p className='uploadtrack-p2'>.mp4 или .mkv, макс. 200МБ</p>
                                     </div>
                                     <p className='or'>или</p>
                                     <CustomButton text={'Выберите файл'} func={handleVideoInput} success={'Изменить'} icon={uploadImg}/>

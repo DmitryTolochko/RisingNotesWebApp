@@ -25,7 +25,7 @@ function Blog({artistId, count=0, offset=0}) {
     return (
         <div className="blog">
             {verts?.map((video)=>(
-                <VerticalClip key={video.id} id={video.id}/>
+                <VerticalClip key={video.id} clipId={video.id} authorId={video.authorId} authorName={video.authorName}/>
             ))}
         </div>
     )

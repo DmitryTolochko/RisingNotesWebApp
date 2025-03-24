@@ -1,59 +1,78 @@
 import { useEffect, useRef, useState } from 'react';
 import './BlogVideoPlayer.css';
-import { api, axiosAuthorized, axiosUnauthorized } from '../App/App';
+import { axiosAuthorized, axiosUnauthorized } from '../App/App';
 import heart from '../../Images/controller/heart.svg';
 import closeButton from '../../Images/playerforvideo/closebutton.svg'
 import { useSelector, useDispatch } from 'react-redux';
-import { updateVertVideoPlayerValue } from '../../Redux/slices/vertVideoPlayerSlice';
 import { updateFeaturedValue } from '../../Redux/slices/featuredSlice';
 import redHeart from '../../Images/red-heart.svg';
 import Comment from '../Comment';
 import sendIcon from '../../Images/controller/sendIcon.svg';
-import CustomButton from '../CustomButton/CustomButton';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { shortenText } from '../../Tools/Tools';
-import { addSongToFavorite, deleteSongFromFavorite } from '../../Api/Song';
+import { addSongToFavorite, deleteSongFromFavorite, getSongInfo, getSongLogo } from '../../Api/Song';
+import { updateVertVideoInfoValue } from '../../Redux/slices/vertVideoInfoSlice';
+import { getClipFile, getClipInfo } from '../../Api/Clip';
+import { getAuthorInfo, getAuthorLogo } from '../../Api/Author';
+import CustomButton from '../CustomButton/CustomButton';
 
-function VertVideoPlayer() {
+function BlogVideoPlayer() {
+    const location = useLocation();
     const videoRef = useRef();
     const placeholderVideoRef = useRef();
     const [isPlaying, setIsPlaying] = useState(false);
     const [isDataUpdated, setIsDataUpdated] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams()
     
-    const resize = useSelector((state)=> state.resize.value)
-    const vertVideoInfo = useSelector((state)=> state.vertVideoInfo.value)
-    const vertvideo = useSelector((state) => state.vertVideoPlayer.value)
+    const resize = useSelector((state)=> state.resize.value);
+    const vertVideoInfo = useSelector((state)=> state.vertVideoInfo.value);
+    const [blogId, setBlogId] = useState(undefined);
     const featured = useSelector((state)=>state.featured.value)
     const dispatch = useDispatch();
 
     const [comments, setComments] = useState([]);
     const [comment, setComment] = useState('');
+    const [videoLink, setVideoLink] = useState(undefined);
+
+    useEffect(()=>{
+        setBlogId(searchParams.get('short_view'));
+    },[location]);
 
     useEffect(() => {
-        if (vertvideo !== '' && vertvideo !== undefined)
+        if (blogId) {
             getComments();
+            getClipFile(blogId, true)
+                .then(response => setVideoLink(response));
+
+            if (vertVideoInfo === undefined || vertVideoInfo === "") {
+                getVertData()
+                .then((res) => dispatch(updateVertVideoInfoValue(res)));
+            }
+        }
+    }, [blogId, isDataUpdated]);
+
+    useEffect(() => {
         if (resize === 'standart')
             handlePlayVideo();
-    }, [vertvideo, isDataUpdated]);
+    }, [videoLink]);
 
     async function handlePlayVideo() {
         // плеер видео
-        if (isPlaying || !vertvideo) {
+        if (isPlaying || !videoLink) {
             setIsPlaying(false);
             await videoRef?.current?.pause();
             await placeholderVideoRef?.current?.pause();
         }
-        else if (typeof vertvideo === "string" && vertvideo.includes('api/short-video')) {
-            videoRef.current.src = vertvideo;
+        else if (typeof videoLink === "string" && videoLink.includes('api/short-video')) {
+            videoRef.current.src = videoLink;
             await videoRef.current.play();
-            placeholderVideoRef.current.src = vertvideo;
+            placeholderVideoRef.current.src = videoLink;
             await placeholderVideoRef.current.play();
             setIsPlaying(true);
         }
         else {
-            videoRef.current.src = vertvideo;
-            placeholderVideoRef.current.src = vertvideo;
+            videoRef.current.src = videoLink;
+            placeholderVideoRef.current.src = videoLink;
 
             await videoRef.current.play();
             await placeholderVideoRef.current.play();
@@ -63,12 +82,12 @@ function VertVideoPlayer() {
     }
 
     function handleClickOnAuthor() {
-        dispatch(updateVertVideoPlayerValue(false));
+        setBlogId(undefined);
         window.location.replace(`/artist/${vertVideoInfo.uploaderId}`);
     }
 
     function handleClickOnSong() {
-        dispatch(updateVertVideoPlayerValue(false));
+        setBlogId(undefined);
         window.location.replace(`/commentaries/${vertVideoInfo.relatedSongId}`);
     }
 
@@ -85,7 +104,7 @@ function VertVideoPlayer() {
     };
 
     async function getComments() {
-        await axiosUnauthorized.get('api/short-video/' + vertVideoInfo.id + '/comment/list').then(resp =>{
+        await axiosUnauthorized.get('api/short-video/' + blogId + '/comment/list').then(resp =>{
             setComments(resp?.data.commentList);
         })
         .catch(err => Promise.reject(err));
@@ -93,7 +112,7 @@ function VertVideoPlayer() {
 
     const handleSendComment = () => {
         if (comment !== '') {
-            axiosAuthorized.post(`api/short-video/${vertVideoInfo.id}/comment`, {text: comment})
+            axiosAuthorized.post(`api/short-video/${blogId}/comment`, {text: comment})
             .then(response => {
                 setIsDataUpdated(!isDataUpdated);
                 setComment('');
@@ -107,16 +126,29 @@ function VertVideoPlayer() {
         }
     };
 
+    const getVertData = async () =>{
+        let result = undefined;
+        result = await getClipInfo(blogId, true);
+
+        result.songLogo =  await getSongLogo(result.relatedSongId);
+        let songInfo = await getSongInfo(result.relatedSongId);
+        result.songName = songInfo?.name;
+        result.authorAvatar = await getAuthorLogo(result.authorId);
+        let authorInfo = await getAuthorInfo(result.authorId);
+        result.authorName = authorInfo?.name;
+
+        return result;
+    }
 
     if (resize === 'standart')
     return (
         <>
-            {vertvideo ?
+            {videoLink && blogId ?
                 <div className="blog-video-wrapper">
                     <video alt='background' 
                         className='placeholder-vert-video' 
                         ref={placeholderVideoRef} 
-                        src={vertvideo} 
+                        src={videoLink} 
                         muted 
                         loop
                     />
@@ -124,50 +156,58 @@ function VertVideoPlayer() {
                         <div className='vertical-wrapper'>
                             <video className='vertvideo-player' 
                             ref={videoRef} 
-                            src={vertvideo} 
+                            src={videoLink} 
                             type="video/mp4" onClick={handlePlayVideo}
                             loop/>
                         </div>
 
                         <div className='blog-text'>
-                            <button onClick={() =>{
-                                setSearchParams({})
-                                dispatch(updateVertVideoPlayerValue(false))
-                            }} className='blog-close'>
-                                <img alt='x' src={closeButton}/>
-                            </button>
                             <button onClick={handleClickOnAuthor} className='blog-author'>
                                 <img  alt='avatar' src={vertVideoInfo.authorAvatar} />
                                 <p>{shortenText(vertVideoInfo.authorName, 20)}</p>
                             </button>
 
-                            <p>{shortenText(vertVideoInfo.description, 350)}</p>
+                            <span>
+                                <h2>{shortenText(vertVideoInfo.title, 30)}</h2>
+                                <p>{shortenText(vertVideoInfo.description, 350)}</p>
+                            </span>
 
-                            <div className='blog-song'>
-                                <img alt='photo' src={vertVideoInfo.songLogo} onClick={handleClickOnSong}/>
-                                <span>
-                                    <span onClick={handleClickOnSong}>
-                                        <p className='blog-song-name'>{shortenText(vertVideoInfo.title, 20)}</p>
-                                        <p className='blog-artist-name'>{shortenText(vertVideoInfo.authorName, 25)}</p>
-                                    </span>
-                                    <button onClick={() => handleToFavorite(vertVideoInfo.relatedSongId)}>
-                                        <img className='blog-fav-icon' alt='to_favourites' src={featured.includes(vertVideoInfo.relatedSongId) ? redHeart : heart} />
-                                    </button>
-                                </span>
-                            </div>
-
-                            <div className='comment-input-wrapper'>
-                                <textarea placeholder='Введите текст комментария здесь...' className='comment-input' 
-                                    onChange={(e) => setComment(shortenText(e.target.value, 350))} value={shortenText(comment, 350)} maxLength={349}></textarea>
-                                <button className='comment-btn-offset' style={{right: '68px'}} onClick={handleSendComment}><img src={sendIcon}/></button>
-                            </div>
+                            {vertVideoInfo?.relatedSongId ? (
+                                <div className='blog-song-wrapper'>
+                                    <div className='blog-song'>
+                                        <img alt='photo' src={vertVideoInfo.songLogo} onClick={handleClickOnSong}/>
+                                        <span>
+                                            <span onClick={handleClickOnSong}>
+                                                <p className='blog-song-name'>{shortenText(vertVideoInfo.songName, 20)}</p>
+                                                <p className='blog-artist-name'>{shortenText(vertVideoInfo.authorName, 25)}</p>
+                                            </span>
+                                            <button onClick={() => handleToFavorite(vertVideoInfo.relatedSongId)}>
+                                                <img className='blog-fav-icon' alt='to_favourites' src={featured.includes(vertVideoInfo.relatedSongId) ? redHeart : heart} />
+                                            </button>
+                                        </span>
+                                    </div>
+                                </div>
+                            ) : (<></>)}
 
                             <div className='blog-comments'>
+                                <div className='comment-input-wrapper' style={{marginBottom: '24px'}}>
+                                    <textarea placeholder='Введите текст комментария здесь...' className='comment-input' 
+                                        onChange={(e) => setComment(shortenText(e.target.value, 350))} value={shortenText(comment, 350)} maxLength={349}></textarea>
+                                    <div style={{height: '48px'}}>
+                                        <CustomButton icon={sendIcon} errorText='' func={handleSendComment} reusable={true} />
+                                    </div>
+                                    {/* <button className='comment-btn-offset' style={{right: '68px'}} onClick={handleSendComment}><img src={sendIcon}/></button> */}
+                                </div>
                                 {comments?.map(e => (<div key={e.id} className='comment-wrapper'><Comment data={e} songId={vertVideoInfo.relatedSongId} setIsDataUpdated={setIsDataUpdated} isDataUpdated={isDataUpdated} isMobile={true}/></div>))}
                             </div>
                             
                         </div>
-
+                        <button onClick={() =>{
+                            setSearchParams({});
+                            setBlogId(undefined);
+                        }} className='blog-close'>
+                            <img alt='x' src={closeButton}/>
+                        </button>
                     </div>
                 </div>
                 : <></>
@@ -177,12 +217,12 @@ function VertVideoPlayer() {
     else {
         return (
             <>
-            { vertvideo ?
+            {videoLink && blogId  ?
                 <div className='video-player-wrapper'>
                     <button className='player-exit-button' onClick={() => {
-                        dispatch(updateVertVideoPlayerValue(false))
+                        setBlogId(undefined);
                         }}><img src={closeButton}/></button>
-                    <video className='vertvideo-player' src={vertvideo} autoPlay={true} type="video/mp4" loop/>
+                    <video className='vertvideo-player' src={videoLink} autoPlay={true} type="video/mp4" loop/>
                 </div>
                 : <></>
             }
@@ -192,4 +232,4 @@ function VertVideoPlayer() {
 }
 
 
-export default VertVideoPlayer;
+export default BlogVideoPlayer;

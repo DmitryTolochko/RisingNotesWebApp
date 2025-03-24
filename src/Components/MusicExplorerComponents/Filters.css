@@ -68,3 +68,9 @@
     right: -350px;
     transition: all .2s ease-in-out;
 }
+
+.filters-results {
+    font-size: 16px;
+    color: #787885;
+    font-weight: 500;
+}

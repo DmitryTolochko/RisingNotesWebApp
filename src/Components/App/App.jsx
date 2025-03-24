@@ -28,7 +28,7 @@ import AccountPage from '../../Pages/AccountPage/AccountPage';
 import ErrorMessage from '../ErrorMessage/ErrorMessage.jsx';
 import Footer from '../Footer/Footer.jsx';
 import VideoPlayer from '../VideoPLayer/VideoPlayer.jsx';
-import VertVideoPlayer from '../BlogVideoPlayer/BlogVideoPlayer.jsx';
+import BlogVideoPlayer from '../BlogVideoPlayer/BlogVideoPlayer.jsx';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { updateResizeValue } from '../../Redux/slices/resizeSlice.js';
@@ -81,8 +81,6 @@ export const axiosPictures = axios.create({
 // ссылка на переменную
 
 function App() {
-    const location = useLocation()
-    const [searchParams, setSearchParams] = useSearchParams();
     moment.locale('ru')
 
     //Redux Dispatcher
@@ -118,17 +116,6 @@ function App() {
 
         return () => window.removeEventListener('resize', handleResize);
     }, []);
-
-    
-    useEffect(()=>{
-        const short = searchParams.get('short_view')
-
-        if(short){
-            dispatch(
-                updateVertVideoPlayerValue(short)
-            )
-        }
-    },[location])
 
     function invokeErrorMessage(error) {
         if (error.response === undefined) {
@@ -322,10 +309,9 @@ function App() {
 const Players = () => {
     return(
         <>
-            <VertVideoPlayer />
+            <BlogVideoPlayer />
             <MusicPlayer/>
             <VideoPlayer />
-            {/* VideoPlayer - outdated */}
         </>
     )
 }

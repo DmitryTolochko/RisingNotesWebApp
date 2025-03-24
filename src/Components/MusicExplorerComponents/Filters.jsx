@@ -31,8 +31,14 @@ function Filters({setFiltersApplied}) {
     const [genrePredicate, setGenrePredicate] = useState(filters.genreOrAnd);
     const [langPredicate, setLangPredicate] = useState(filters.languageOrAnd);
     const [moodPredicate, setMoodPredicate] = useState(filters.moodOrAnd);
+    const [resultCount, setResultCount] = useState(0);
 
     const [cookies, setCookies] = useCookies(['role']);
+
+    useEffect(() => {
+        songsByFiltersGetter(filters, cookies.role ? true : false, true)
+        .then(res => setResultCount(res));
+    }, [filters]);
 
     useEffect(() => {
         // получение опций для выпадающих списков
@@ -130,6 +136,7 @@ function Filters({setFiltersApplied}) {
                 <FilterBool/>
             </div>
             <div className="filters-settings">
+                <p className='filters-results'>Результатов найдено: {resultCount}</p>
                 <CustomButton 
                     text={'Применить фильтры'} 
                     success={'Изменить фильтры'} 

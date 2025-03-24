@@ -2,6 +2,7 @@
     width: 100%;
     margin: 0 auto;
     max-width: 1220px;
+    margin-bottom: 24px;
 }
 .video-wrapper{
     position: relative;
@@ -92,4 +93,14 @@
     display: flex;
     align-items: center;
     gap:10px;
+}
+
+.clip-description {
+    text-align: start;
+    width: 100%;
+    max-width: 1220px;
+    z-index: 5;
+    background-color: #191E28;
+    padding: 24px;
+    border-radius: 10px;
 }

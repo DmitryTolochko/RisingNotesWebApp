@@ -8,7 +8,7 @@ import { updateVertVideoInfoValue } from '../../Redux/slices/vertVideoInfoSlice'
 import { updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlice'
 import { useSearchParams } from 'react-router-dom'
 import { shortenText, statusColor, statusType } from '../../Tools/Tools'
-import { getSongLogo } from '../../Api/Song'
+import { getSongInfo, getSongLogo } from '../../Api/Song'
 import { getAuthorInfo, getAuthorLogo } from '../../Api/Author'
 import { getClipFile, getClipInfo, getClipPreview, getClipViews } from '../../Api/Clip'
 import { getClipRequestFile, getClipRequestInfo, getClipRequestPreview } from '../../Api/ClipPublish'
@@ -16,13 +16,15 @@ import viewsIcon from '../../Images/account-page/stats-icon.svg';
 import editIcon from '../../Images/account-page/edit-icon.svg';
 import { updateVideoPlayerValue } from '../../Redux/slices/videoPlayerSlice';
 
-function VerticalClip({clipId, clipRequestId=undefined, views=0, status=0, authorId, authorName}) {
+function VerticalClip({clipId, clipRequestId=undefined, status=0, authorId, authorName}) {
     const [dataFetched, setDataFetched] = useState(false);
     const [vertData, setVertData] = useState(undefined);
     const [videoLoaded, setVideoLoaded] = useState(false);
     const [clipLink, setClipLink] = useState(undefined);
     const [previewLink, setPreviewLink] = useState(undefined);
-    const [searchParams, setSearchParams] = useSearchParams()
+    const [views, setViews] = useState(0);
+
+    const [searchParams, setSearchParams] = useSearchParams();
     const previewRef = useRef(undefined);
     const videoPreviewRef = useRef(undefined);
 
@@ -43,13 +45,13 @@ function VerticalClip({clipId, clipRequestId=undefined, views=0, status=0, autho
                 .then(response => setPreviewLink(response));
             getClipFile(clipId, true)
                 .then(response => setClipLink(response));
-            // getClipViews(clipId)
-            //     .then(response => setViews(response));
         } else {
             getClipRequestPreview(clipRequestId, true)
                 .then(response => setPreviewLink(response));
             getClipRequestFile(clipRequestId, true)
                 .then(response => setClipLink(response));
+            // getClipViews(clipRequestId, true)
+            // .then(response => setViews(response));
         }
     }, []);
 
@@ -61,7 +63,9 @@ function VerticalClip({clipId, clipRequestId=undefined, views=0, status=0, autho
             result = await getClipRequestInfo(clipRequestId, true);
         }
         result.authorAvatar = await getAuthorLogo(authorId);
-        result.songLogo =  await getSongLogo(result.songId);
+        result.songLogo =  await getSongLogo(result.relatedSongId);
+        let songInfo = await getSongInfo(result.relatedSongId);
+        result.songName = songInfo?.name;
 
         result.authorName = authorName;
 
@@ -71,7 +75,8 @@ function VerticalClip({clipId, clipRequestId=undefined, views=0, status=0, autho
     const handleVertClick = () =>{
         if (clipId) {
             dispatch(updateMusicIsPlayingValue(false));
-            setSearchParams({'short_view':clipLink})
+            // setSearchParams({'short_view':clipLink})
+            setSearchParams({'short_view':vertData.id})
             dispatch(updateVertVideoInfoValue(vertData));
         }
         else 

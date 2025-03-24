@@ -43,7 +43,7 @@ export function buildQueryString(params) {
     return queryString;
 }
 
-export async function songsByFiltersGetter(filters, isAuthorized=false){
+export async function songsByFiltersGetter(filters, isAuthorized=false, onlyCount=false){
     const formatFilters = {
         'GenreList.ValueList': filters.genre,
         'GenreList.OrPredicate': filters.genreOrAnd !== 'and' ? true : false,
@@ -64,21 +64,25 @@ export async function songsByFiltersGetter(filters, isAuthorized=false){
         formatFilters['Instrumental'] = !filters.instrumental;
     }
 
-    console.log(formatFilters);
     const query = buildQueryString(formatFilters);
-    try {
-        let response = undefined;
-        if (isAuthorized) {
-            response = await axiosAuthorized.get('api/song/list?' + query);
-        } else {
-            response = await axiosUnauthorized.get('api/song/list?' + query);
+    if (onlyCount) {
+        let response = await axiosUnauthorized.get(`api/song/list/count?` + query);
+        return response.data.count;
+    } else {
+        try {
+            let response = undefined;
+            if (isAuthorized) {
+                response = await axiosAuthorized.get('api/song/list?' + query);
+            } else {
+                response = await axiosUnauthorized.get('api/song/list?' + query);
+            }
+            
+            let result = response.data.songList.reverse();
+            return result;
         }
-        
-        let result = response.data.songList.reverse();
-        return result;
-    }
-    catch (err) {
-        return -1;
+        catch (err) {
+            return -1;
+        }
     }
 }
 

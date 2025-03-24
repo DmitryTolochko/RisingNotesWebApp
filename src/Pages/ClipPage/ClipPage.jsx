@@ -30,6 +30,7 @@ function ClipPage() {
     const [authorId, setAuthorId] = useState(null)
     const [title, setTitle] = useState(null)
     const [artistAvatar, setArtistAvatar] = useState(defaultAvatar);
+    const [description, setDescription] = useState('');
 
     const getClipInfo = async () => {
         await axiosUnauthorized.get(api + `api/music-clip/${clipId}`)
@@ -39,6 +40,7 @@ function ClipPage() {
                 setTitle(data.title)
                 setAuthorId(data.uploaderId)
                 getAuthorName(data.uploaderId)
+                setDescription(data.description);
             })
             .catch(error => {
                 console.log(`Can't fetch clip info. ${error}`)
@@ -137,11 +139,16 @@ function ClipPage() {
                                 // <Skeleton baseColor='#0F141D' highlightColor="#2C323D"  height={200}/>
                             }
                         </span>
-                        
                     </div>
                 </div>
+            </div>
+
+            {description !== '' ? (
+                <div className="comment-page-wrapper" style={{minHeight: '0', padding: '0'}}>
+                    <p className="clip-description">{description}</p>
                 </div>
-               
+            ) : (<></>)}
+            
 
             <hr className="clip-hr" style={{zIndex: '2'}}/>
 
