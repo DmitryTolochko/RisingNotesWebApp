@@ -8,7 +8,7 @@ import cover from '../../../Images/main-placeholder.png';
 import { shortenText } from '../../../Tools/Tools';
 
 const statusType = {
-    0: 'Нет файлов',
+    0: 'На согласовании',
     1: 'На модерации',
     2: 'На доработке',
     3: 'Опубликовано',
@@ -71,9 +71,9 @@ export default function Song (props) {
     return (
         <div className='track'>
             <img draggable='false' className='song-img' alt='cover' src={coverLink}/>
-            <p className='song-title-t'>{shortenText(songName, 15)}<p className='songAuthor'>{shortenText(props.artist, 15)}</p></p>
+            <p className='song-title-t'>{shortenText(songName, 15)}<p className='songAuthor'>{shortenText(props.artist + ', ' + props.featured, 15)}</p></p>
             <p className='track-statistic'><img alt='stats' src={statsIcon}/>{auditionCount}</p>
-            <p className='song-status'>
+            <p className='song-status' style={{width: '100%'}}>
                 <div className={'song-status-dot ' + statusColor[props.status]}></div>
                 {statusType[props.status]}
             </p>

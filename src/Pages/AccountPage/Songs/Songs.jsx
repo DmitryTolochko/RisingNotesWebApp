@@ -27,7 +27,8 @@ export default function Songs(props) {
                     <Song 
                         key={el.id} 
                         id={el.id} 
-                        artist={props.artist} 
+                        artist={el.authorName} 
+                        featured={el.featuredAuthorList.map(el => el.authorName)}
                         status={el.status} />
                 )}
             </div>

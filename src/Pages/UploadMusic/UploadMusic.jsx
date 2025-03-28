@@ -19,8 +19,9 @@ import CustomButton from '../../Components/CustomButton/CustomButton';
 import CustomInput from '../../Components/CustomInput/CustomInput';
 import { useDispatch, useSelector } from 'react-redux';
 import { showError } from '../../Redux/slices/errorMessageSlice';
-import { changeSongRequestStatus, createNewSongRequest, deleteSongRequest, getSongRequestInfo } from '../../Api/SongPublish';
+import { answerSongRequestAsCoAuthor, changeSongRequestStatus, createNewSongRequest, deleteSongRequest, getSongRequestInfo, sendSongRequestToReview } from '../../Api/SongPublish';
 import { getGenres, getLanguages, getMoods } from '../../Api/CommonData';
+import { getAuthorListByName } from '../../Api/Author';
 
 function UploadMusic(){
     const navigate = useNavigate();
@@ -51,6 +52,7 @@ function UploadMusic(){
     const [languageList, setLanguageList] = useState([]);
     const [title, setTitle] = useState('Новый трек');
     const [duration, setDuration] = useState(0);
+    const [coAuthors, setCoAuthors] = useState([]);
 
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
     const [isSent, setIsSent] = useState(false);
@@ -87,7 +89,7 @@ function UploadMusic(){
         if (role === 'author') {
             // новая песня
             await createNewSongRequest(name, lyrics, isLyricsExist, 
-                duration, vibe, genre, role, songfile, logofile, gender, language);
+                duration, vibe, genre, role, songfile, logofile, gender, language, coAuthors);
         }
     }
 
@@ -173,13 +175,26 @@ function UploadMusic(){
 
     const acceptSong = async () => {
         // Одобрение заявки
-        await changeSongRequestStatus(3, comment, params.id);
-        navigate(-1);        
+        if (role === 'admin') {
+            await changeSongRequestStatus(3, comment, params.id);
+        } else if (role === 'coAuthor') {
+            // await answerSongRequestAsCoAuthor(params.id, true);
+            if (coAuthors.filter(el => el.requestStatus === 2).length  === coAuthors.length) {
+                await sendSongRequestToReview(params.id);
+            }
+        }
+        
+        // navigate(-1);        
     }
 
     const declineSong = async () => {
         // Отклонение заявки
-        await changeSongRequestStatus(4, comment, params.id);
+        if (role === 'admin') {
+            await changeSongRequestStatus(4, comment, params.id);
+        } else if (role === 'coAuthor') {
+            await answerSongRequestAsCoAuthor(params.id, false);
+        }
+        
         navigate(-1);
     }
 
@@ -220,10 +235,15 @@ function UploadMusic(){
         setCurrentImage(songRequestInfo.logoFileLink);
         setSongfile(songRequestInfo.songFileLink);
         setDuration(songRequestInfo.durationMs);
+        setCoAuthors(songRequestInfo.featuredAuthorList);
         if (songRequestInfo.reviewerComment !== null)
             setComment(songRequestInfo.reviewerComment);
         
-        if (cookies?.role !== 'admin'){
+        if (songRequestInfo.featuredAuthorList.some(el => el.userId === cookies.userId)) {
+            setRole('coAuthor');
+            setTitle('Согласование трека')
+        }
+        else if (cookies?.role !== 'admin'){
             setRole('authoredit');
             setTitle('Редактирование трека');
         }
@@ -347,6 +367,18 @@ function UploadMusic(){
                             <option value={2}>Мужской</option>
                         </select>
                     </div>
+                    <div className='column'>
+                        <CustomInputWithTags 
+                            heading={'Соавторы'}
+                            placeholder={"Начните вводить авторов..."} 
+                            list={coAuthors} 
+                            setList={setCoAuthors} 
+                            isRequired={false}
+                            func={getAuthorListByName}
+                            responseStructure={{
+                                displayKey: 'name', idKey: 'id'
+                            }}/>
+                    </div>
                 </div>
 
                 <div className='song-information-3' >
@@ -411,6 +443,18 @@ function UploadMusic(){
                                 <p className='inp-column1' style={{padding: '10px 16px'}}>{comment}</p>
                             </>
                             ) : (<></>)}
+                    </div> : ''}
+
+                    {role === 'coAuthor' ? <div>
+                        <div className='button-and-text'>
+                            <CustomButton 
+                                text={'Подтвердить*'} 
+                                func={acceptSong} 
+                                success={'Подтверждено'} 
+                                icon={uploadImg}/>
+                            <button className='save-installmusic' onClick={declineSong}><img src={trashImg}/>Отклонить</button>
+                        </div>
+                        <text className='warning-upload'>*перед публикацией трек будет отправлен на модерацию и согласование другим авторам</text>
                     </div> : ''}
 
                     <input type='file' accept=".jpg,.png" max='5000000' className='input-file' ref={imageSetterRef} onChange={changeLogo}></input>

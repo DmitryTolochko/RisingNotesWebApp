@@ -27,7 +27,7 @@ export async function getSongRequestsList() {
     return list;
 }
 
-export async function createNewSongRequest(name, lyrics, isLyricsExist, duration, vibe, genre, role, songfile, logofile, gender, language) {
+export async function createNewSongRequest(name, lyrics, isLyricsExist, duration, vibe, genre, role, songfile, logofile, gender, language, coAuthors=[]) {
     let formData = new FormData();
 
     formData.append('Name', name);
@@ -55,6 +55,10 @@ export async function createNewSongRequest(name, lyrics, isLyricsExist, duration
 
     formData.append('LogoFile.File', logofile);
 
+    coAuthors.forEach((item, index) => {
+        formData.append(`FeaturedAuthorIdList[${index}]`, item.id);
+    })
+
     return await axiosAuthorized.post(`/api/song/upload-request`, formData, {
         headers: {
             "Content-Type": "multipart/form-data",
@@ -74,4 +78,14 @@ export async function changeSongRequestStatus(status, comment, songRequestId) {
 export async function deleteSongRequest(songRequestId) {
     await axiosAuthorized.delete(`api/song/upload-request/` + songRequestId)
     .catch(err => console.log(err));
+}
+
+export async function answerSongRequestAsCoAuthor(requestId, isAccepted) {
+    await axiosAuthorized.post(`api/song/upload-request/${requestId}/featured-author/${isAccepted}`)
+    .catch(err => {return Promise.reject(err)});
+}
+
+export async function sendSongRequestToReview(requestId) {
+    await axiosAuthorized.patch(`api/song/upload-request/${requestId}/review`)
+    .catch(err => {return Promise.reject(err)});
 }

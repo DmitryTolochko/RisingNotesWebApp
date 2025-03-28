@@ -19,7 +19,7 @@ export async function getAuthorSongs(authorId, count=0, offset=0) {
     let response = await axiosUnauthorized.get(`api/author/${authorId}/song/list`  + (count == 0 ? '' : `?count=${count}&offset=${offset}`))
     .catch(err => {
         throw err;
-    })
+    });
     let result = response?.data.songInfoList;
     return result;
 }
@@ -33,4 +33,17 @@ export async function getAuthorLogo(authorId) {
     } else {
         return defaultAvatar;
     }
+}
+
+export async function getAuthorListByName(name) {
+    let list = [];
+    let response = await axiosUnauthorized.get(`api/author/list?nameWildcard=${name}`)
+    .catch(err => {
+        throw err;
+    });
+    if (response) {
+        list = response.data.authorList;
+    }
+
+    return list;
 }

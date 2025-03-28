@@ -1,14 +1,18 @@
 import React, { useRef } from 'react';
 import { useEffect, useState } from "react";
 import errorImg from '../../Images/error.svg';
+import { getAuthorListByName } from '../../Api/Author';
 
 function CustomInputWithTags({
     list, 
     setList, 
     placeholder, 
-    availableOptions, 
+    availableOptions=[], 
     heading, 
-    alertMessage='Выберите по крайней мере один тег'}){
+    alertMessage='Выберите по крайней мере один тег',
+    isRequired=true,
+    func=undefined,
+    responseStructure=undefined}){
 
     const select = useRef();
     
@@ -23,6 +27,15 @@ function CustomInputWithTags({
         }
         // добавление тега
         if (tag != '' && availableOptions.includes(tag)) {
+            if (currentList === undefined) {
+                var arr = [tag];
+            } else {
+                var arr = [...currentList, tag];
+            }
+            setCurrentList(e => e = arr);
+            setCurrentTag(undefined);
+            setList(arr);
+        } else if (responseStructure && tag != '' && filteredOptions.includes(tag)) {
             if (currentList === undefined) {
                 var arr = [tag];
             } else {
@@ -51,11 +64,23 @@ function CustomInputWithTags({
         else {
             select.current.className = "hidden-options";
         }
+
+        if (func && currentTag !== undefined && currentTag !== '') {
+            const timerId = setTimeout(() => {
+                updateAvailableOptions(currentTag);
+            }, 500);
+            return () => clearTimeout(timerId);
+        }
     }, [currentTag]);
 
-    function handleInputChange(e) {
+    async function handleInputChange(e) {
         e.preventDefault();
         setCurrentTag(e.target.value);
+    }
+
+    async function updateAvailableOptions(value) {
+        let authors = await func(value);
+        setOptions(authors);
     }
 
     function handleOptionClick(e) {
@@ -72,6 +97,9 @@ function CustomInputWithTags({
     }
 
     function isValidValue() {
+        if (!isRequired) {
+            return false;
+        }
         return currentList !== undefined && currentList.length === 0;
     }
 
@@ -89,16 +117,20 @@ function CustomInputWithTags({
             </span>            
             <div className='input-with-tags'>
                 <div className='input-filtercomponent'>
-                    <input className="input-installmusic" placeholder={placeholder} value={currentTag} onChange={handleInputChange} onClick={handleMouseClick}/>
+                    <input className="input-installmusic" placeholder={placeholder} value={responseStructure && currentTag ? currentTag[responseStructure.displayKey] : currentTag} onChange={handleInputChange} onClick={handleMouseClick}/>
                     <button className="submit-tag-input-track" onClick={addTag}>&#10010;</button>
                     <ul ref={select} onMouseLeave={handleMouseLeave}>
-                        {filteredOptions?.map(el => <li className="input-option" onClick={e => handleOptionClick(el)}>{el}</li>)}
+                        {responseStructure ? (
+                            filteredOptions?.map(el => <li className="input-option" onClick={e => handleOptionClick(el)}>{el[responseStructure.displayKey]}</li>)
+                        ) : (
+                            filteredOptions?.map(el => <li className="input-option" onClick={e => handleOptionClick(el)}>{el}</li>)
+                        )}
                     </ul>
                 </div>
                 <div className="filter-tags">
                     {currentList?.map((tag, index) => (
                         <div className="tag-container2" key={index} id={index.id}  >
-                            <span className='tag'>{tag}</span>
+                            <span className='tag'>{responseStructure && tag ? tag[responseStructure.displayKey] : tag}</span>
                             <button className='tag-close' onClick={() => deleteTag(tag)}>&#215;</button>
                         </div>
                     ))}
