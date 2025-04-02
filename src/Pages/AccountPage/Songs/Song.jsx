@@ -25,13 +25,13 @@ const statusColor = {
     5: 'red'
 }
 
-export default function Song (props) {
-    // TODO: дубль RequestSong
+export default function Song ({id, artist, featured=[], status}) {
     const [songName, setSongName] = useState('');
     const [duration, setDuration] = useState(0);
     const [songId, setSongId] = useState(undefined); 
     const [auditionCount, setAuditionCount] = useState(0);
     const [coverLink, setCoverLink] = useState(cover);
+    const [artistNames, setArtistNames] = useState('');
 
     const formatTime = (miliseconds) => {
         let seconds = miliseconds * 0.001
@@ -45,7 +45,7 @@ export default function Song (props) {
     };
 
     useEffect(() => {
-        axiosAuthorized.get(`api/song/upload-request/${props.id}`)
+        axiosAuthorized.get(`api/song/upload-request/${id}`)
         .then(response => {
             setSongName(response.data.songName);
             setDuration(response.data?.durationMs);
@@ -61,8 +61,14 @@ export default function Song (props) {
         setDuration(formatTime(0));
     }, []);
 
+    useEffect(() => {
+        let names = artist;
+        featured.map(el =>  names += ', ' + el);
+        setArtistNames(names);
+    }, [featured]);
+
     async function getCoverLink() {
-        await axiosUnauthorized.get(`api/song/upload-request/${props.id}/logo/link`).then(response => {
+        await axiosUnauthorized.get(`api/song/upload-request/${id}/logo/link`).then(response => {
             setCoverLink(response.data.presignedLink);
         })
         .catch(err => {setCoverLink(cover)});
@@ -71,11 +77,11 @@ export default function Song (props) {
     return (
         <div className='track'>
             <img draggable='false' className='song-img' alt='cover' src={coverLink}/>
-            <p className='song-title-t'>{shortenText(songName, 15)}<p className='songAuthor'>{shortenText(props.artist + ', ' + props.featured, 15)}</p></p>
+            <p className='song-title-t'>{shortenText(songName, 15)}<p className='songAuthor'>{shortenText(artistNames, 20)}</p></p>
             <p className='track-statistic'><img alt='stats' src={statsIcon}/>{auditionCount}</p>
             <p className='song-status' style={{width: '100%'}}>
-                <div className={'song-status-dot ' + statusColor[props.status]}></div>
-                {statusType[props.status]}
+                <div className={'song-status-dot ' + statusColor[status]}></div>
+                {statusType[status]}
             </p>
             <p className='song-duration'>{formatTime(duration)}</p>
             <div className='track-buttons'>
@@ -83,7 +89,7 @@ export default function Song (props) {
                     <Link draggable='false' to={`/commentaries/${songId}`}><img draggable='false' alt='comment' src={message}/></Link> : 
                     <Link draggable='false' to={`/account`}><img alt='comment' draggable='false' src={message} style={{opacity: 0.2}}/></Link>
                 }
-                <a href={`/uploadmusic/${props.id}`}><img alt='list' src={editIcon} /></a>
+                <a href={`/uploadmusic/${id}`}><img alt='list' src={editIcon} /></a>
             </div>
             
         </div>

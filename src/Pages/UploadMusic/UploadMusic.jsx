@@ -53,6 +53,7 @@ function UploadMusic(){
     const [title, setTitle] = useState('Новый трек');
     const [duration, setDuration] = useState(0);
     const [coAuthors, setCoAuthors] = useState([]);
+    const [statusAuthor, setStatusAuthor] = useState(0);
 
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
     const [isSent, setIsSent] = useState(false);
@@ -74,7 +75,6 @@ function UploadMusic(){
         let flag = false;
         arr.forEach((input) => {
             if (input == undefined || input == '' || (input == [] && input.length == 0)) {
-                console.log(input == undefined);
                 flag = true;
             }
         })
@@ -178,13 +178,10 @@ function UploadMusic(){
         if (role === 'admin') {
             await changeSongRequestStatus(3, comment, params.id);
         } else if (role === 'coAuthor') {
-            // await answerSongRequestAsCoAuthor(params.id, true);
-            if (coAuthors.filter(el => el.requestStatus === 2).length  === coAuthors.length) {
-                await sendSongRequestToReview(params.id);
-            }
+            await answerSongRequestAsCoAuthor(params.id, true);
         }
         
-        // navigate(-1);        
+        navigate(-1);        
     }
 
     const declineSong = async () => {
@@ -235,18 +232,22 @@ function UploadMusic(){
         setCurrentImage(songRequestInfo.logoFileLink);
         setSongfile(songRequestInfo.songFileLink);
         setDuration(songRequestInfo.durationMs);
-        setCoAuthors(songRequestInfo.featuredAuthorList);
+        let authors = songRequestInfo.featuredAuthorList;
         if (songRequestInfo.reviewerComment !== null)
             setComment(songRequestInfo.reviewerComment);
         
-        if (songRequestInfo.featuredAuthorList.some(el => el.userId === cookies.userId)) {
+        if (authors.some(el => el.userId === cookies.userId)) {
             setRole('coAuthor');
-            setTitle('Согласование трека')
+            setTitle('Согласование трека');
+            let status = authors.filter(el => el.userId === cookies.userId)[0].requestStatus;            ;
+            setStatusAuthor(status);
         }
         else if (cookies?.role !== 'admin'){
             setRole('authoredit');
             setTitle('Редактирование трека');
         }
+        authors = [...authors, songRequestInfo.author];
+        setCoAuthors(authors);
     }
 
     const { getRootProps: getInputFile } = useDropzone({
@@ -414,7 +415,7 @@ function UploadMusic(){
                                 icon={uploadImg}
                                 disabled={isButtonDisabled}/>
                         </div>
-                            <text className='warning-upload'>*перед публикацией трек будет отправлен на модерацию</text>
+                            <text className='warning-upload'>*перед публикацией трек будет отправлен на модерацию и согласование другим авторам</text>
                     </div> : ''}
 
                     {role === 'admin' ? <div>
@@ -445,13 +446,15 @@ function UploadMusic(){
                             ) : (<></>)}
                     </div> : ''}
 
-                    {role === 'coAuthor' ? <div>
+                    {role === 'coAuthor' && statusAuthor === 1 ? <div>
                         <div className='button-and-text'>
                             <CustomButton 
                                 text={'Подтвердить*'} 
                                 func={acceptSong} 
                                 success={'Подтверждено'} 
-                                icon={uploadImg}/>
+                                icon={uploadImg}
+                                disabled={statusAuthor !== 1}
+                                />
                             <button className='save-installmusic' onClick={declineSong}><img src={trashImg}/>Отклонить</button>
                         </div>
                         <text className='warning-upload'>*перед публикацией трек будет отправлен на модерацию и согласование другим авторам</text>

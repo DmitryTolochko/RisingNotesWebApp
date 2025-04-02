@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import Playlist from '../../Components/Playlist';
 import ShowMoreBtn from './ShowMoreBtn';
 
-const Playlists = ({playlists, activeTab, setActiveTab}) =>{
+const Playlists = ({playlists, activeTab, setActiveTab, customHeading='Плейлисты', isNewHidden=false}) =>{
 
     const playlistsToShow = playlists?.length>5 && activeTab=='main' ? playlists.slice(0,5) : playlists
     const dispatch = useDispatch()
@@ -33,16 +33,19 @@ const Playlists = ({playlists, activeTab, setActiveTab}) =>{
     return(
         <section className='featured-section'>
             <div className="featured-section__title_wrapper">
-                <h2 className='featured-section__title'>Плейлисты</h2>
+                <h2 className='featured-section__title'>{customHeading}</h2>
                 <ShowMoreBtn collection={playlists} redirect={'playlists'} maxValue={5} activeTab={activeTab} setActiveTab={setActiveTab}/>
             </div>
             <div className="playlists">
                 {playlistsToShow?.map(el => (
                     <Playlist id={el}/>
                 ))}
-                <div draggable='false' className='playlist'>
-                    <img draggable='false' className='new-playlist' alt='add new playlist' src={newPlaylist} onClick={addNewPlaylist}/>
-                </div>
+                {!isNewHidden ? (
+                    <div draggable='false' className='playlist'>
+                        <img draggable='false' className='new-playlist' alt='add new playlist' src={newPlaylist} onClick={addNewPlaylist}/>
+                    </div>
+                ) : (<></>)}
+                
             </div>
         </section>
     )

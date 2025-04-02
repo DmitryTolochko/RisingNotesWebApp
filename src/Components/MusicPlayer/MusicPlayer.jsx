@@ -14,9 +14,6 @@ import vol from '../../Images/controller/volume-2.svg';
 import { ReactComponent as ListIcon } from '../../Images/list.svg';
 import playlistIcon from '../../Images/player/plus.svg';
 
-import { api } from '../App/App';
-import { axiosAuthorized, axiosUnauthorized } from '../App/App';
-
 import './MusicPlayer.css';
 import useSearchClean from '../../Hooks/useSearchClean/useSearchClean';
 import { useCookies } from 'react-cookie';
@@ -41,8 +38,7 @@ const MusicPlayer = () => {
     const [auditionTimer, setAuditionTimer] = useState(null);
     const handleRef = useRef(0);
     const [songName, setSongName] = useState('');
-    const [songAuthor, setSongAuthor] = useState('');
-    const [authorId, setAuthorId] = useState('');
+    const [songAuthors, setSongAuthors] = useState([]);
     const location = useLocation();
     const [hiddenTag, setHiddenTag] = useState('');
     const [coverLink, setCoverLink] = useState(cover);
@@ -99,16 +95,8 @@ const MusicPlayer = () => {
             getSongInfo(currentSong, undefined)
             .then(songInfo => {
                 setSongName(songInfo.name);
-                setAuthorId(songInfo.authorId);
-                getAuthorInfo(songInfo.authorId)
-                .then(info => {
-                    setSongAuthor(info.name);
-                })
-                .catch(err => {
-                    console.log(err);
-                    dispatch(updateSongsValue(songs.filter(e => e !== currentSong)))
-                    dispatch(updateCurrentSongValue(''))
-                });                    
+                let authors = [songInfo.author, ...songInfo.featuredAuthorList];
+                setSongAuthors(authors);                  
             })
             .catch(err => {
                 console.log(err);
@@ -333,6 +321,12 @@ const MusicPlayer = () => {
         cleanQuery();
     }
 
+    function getProperAuthorName(el, index) {
+        if (index + 1 !== songAuthors.length) {
+            return shortenText(el.name, 25) + ', ';
+        }
+        return shortenText(el.name, 25);
+    }
 
     if (resize === 'standart') {
         return (<div className={"music-player-wrapper " + hiddenTag}>
@@ -343,7 +337,12 @@ const MusicPlayer = () => {
 
                 <span className='music-player-head' onClick={hideAllModals}>
                     <Link to={currentSong === '' ? '' : `/commentaries/${currentSong}`} className='music-player-head-song'>{shortenText(songName, 25)}</Link>
-                    <Link to={`/artist/${authorId}`} className='music-player-head-author'>{shortenText(songAuthor, 25)}</Link>
+                    <div className='music-player-authors'>
+                        {songAuthors.map((el, index) => (
+                                <Link to={`/artist/${el.id}`} key={index} className='music-player-head-author'>{getProperAuthorName(el, index)}</Link>
+                        ))}
+                    </div>
+                    
                 </span>
 
                 <div className='music-player-buttons'>
@@ -363,7 +362,7 @@ const MusicPlayer = () => {
                 </div>
                 ) : (<></>)}
                 
-                {!modalIsHidden ? <div className='playlist-modal-wrapper'><PlaylistModalMenu songAuthor={songAuthor} songName={songName} id={currentSong}/></div> : <></>}
+                {!modalIsHidden ? <div className='playlist-modal-wrapper'><PlaylistModalMenu songAuthor={'Плейлист: '} songName={songName} id={currentSong}/></div> : <></>}
                 
                 <div className="track-range">
                     <span className="header-text header__track-duration">{formatTime(trackCurrentDuration)}</span>
@@ -402,7 +401,11 @@ const MusicPlayer = () => {
                     <img className={isPlaying ? 'mobile-music-player-img rotate' : 'mobile-music-player-img'} draggable='false' src={coverLink} alt='cover'/>
                     <span>
                         <Link to={currentSong === '' ? '' : `/commentaries/${currentSong}`} className='mobile-music-player-song-name'>{shortenText(songName, 25)}</Link>
-                        <Link to={`/artist/${authorId}`} className='mobile-music-player-author'>{shortenText(songAuthor, 25)}</Link>
+                        <div className='music-player-authors'>
+                            {songAuthors.map((el, index) => (
+                                <Link to={`/artist/${el.id}`} key={index} className='music-player-head-author'>{getProperAuthorName(el, index)}</Link>
+                            ))}
+                        </div>
                     </span>
                     <a onClick={() => {
                         dispatch(updatePlayerQueueVisibility(!isPlayerQueueVisible));
@@ -420,7 +423,7 @@ const MusicPlayer = () => {
                     </div>
                     ) : (<></>)}
                     
-                    {!modalIsHidden ? <div className='playlist-modal-wrapper-mobile'><PlaylistModalMenu songAuthor={songAuthor} songName={songName} id={currentSong}/></div> : <></>}
+                    {!modalIsHidden ? <div className='playlist-modal-wrapper-mobile'><PlaylistModalMenu songAuthor={'Плейлист: '} songName={songName} id={currentSong}/></div> : <></>}
 
                     <div className='music-player-buttons'>
                         <button onClick={handlePrevSong} disabled={songs.length < 1}>

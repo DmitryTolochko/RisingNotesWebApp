@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import BackButton from '../../Components/BackButton';
-import RequestSong from './RequestSong';
 import { api, axiosAuthorized } from '../../Components/App/App';
 import searchIcon from '../../Images/sidebar/Vector.svg';
 
 import './AdminPanel.css';
 import UserCard from '../../Components/UserCard/UserCard';
 import ChosenUser from '../../Components/ChosenUser/ChosenUser';
-import Loader from '../../Components/Loader/Loader';
 import { getClipRequestInfo, getClipRequestsListForReview } from '../../Api/ClipPublish';
 import { getSongRequestInfo, getSongRequestsListForReview } from '../../Api/SongPublish';
 import Clip from '../../Components/Clip/Clip';
 import VerticalClip from '../../Components/VerticalClip/VerticalClip';
+import Song from '../AccountPage/Songs/Song';
 
 function AdminPanel() {
     const [songRequestsList, setSongRequestsList] = useState([]);
@@ -128,8 +127,13 @@ function AdminPanel() {
                 </div>
 
                 {currPage === 0 ? (
-                    <div className=''>
-                        {songRequestsList.map(el => <RequestSong info={el} key={el.id}/>)}
+                    <div className='tracks'>
+                        {songRequestsList.map(el => <Song 
+                            key={el.id} 
+                            id={el.id} 
+                            artist={el.authorName} 
+                            featured={el.featuredAuthorList.map(el => el.name)}
+                            status={el.status}/>)}
                     </div>
                 ) : (<></>)}
 

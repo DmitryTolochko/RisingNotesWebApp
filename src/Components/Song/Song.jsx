@@ -21,15 +21,16 @@ import './Song.css';
 import { updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlice';
 import PlaylistModalMenu from '../PlaylistModalMenu/PlaylistModalMenu';
 import { updatePlayerQueueVisibility } from '../../Redux/slices/playerQueueSlice';
-import { addSongToExcluded, addSongToFavorite, deleteSongFromExcluded, deleteSongFromFavorite, getSongLogo } from '../../Api/Song';
+import { addSongToExcluded, addSongToFavorite, deleteSongFromExcluded, deleteSongFromFavorite, getSongInfo, getSongLogo } from '../../Api/Song';
+import { shortenText } from '../../Tools/Tools';
 
 function Song({
     id, 
     onClick=undefined, 
-    duration, 
-    artist, 
-    genres, 
-    name, 
+    // duration, 
+    // artist, 
+    // genres, 
+    // name, 
     isAttachedToMessage=false, 
     isPicked=false,
     deleteFunc=undefined
@@ -37,6 +38,9 @@ function Song({
     const [modalIsHidden, setModalIsHidden] = useState(true);
     const [formatedDuration, setDuration] = useState(0);
     const [avatar, setAvatar] = useState(placeholder);
+    const [songName, setSongName] = useState('');
+    const [songAuthors, setSongAuthors] = useState([]);
+    const [genres, setGenres] = useState([]);
     const {cleanQuery} = useSearchClean();
 
     const dispatch = useDispatch();
@@ -46,6 +50,18 @@ function Song({
     const songs = useSelector((state)=>state.songs.value);
     const currentSong = useSelector((state)=> state.currentSong.value);
     const [isHoverOn, setIsHoverOn] = useState(false);
+
+    useEffect(() => {
+        getAvatar();
+        getSongInfo(id)
+        .then(info => {
+            setSongName(info.name);
+            setGenres(info.genreList);
+            setDuration(formatTime(info.durationMs));
+            let authors = [info.author, ...info.featuredAuthorList];
+            setSongAuthors(authors);
+        })
+    }, []);
 
     function runDelegate() {
         onClick(id);
@@ -67,12 +83,6 @@ function Song({
         seconds = seconds % 60;
         return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
     };
-
-    useEffect(() => {
-        // установить длительность песни в правильном формате
-        setDuration(formatTime(duration));
-        getAvatar();
-    }, []);
 
     async function handleToFavorite() {
         // добавление и удаление из избранных
@@ -118,6 +128,12 @@ function Song({
         cleanQuery();
     };
 
+    function getProperArtistName() {
+        let names = '';
+        songAuthors.map(el =>  names += el.name + ', ');
+        return shortenText(names.slice(0, -2), 20);
+    }
+
     if (!isAttachedToMessage)
     return (
         <>
@@ -132,8 +148,8 @@ function Song({
                     ) : (<></>)}
                     <img onClick={handleAddToSongs} className='song-img' alt='cover' src={avatar} draggable='false'/>
                 </div>
-                <Link to={`/commentaries/${id}`} onClick={hideAllModals} className='song-title-t'>{name}
-                    <p className='songAuthor'>{artist}</p>
+                <Link to={`/commentaries/${id}`} onClick={hideAllModals} className='song-title-t'>{shortenText(songName, 20)}
+                    <p className='songAuthor'>{getProperArtistName()}</p>
                 </Link>
                 
                 {resize === 'standart' ? (
@@ -155,7 +171,7 @@ function Song({
                     <a onClick={handleToFavorite}><img alt='like' src={featured.includes(id) ? redHeart : heart}/></a>
                 )}
 
-                {!modalIsHidden ? (<PlaylistModalMenu songAuthor={artist} songName={name} id={id}/>) : (<></>)}
+                {!modalIsHidden ? (<PlaylistModalMenu songAuthor={'Плейлист: '} songName={songName} id={id}/>) : (<></>)}
             </div>
         </>
     )
@@ -172,8 +188,8 @@ function Song({
                 ) : (<></>)}
                 <img onClick={handleAddToSongs} className='song-img' alt='cover' src={avatar} draggable='false'/>
             </div>
-            <Link className='song-title-t' style={{maxWidth: 'none'}}>{name}
-                <p className='songAuthor'>{artist}</p>
+            <Link className='song-title-t' style={{maxWidth: 'none'}}>{shortenText(songName, 20)}
+                <p className='songAuthor'>{getProperArtistName()}</p>
             </Link>
             
             {isPicked && deleteFunc ? (

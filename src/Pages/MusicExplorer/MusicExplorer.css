@@ -20,6 +20,18 @@
     }
 }
 
+.explorer-main-block {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.explorer-main-block > p {
+    font-size: 16px;
+}
+
 .filter-button {
     border-radius: 15px;
     animation: 1.5s infinite linear shadow-spin;
@@ -56,6 +68,7 @@
     width: 100%;
     max-width: 1224px;
     margin-bottom: 40px;
+    padding-top: 245px;
 }
 
 .filter-opened {

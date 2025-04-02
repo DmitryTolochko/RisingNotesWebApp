@@ -16,6 +16,7 @@ import { updateCurrentSongValue } from '../../Redux/slices/currentSongSlice';
 import FilterNotificationPopup from '../../Components/Player/FilterComponent/FilterElements/FilterNotificationPopup';
 import { shortenText } from '../../Tools/Tools';
 import { getSongInfo, getSongLogo } from '../../Api/Song';
+import Playlists from '../Featured/Playlists';
 
 function MusicExplorer() {
     const [iconColor, setIconColor] = useState('#000000');
@@ -23,6 +24,7 @@ function MusicExplorer() {
     const currentSong = useSelector((state)=> state.currentSong.value);
     const subscriptions = useSelector((state)=>state.subscriptions.value);
     const songs = useSelector((state)=> state.songs.value);
+    const playlists = useSelector((state) => state.playlists.value);
 
     const dispatch = useDispatch();
 
@@ -150,10 +152,15 @@ function MusicExplorer() {
     return (
         <div className='comment-page-wrapper'>
             <div className='explorer' style={{justifyContent: 'center', marginTop: '0'}}>
-                <span className='explorer-start-h'>
-                    <img src={icon}/>
-                    <h1>Искать новых авторов</h1>
+                <span className='explorer-main-block'>
+                    <span className='explorer-start-h'>
+                        <img src={icon}/>
+                        <h1 style={{fontSize: '48px'}}>Искать новых авторов</h1>
+                    </span>
+                    <p>Ищите авторов и создавайте коллабы, чтобы попасть в плейлисты от редакции!</p>
+                    
                 </span>
+
                 <button className={filters.visibility ? 'filter-button filter-opened' : 'filter-button'}
                     onClick={() => {
                         dispatch(setFilterVisibility(!filters.visibility));
@@ -162,6 +169,8 @@ function MusicExplorer() {
                     <FilterIcon stroke={iconColor} />
                     Настроить
                 </button>
+                
+                <Playlists playlists={playlists} customHeading='Плейлисты от редакции' isNewHidden={true}/>
                 <img className="player-bg-image bg-loaded" src={bgImage} alt="" />  
                 <Filters setFiltersApplied={setFiltersApplied}/>
                 

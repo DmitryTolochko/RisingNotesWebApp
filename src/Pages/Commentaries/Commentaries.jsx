@@ -9,7 +9,6 @@ import commentsIcon from '../../Images/controller/message.svg';
 import sendIcon from '../../Images/controller/sendIcon.svg';
 import burgerIcon from '../../Images/controller/menu.svg';
 import playIcon from '../../Images/player/PlayBtn.svg';
-import defaultAvatar from '../../Images/image-placeholder/user_logo_small_placeholder.png';
 import placeholder from '../../Images/main-placeholder.png';
 import heartIcon from '../../Images/controller/heart.svg';
 import redHeart from '../../Images/red-heart.svg';
@@ -20,15 +19,15 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import './Commentaries.css';
 import CustomButton from '../../Components/CustomButton/CustomButton';
-import { updateVideoPlayerValue } from '../../Redux/slices/videoPlayerSlice';
 import { updateCurrentSongValue } from '../../Redux/slices/currentSongSlice';
 import { updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlice';
 import { updateFeaturedValue } from '../../Redux/slices/featuredSlice';
 import PlaylistModalMenu from '../../Components/PlaylistModalMenu/PlaylistModalMenu';
 import useSearchClean from '../../Hooks/useSearchClean/useSearchClean';
 import { shortenText } from '../../Tools/Tools';
-import { deleteSongComment, getSongComments, sendSongComment } from '../../Api/SongComment';
+import { getSongComments, sendSongComment } from '../../Api/SongComment';
 import { addSongToFavorite, deleteSongFromFavorite, getSongInfo, getSongLogo } from '../../Api/Song';
+import { getAuthorLogo } from '../../Api/Author';
 
 const Commentaries = ({clip}) => {
     const params = useParams();
@@ -36,8 +35,7 @@ const Commentaries = ({clip}) => {
     const [comment, setComment] = useState('');
     const [isDataUpdated, setIsDataUpdated] = useState(false);
     const [songName, setSongName] = useState('');
-    const [songAuthor, setSongAuthor] = useState('');
-    const [authorId, setAuthorId] = useState('');
+    const [songAuthors, setSongAuthors] = useState([]);
     const [genres, setGenres] = useState([]);
     const [clipId, setClipId] = useState(clip ? clip : undefined);
 
@@ -45,7 +43,6 @@ const Commentaries = ({clip}) => {
     const [songText, setText] = useState('');
     const resize = useSelector((state)=> state.resize.value);
     const dispatch = useDispatch();
-    const [artistAvatar, setArtistAvatar] = useState(defaultAvatar);
     const [songLogo, setSongLogo] = useState(placeholder);
     const [playButtonIcon, setPlayButtonIcon] = useState(playFilledIcon);
     const featured = useSelector((state)=>state.featured.value);
@@ -70,8 +67,6 @@ const Commentaries = ({clip}) => {
 
     async function getAllInfo () {
         // получить всю информацию
-        let authorId = undefined;
-
         if(clip){
             await axiosUnauthorized.get(`/api/music-clip/${clipId}/comment/list`)
                 .then(response => {
@@ -89,17 +84,15 @@ const Commentaries = ({clip}) => {
             let songInfo = await getSongInfo(params.id);
             setSongName(songInfo.name);
             setGenres(songInfo.genreList);
-            setSongAuthor(songInfo.authorName);
             setText(songInfo?.lyrics !== 'undefined' && songInfo.lyrics ? songInfo.lyrics : 'Мы не знаем текст этой песни :(');
-            setAuthorId(songInfo.authorId);
+            let authors = [songInfo.author, ...songInfo.featuredAuthorList];
+            let list = await Promise.all(authors.map(async el => {
+                let info = el;
+                info.logo = await getAuthorLogo(el.id);
+                return info;
+            }))
 
-            await axiosPictures.get('api/author/' + authorId + '/logo/link')
-                .then(response => {
-                    setArtistAvatar(response?.data?.presignedLink)
-                })
-                .catch(err => {
-                    setArtistAvatar(defaultAvatar);
-                });
+            setSongAuthors(list);
 
             await axiosPictures.get(api + 'api/music-clip/by-song/' + params.id)
                 .then(response => {
@@ -184,12 +177,19 @@ const Commentaries = ({clip}) => {
                             <a onClick={handleToFavorite}><img draggable='false' src={featured.includes(params.id) ? redHeart : heartIcon}/></a>
                             <a onClick={handlePlaySong}><img src={playButtonIcon} draggable='false'/></a>
                             <a onClick={changeModalState}><img src={listIcon} draggable='false'/></a>
-                            {!modalIsHidden ? (<PlaylistModalMenu songAuthor={songAuthor} songName={songName} id={params.id}/>) : (<></>)}
+                            {!modalIsHidden ? (<PlaylistModalMenu songAuthor={'Плейлист: '} songName={songName} id={params.id}/>) : (<></>)}
                         </div>
                         <img alt='cover' src={songLogo} draggable='false'/>
                         <span className='comm-page-text'>
                             <h2 className='comm-page-h2'>{shortenText(songName, 25)}</h2>
-                            <Link to={`/artist/${authorId}`} className='comm-page-author'><img src={artistAvatar} alt='avatar'/>{shortenText(songAuthor, 25)}</Link>
+                            <div className='comm-authors'>
+                                {songAuthors.map(el => (
+                                    <Link to={`/artist/${el.id}`} className='comm-page-author'>
+                                        <img src={el.logo} alt='avatar'/>{shortenText(el.name, 25)}
+                                    </Link>
+                                ))}
+                            </div>
+                            
                             <div className='comm-head-buttons'>
                                 {genres.map(el => <span key={el} className='song-tag'>{el}</span>)}
                             </div>
