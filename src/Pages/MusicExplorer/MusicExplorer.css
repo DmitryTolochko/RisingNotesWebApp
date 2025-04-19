@@ -10,6 +10,12 @@
     }
 }
 
+.explorer-start-h > h1 {
+    @media screen and (min-width: 770px){ 
+        font-size: 48px !important;
+    }
+}
+
 .explorer-start-h > img{
     width: 48px;
     height: 40px;
@@ -68,7 +74,7 @@
     width: 100%;
     max-width: 1224px;
     margin-bottom: 40px;
-    padding-top: 245px;
+    /* padding-top: 245px; */
 }
 
 .filter-opened {

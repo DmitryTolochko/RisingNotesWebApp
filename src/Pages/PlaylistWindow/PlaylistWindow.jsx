@@ -17,6 +17,8 @@ import { updateMusicIsPlayingValue } from '../../Redux/slices/musicIsPlayingSlic
 import { showError } from '../../Redux/slices/errorMessageSlice';
 import { updatePlayerQueueName } from '../../Redux/slices/playerQueueSlice';
 import { shortenText } from '../../Tools/Tools';
+import { useCookies } from 'react-cookie';
+import { changePlaylistPrivacy, makeGeneratedPlaylistPublic } from '../../Api/Playlist';
 
 function PlaylistWindow(){
     const imageSetterRef = useRef(null);
@@ -31,6 +33,7 @@ function PlaylistWindow(){
 
     const playlists = useSelector((state)=>state.playlists.value)
     const dispatch = useDispatch();
+    const [cookies, setCookies] = useCookies(['accessToken', 'refreshToken', 'authorId', 'role', 'userId']);
     
 
     async function reviewAvatar() {
@@ -73,7 +76,7 @@ function PlaylistWindow(){
         try {
             await axiosAuthorized.delete(`api/playlist/${params.id}`);
                 dispatch(
-                    updatePlaylistsValue(playlists.filter(id => id !== params.id))
+                    updatePlaylistsValue(playlists.filter(el => el.id !== params.id))
                 )
             navigate(`/featured`)
         } 
@@ -83,7 +86,7 @@ function PlaylistWindow(){
     }
 
     const handleImageInput = () => {
-        if (playlists.filter(el => el === params.id).length > 0)
+        if (playlists?.filter(el => el.id === params.id).length > 0 || cookies.role === 'admin')
             imageSetterRef.current.click();
     }
 
@@ -122,10 +125,10 @@ function PlaylistWindow(){
     };
 
     const handleInputChange = (event) => {
-        if (playlists.some(el => el === params.id)) {
+        if (playlists?.some(el => el.id === params.id)) {
             dispatch(
-                updatePlaylistsValue(playlists.filter(el => el != params.id))
-            )
+                updatePlaylistsValue(playlists.filter(el => el.id != params.id))
+            );
         }
         setNamePlaylist(event.target.value);
     };
@@ -140,23 +143,33 @@ function PlaylistWindow(){
         .then(() => {
             setIsEditing(false);
         });
-        if (!playlists.some(el => el === params.id)) {
+        if (!playlists.some(el => el.id === params.id)) {
             dispatch(
-                updatePlaylistsValue([...playlists, params.id])
-            )
+                updatePlaylistsValue([...playlists, {id: params.id, name: namePlaylist, isPrivate: isPrivate}])
+            );
         }
     };
 
     const handleCheckboxChange = async () => {
         // приватизация плейлиста
         const playlistId = params.id;
-        try {
-          await axiosAuthorized.patch(`/api/playlist/${playlistId}`, {
-            isPrivate: !isPrivate
-          });
-        } catch (error) {
-          console.error(error);
+        if (cookies.role === 'admin') {
+            await makeGeneratedPlaylistPublic(playlistId);
+        } else {
+            await changePlaylistPrivacy(playlistId, !isPrivate);
         }
+
+        let arr = playlists.filter(el => el.id != params.id);
+        let playlist = playlists.filter(el => el.id === params.id)[0];
+        arr.push({
+            id: playlist.id,
+            name: playlist.name,
+            isPrivate: !isPrivate
+        });
+
+        dispatch(
+            updatePlaylistsValue(arr)
+        );
 
         setIsPrivate(!isPrivate);
     };
@@ -176,7 +189,7 @@ function PlaylistWindow(){
                 <BackButton/>
                 <div className='playlist-information'>
                     <div className='playlist-image-wrapper' onClick={handleImageInput}>
-                        {playlists.filter(el => el === params.id).length > 0 ? 
+                        {playlists?.filter(el => el.id === params.id).length > 0 || cookies.role === 'admin' ? 
                             <div className='playlist-image-change'><img draggable='false' src={bigEdit}/></div> : <></>}
                         <img draggable='false' className='playlist-image' alt='playlist cover' 
                             src={logofile}/>
@@ -201,7 +214,7 @@ function PlaylistWindow(){
                             ) : (
                             <p className='playlistname' >{shortenText(namePlaylist, 35)}</p>
                         )}
-                        {playlists.filter(el => el === params.id).length > 0 ? (
+                        {playlists?.filter(el => el.id === params.id).length > 0  || cookies.role === 'admin' ? (
                             <div className='playlist-edit'>
                                 <div className="private-checkbox">
                                     <input type="checkbox" className='checkbox' checked={isPrivate}/>

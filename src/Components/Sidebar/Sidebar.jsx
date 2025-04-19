@@ -56,15 +56,15 @@ function Sidebar(props) {
       // Получить или обновить информацию о плейлистах
       try {
          const arr = await Promise.all(playlists.map(async (el) => {
-            let response = await axiosAuthorized.get(`api/playlist/${el}`)
+            let response = await axiosAuthorized.get(`api/playlist/${el.id}`)
             .catch(err => console.log(err));
-            let img = await axiosPictures.get(api + `api/playlist/${el}/logo/link`)
+            let img = await axiosPictures.get(api + `api/playlist/${el.id}/logo/link`)
             .then(resp => {return resp?.data?.presignedLink})
             .catch(err => {return placeholder});
 
             return {
                name: response?.data?.name,
-               id: el,
+               id: el.id,
                img: img
             };
          }));
@@ -94,7 +94,7 @@ function Sidebar(props) {
       .then (
          response => {
             id = response.data.id
-            dispatch(updatePlaylistsValue([...playlists, id]))
+            dispatch(updatePlaylistsValue([...playlists, {id: id, name: 'Новый плейлист', isPrivate: true}]))
          }
       )
       navigate(`/playlist/${id}`)

@@ -18,16 +18,16 @@ function PlaylistModalMenu({songAuthor, songName, id}) {
     async function getPlaylistsInfo() {
         // Получить или обновить информацию о плейлистах
         let arr = await Promise.all(playlists.map(async (el) => {
-            const response = await axiosAuthorized.get(`api/playlist/${el}`)
+            const response = await axiosAuthorized.get(`api/playlist/${el.id}`)
             .catch(err => console.log(err));
             let img = thumb;
-            await axiosPictures.get(api + `api/playlist/${el}/logo/link`)
+            await axiosPictures.get(api + `api/playlist/${el.id}/logo/link`)
             .then(response => img = response?.data?.presignedLink)
             .catch(err => img = thumb);
 
             let isSongInPlaylist = false;
 
-            await axiosUnauthorized.get(`api/playlist/` + el +`/song/list`)
+            await axiosUnauthorized.get(`api/playlist/` + el.id +`/song/list`)
             .then(resp => {
                 if (resp.data.songList.filter(el => el.id === id).length > 0)
                 {
@@ -45,16 +45,16 @@ function PlaylistModalMenu({songAuthor, songName, id}) {
         setPlaylistsInfo(arr);
     }  
 
-    async function addToPlaylist(playlistId) {
+    async function addToPlaylist(playlist) {
         // Добавить в плейлист
-        await axiosAuthorized.patch(api + `api/playlist/` + playlistId + '/song/' + id).then(response => {
+        await axiosAuthorized.patch(api + `api/playlist/` + playlist.id + '/song/' + id).then(response => {
             getPlaylistsInfo();
         })
     }
 
-    async function excludeFromPlaylist(playlistId) {
+    async function excludeFromPlaylist(playlist) {
         // Удалить из плейлиста
-        await axiosAuthorized.delete(api + `api/playlist/` + playlistId + '/song/' + id).then(response => {
+        await axiosAuthorized.delete(api + `api/playlist/` + playlist.id + '/song/' + id).then(response => {
             getPlaylistsInfo();
         })
     }
@@ -70,8 +70,8 @@ function PlaylistModalMenu({songAuthor, songName, id}) {
         .then (
             response => {
                 id = response.data.id
-                dispatch(updatePlaylistsValue([...playlists, id]))
-                addToPlaylist(id);
+                dispatch(updatePlaylistsValue([...playlists, {id: id, name: shortenText(songAuthor, 15) + ' - ' + shortenText(songName, 15), isPrivate: true}]))
+                addToPlaylist({id: id, name: shortenText(songAuthor, 15) + ' - ' + shortenText(songName, 15), isPrivate: true});
             }
         )
 

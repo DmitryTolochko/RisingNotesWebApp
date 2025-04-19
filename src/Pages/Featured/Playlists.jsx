@@ -1,34 +1,21 @@
 import newPlaylist from '../../Images/featured/newplaylist.png';
-import { axiosAuthorized } from '../../Components/App/App';
-import { api } from '../../Components/App/App';
 import { useDispatch } from 'react-redux';
 import { updatePlaylistsValue } from '../../Redux/slices/playlistsSlice';
 import { useNavigate } from 'react-router-dom';
-import Playlist from '../../Components/Playlist';
+import Playlist from '../../Components/Playlist/Playlist';
 import ShowMoreBtn from './ShowMoreBtn';
+import { createNewPlaylist } from '../../Api/Playlist';
 
 const Playlists = ({playlists, activeTab, setActiveTab, customHeading='Плейлисты', isNewHidden=false}) =>{
-
-    const playlistsToShow = playlists?.length>5 && activeTab=='main' ? playlists.slice(0,5) : playlists
+    const playlistsToShow = playlists?.length> 5 && activeTab=='main' ? playlists.slice(0,5) : playlists
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
     async function addNewPlaylist() {
-        let id = 0
-        let formData = new FormData();
-        formData.append('Name', 'Новый плейлист')
-        await axiosAuthorized.post(api + 'api/playlist', formData, { headers: {
-            "Content-Type": "multipart/form-data",
-        }})
-        .then (
-            response => {
-                id = response.data.id
-                dispatch(updatePlaylistsValue([...playlists, id]))
-            }
-        )
-        navigate(`/playlist/${id}`)
+        let id = await createNewPlaylist('Новый плейлист');
+        dispatch(updatePlaylistsValue([...playlists, {id: id, name: "Новый плейлист", isPrivate: true}]));
+        navigate(`/playlist/${id}`);
     };
-
     
     return(
         <section className='featured-section'>
@@ -37,15 +24,14 @@ const Playlists = ({playlists, activeTab, setActiveTab, customHeading='Плей�
                 <ShowMoreBtn collection={playlists} redirect={'playlists'} maxValue={5} activeTab={activeTab} setActiveTab={setActiveTab}/>
             </div>
             <div className="playlists">
-                {playlistsToShow?.map(el => (
-                    <Playlist id={el}/>
-                ))}
                 {!isNewHidden ? (
                     <div draggable='false' className='playlist'>
                         <img draggable='false' className='new-playlist' alt='add new playlist' src={newPlaylist} onClick={addNewPlaylist}/>
                     </div>
                 ) : (<></>)}
-                
+                {playlistsToShow?.map(el => (
+                    <Playlist id={el.id} isPrivate={!isNewHidden ? el.isPrivate : true}/>
+                ))}
             </div>
         </section>
     )

@@ -114,6 +114,7 @@
 }
 .featured-section{
     margin-bottom: 50px;
+    z-index: 2;
 }
 .featured-section > .playlists{
     margin: 0;

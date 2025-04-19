@@ -13,8 +13,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { ReactComponent as BellImage} from '../../Images/controller/bell.svg';
 
 import './Header.css';
-import { clearNotification, updateChatInfo } from '../../Redux/slices/socketInfoSlice';
-import { shortenText } from '../../Tools/Tools';
+import { clearNotification, NotificationTypes, updateChatInfo } from '../../Redux/slices/socketInfoSlice';
+import { shortenText, statusColor, statusType } from '../../Tools/Tools';
 import { getChatInfo } from '../../Api/Messenger';
 
 
@@ -55,9 +55,14 @@ function Header() {
     async function handleClickOnMessage(el) {
         setIsNotificationsOpened(false);
         dispatch(clearNotification(el));
-        let info = await getChatInfo(el.id);
-        dispatch(updateChatInfo(info));
-        navigate(`/messenger`);
+        if (el.type === NotificationTypes.message) {
+            let info = await getChatInfo(el.id);
+            dispatch(updateChatInfo(info));
+            navigate(`/messenger`);
+        } else if (el.type === NotificationTypes.songRequest) {
+            navigate(`/uploadmusic/${el.id}`)
+        }
+        
     }
 
     return (
@@ -96,11 +101,12 @@ function Header() {
                         <div className='notification-messages'>
                             {notifications.map(el => (
                                 <div className='notification-message' onClick={() => handleClickOnMessage(el)}>
-                                    <img src={el.logoFileLink ? el.logoFileLink : defaultAvatar}/>
+                                    <img src={el.logoFileLink ? el.logoFileLink : defaultAvatar} className={el.type === NotificationTypes.message ? 'round-avatar' : 'square-avatar'}/>
                                     <span>
-                                        <p className='notification-message-user-name'>{shortenText(el.userName, 13)}</p>
-                                        <p className='notification-message-text'>{shortenText(el?.message, 20)}</p>
+                                        <p className='notification-message-user-name'>{shortenText(el.type === NotificationTypes.message ? el.userName : statusType[el.status], 15)}</p>
+                                        <p className='notification-message-text'>{shortenText(el.type === NotificationTypes.message ? el.message : el.songName, 20)}</p>
                                     </span>
+                                    {el.type === NotificationTypes.songRequest ? <div className={'song-status-dot ' + statusColor[el.status]}></div> : <></>}
                                     {el?.unreadCount > 0 ? (
                                     <span>
                                         <div className='unread'>{el?.unreadCount}</div>

@@ -2,11 +2,13 @@ import { HubConnectionBuilder } from "@microsoft/signalr";
 import { useCookies } from "react-cookie";
 import { api, axiosAuthorized, axiosRefresh } from "../App/App";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { updateChatInfo, updateCurrentChatMessages, updateNotifications, updateRecentChats, updateRecentFilteredChats } from "../../Redux/slices/socketInfoSlice";
+import { NotificationTypes, updateChatInfo, updateCurrentChatMessages, updateNotifications, updateRecentChats, updateRecentFilteredChats } from "../../Redux/slices/socketInfoSlice";
 import { getMessages, getUnreadCount } from "../../Api/Messenger";
 import { jwtDecode } from "jwt-decode";
+import { getSongRequestInfo, getSongRequestsList } from "../../Api/SongPublish";
+import { statusType } from "../../Tools/Tools";
 
 export default function SocketConfig() {
     const socketInfo = useSelector((state)=> state.socketInfo);
@@ -14,6 +16,7 @@ export default function SocketConfig() {
     const [cookies, setCookies] = useCookies(['accessToken', 'userId', 'refreshToken']);
     const navigate = useNavigate();
     const socketRef = useRef();
+    const [isInitialized, setIsInitialized] = useState(false);
 
     const connection = new HubConnectionBuilder()
     .withUrl(api + 'messenger', {
@@ -45,7 +48,7 @@ export default function SocketConfig() {
             try {
                 if (cookies.accessToken) {
                     await connection.start();
-                    await getRecentChats(true);
+                    await getRecentChats();
                     console.log("SignalR Connected.");
                 }
             } catch (err) {
@@ -65,19 +68,42 @@ export default function SocketConfig() {
                 await getMessageForNotifications(thisChatId, preparedMessage, userName);
             }
             await getRecentChats();
-        })
+        });
 
         connection.on('onError', (errorText) => {
             console.log(errorText);
-        })
+        });
 
         connection.on('onMessageRead', (chatId, userId, messageId) => {
             console.log(userId);
-        })
+        });
+
+        connection.on('onAddFeaturedAuthor', async (authorId, publishRequestId) => {
+            let info = await getSongRequestInfo(publishRequestId);
+            dispatch(updateNotifications({
+                type: NotificationTypes.songRequest,
+                id: publishRequestId,
+                songName: info.songName,
+                logoFileLink: info.logoFileLink,
+                status: 0
+            }))
+        });
+
+        connection.on('onRequestStatusChange', async (authorId, publishRequestId, oldStatus, newStatus) => {
+            let info = await getSongRequestInfo(publishRequestId);
+            dispatch(updateNotifications({
+                type: NotificationTypes.songRequest,
+                id: publishRequestId,
+                songName: info.songName,
+                logoFileLink: info.logoFileLink,
+                status: newStatus,
+                oldStatus: oldStatus
+            }))
+        });
         await start();
     }
 
-    async function getRecentChats(isInitialized=false) {
+    async function getRecentChats() {
         // Получить существующие чаты
         let response = await axiosAuthorized.get('api/chat/list')
         .catch(err => {return undefined});
@@ -86,7 +112,7 @@ export default function SocketConfig() {
             const list = response?.data?.chatList;
             dispatch(updateRecentChats(list));
             dispatch(updateRecentFilteredChats(list));
-            if (isInitialized)
+            if (!isInitialized && socketInfo.notifications.length === 0)
                 await getAllUnreadCounts(list);
         }
     }
@@ -103,6 +129,7 @@ export default function SocketConfig() {
             .catch(err => {return undefined});
         if (response) {
             dispatch(updateNotifications({
+                type: NotificationTypes.message,
                 id: chatId, 
                 message: message, 
                 userName: userName, 
@@ -114,18 +141,39 @@ export default function SocketConfig() {
     async function getAllUnreadCounts(recentChats) {
         // получить количество непрочитанных сообщений для всех чатов
         let chats = await Promise.all(recentChats
-        .map(async chat => {
-            const newChat = { ...chat };
-            if (newChat?.lastMessage?.readAt === null && newChat?.lastMessage?.senderId !== cookies.userId) {
-                newChat.unreadCount = await getUnreadCount(newChat.id);
+            .map(async chat => {
+                const newChat = { ...chat };
+                if (newChat?.lastMessage?.readAt === null && newChat?.lastMessage?.senderId !== cookies.userId) {
+                    newChat.unreadCount = await getUnreadCount(newChat.id);
+                    dispatch(updateNotifications({
+                        type: NotificationTypes.message,
+                        id: newChat.id, 
+                        message: newChat.lastMessage.text, 
+                        userName: newChat.chatName, 
+                        logoFileLink: newChat.logoFileLink,
+                        unreadCount: newChat.unreadCount}));
+                }
+            })
+        );
+
+        let requests = await getSongRequestsList();
+        requests = requests.filter(el => el.featuredAuthorList.some(author => author.authorId === cookies.authorId && author.requestStatus < 2));
+
+        await Promise.all(requests
+        .map(async request => {
+                let info = await getSongRequestInfo(request.id);
                 dispatch(updateNotifications({
-                    id: newChat.id, 
-                    message: newChat.lastMessage.text, 
-                    userName: newChat.chatName, 
-                    logoFileLink: newChat.logoFileLink,
-                    unreadCount: newChat.unreadCount}));
-            }
-        }));
+                    type: NotificationTypes.songRequest,
+                    id: request.id,
+                    songName: info.songName,
+                    logoFileLink: info.logoFileLink,
+                    status: 0
+                }))
+            })
+        );
+
+        setIsInitialized(true);
+        
     }
 
     useEffect(() => {

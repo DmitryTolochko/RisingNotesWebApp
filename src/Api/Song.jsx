@@ -25,7 +25,7 @@ export async function deleteSongFromFavorite(songId) {
 }
 
 export async function addSongToExcluded(songId) {
-    await axiosAuthorized.patch(`api/song/excluded-track/${songId}`);
+    await axiosAuthorized.post(`api/song/excluded-track/${songId}`);
 }
 
 export async function deleteSongFromExcluded(songId) {

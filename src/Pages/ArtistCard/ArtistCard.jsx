@@ -16,23 +16,24 @@ import { updateSubscriptionsValue } from "../../Redux/slices/subscriptionsSlice.
 
 import './ArtistCard.css';
 import Loader from "../../Components/Loader/Loader.jsx";
+import Playlists from "../Featured/Playlists.jsx";
+import { getPublicPlaylists } from "../../Api/Playlist.jsx";
+import Playlist from "../../Components/Playlist/Playlist.jsx";
+import { getAuthorLogo } from "../../Api/Author.jsx";
 
 function ArtistCard(){
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const subscriptions = useSelector((state)=>state.subscriptions.value)
     const params = useParams();
     const [artist, setArtist] = useState(undefined);
     const [isLoaded, setIsLoaded] = useState(false);
-    const [isSubscribed, setIsSubscribed] = useState(subscriptions.includes(params.id));
     const [currPage, setCurrPage] = useState(0);
-    const [avatar, setAavatar] = useState(ArtistImage);
+    const [avatar, setAvatar] = useState(ArtistImage);
+    const [playlists, setPlaylists] = useState([]);
 
     useEffect(() => {
-        // проверка наличия картинки
-        axiosPictures.get(api + `api/user/${artist?.userId}/logo/link`)
-        .then(response => setAavatar(response?.data?.presignedLink))
-        .catch(err => {setAavatar(ArtistImage)});
+        if (artist?.userId !== undefined)
+            getArtistInfo();
     }, [artist])
 
     useEffect(() => {
@@ -73,6 +74,17 @@ function ArtistCard(){
         setCurrPage(id);
     };
 
+    async function getPlaylists(id, count, offset) {
+        let arr = await getPublicPlaylists(id, count, offset);
+        setPlaylists(arr);
+    }
+
+    async function getArtistInfo() {
+        let logo = await getAuthorLogo(artist?.artistId);
+        setAvatar(logo);
+        await getPlaylists(artist?.userId, 5, 0);
+    }
+
     if (isLoaded || artist?.userId)
         return(
             <section className="comment-page-wrapper">
@@ -89,6 +101,10 @@ function ArtistCard(){
                             className={currPage === 1 ? 'artist-card-menu-item artist-card-menu-item-active' : 'artist-card-menu-item'}>
                             Треки
                         </a>
+                        <a onClick={() => handleChangePage(4)} 
+                            className={currPage === 4 ? 'artist-card-menu-item artist-card-menu-item-active' : 'artist-card-menu-item'}>
+                            Плейлисты
+                        </a>
                         <a onClick={() => handleChangePage(2)} 
                             className={currPage === 2 ? 'artist-card-menu-item artist-card-menu-item-active' : 'artist-card-menu-item'}>
                             Клипы
@@ -101,6 +117,20 @@ function ArtistCard(){
 
                     {currPage === 0 ? 
                     <>
+                        <p className='top-tracks-title'>Плейлисты и альбомы
+                        <button className='search-show-more' onClick={async () => {
+                                await getPlaylists(artist?.userId, 100, 0)
+                                handleChangePage(4);
+                            }}>
+                            <span>Смотреть все</span>
+                            <img src={arrowRight} alt="" />
+                        </button>
+                        </p>
+                        <div className="playlists" style={{marginBottom: '24px'}}>
+                            {playlists?.map(el => (
+                                <Playlist id={el.id}/>
+                            ))}                            
+                        </div>
                         <p className='top-tracks-title'>Треки
                         <button className='search-show-more' onClick={() => handleChangePage(1)}>
                             <span>Смотреть все</span>
@@ -126,9 +156,16 @@ function ArtistCard(){
                     {currPage === 1 ? <Songs artist={artist}/> : <></>}
                     {currPage === 2 ? <Clips artistId={params.id}/> : <></>}
                     {currPage === 3 ? <Blog artistId={params.id}/> : <></>}
+                    {currPage === 4 ? (
+                        <div className="playlists">
+                            {playlists?.map(el => (
+                                <Playlist id={el.id}/>
+                            ))}                            
+                        </div>
+                    ) : <></>}
                     
                 </div>
-                <img className="artist-bg-image" src={avatar}/>
+                <img className="artist-bg-image" src={avatar} />
             </section>
         )
         else {

@@ -17,6 +17,7 @@ import FilterNotificationPopup from '../../Components/Player/FilterComponent/Fil
 import { shortenText } from '../../Tools/Tools';
 import { getSongInfo, getSongLogo } from '../../Api/Song';
 import Playlists from '../Featured/Playlists';
+import { getPublicPlaylists } from '../../Api/Playlist';
 
 function MusicExplorer() {
     const [iconColor, setIconColor] = useState('#000000');
@@ -24,7 +25,8 @@ function MusicExplorer() {
     const currentSong = useSelector((state)=> state.currentSong.value);
     const subscriptions = useSelector((state)=>state.subscriptions.value);
     const songs = useSelector((state)=> state.songs.value);
-    const playlists = useSelector((state) => state.playlists.value);
+    // const playlists = useSelector((state) => state.playlists.value);
+    const [playlists, setPlaylists] = useState([]);
 
     const dispatch = useDispatch();
 
@@ -81,6 +83,9 @@ function MusicExplorer() {
                 console.log(err);
             })
         }
+
+        getPublicPlaylists('01961642-e009-787f-b133-586f85702b83', 5, 0)
+        .then(res => setPlaylists(res));
     }, [currentTrackInfo]);
 
     const getCurrentTrackInfo = async () => {
@@ -146,16 +151,16 @@ function MusicExplorer() {
             return;
         
         getCurrentTrackInfo();
-    }, [currentSong, filtersApplied])
+    }, [currentSong, filtersApplied]);
 
     if (!filtersApplied || songs.length === 0)
     return (
         <div className='comment-page-wrapper'>
-            <div className='explorer' style={{justifyContent: 'center', marginTop: '0'}}>
+            <div className='explorer' style={{justifyContent: 'center', marginTop: '0', paddingTop: '245px'}}>
                 <span className='explorer-main-block'>
                     <span className='explorer-start-h'>
                         <img src={icon}/>
-                        <h1 style={{fontSize: '48px'}}>Искать новых авторов</h1>
+                        <h1>Искать новых авторов</h1>
                     </span>
                     <p>Ищите авторов и создавайте коллабы, чтобы попасть в плейлисты от редакции!</p>
                     
@@ -170,7 +175,10 @@ function MusicExplorer() {
                     Настроить
                 </button>
                 
-                <Playlists playlists={playlists} customHeading='Плейлисты от редакции' isNewHidden={true}/>
+                {playlists.length > 0 ? (
+                    <Playlists playlists={playlists} customHeading='Плейлисты от редакции' isNewHidden={true}/>
+                ) : <section className='featured-section'></section>}
+                
                 <img className="player-bg-image bg-loaded" src={bgImage} alt="" />  
                 <Filters setFiltersApplied={setFiltersApplied}/>
                 

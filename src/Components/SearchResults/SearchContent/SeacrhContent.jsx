@@ -1,7 +1,7 @@
 import './SearchContent.css'
 import arrowRight from '../../../Images/artist-card/Chevron_Right.svg'
 import Song from '../../Song/Song'
-import Playlist from '../../Playlist'
+import Playlist from '../../Playlist/Playlist'
 import Clip from '../../Clip/Clip'
 import pfpPlaceholder from '../../../Images/main-placeholder.png';
 import SearchArtistCard from '../../SearchArtistCard/SearchArtistCard'

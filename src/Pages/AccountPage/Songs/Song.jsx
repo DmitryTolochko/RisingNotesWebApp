@@ -5,25 +5,7 @@ import message from '../../../Images/controller/Chat_Dots.png';
 import statsIcon from '../../../Images/account-page/stats-icon.svg';
 import { api, axiosAuthorized, axiosUnauthorized } from '../../../Components/App/App';
 import cover from '../../../Images/main-placeholder.png';
-import { shortenText } from '../../../Tools/Tools';
-
-const statusType = {
-    0: 'На согласовании',
-    1: 'На модерации',
-    2: 'На доработке',
-    3: 'Опубликовано',
-    4: 'Отклонено',
-    5: 'Отозвано'
-};
-
-const statusColor = {
-    0: 'yellow',
-    1: 'yellow',
-    2: 'yellow',
-    3: 'green',
-    4: 'red',
-    5: 'red'
-}
+import { shortenText, statusColor, statusType } from '../../../Tools/Tools';
 
 export default function Song ({id, artist, featured=[], status}) {
     const [songName, setSongName] = useState('');

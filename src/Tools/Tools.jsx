@@ -53,7 +53,7 @@ export function shortenText(text, numberOfSymbols) {
 }
 
 export const statusType = {
-    0: 'Неизвестно',
+    0: 'На согласовании',
     1: 'На модерации',
     2: 'На доработке',
     3: 'Опубликовано',

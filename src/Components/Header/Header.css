@@ -148,7 +148,15 @@
     width: 24px;
     height: 24px;
     object-fit: cover;
+    /* border-radius: 100px; */
+}
+
+.round-avatar {
     border-radius: 100px;
+}
+
+.square-avatar {
+    border-radius: 2px;
 }
 
 .notification-message-user-name {

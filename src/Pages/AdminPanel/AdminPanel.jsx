@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import BackButton from '../../Components/BackButton';
 import { api, axiosAuthorized } from '../../Components/App/App';
+import newPlaylist from '../../Images/featured/newplaylist.png';
 import searchIcon from '../../Images/sidebar/Vector.svg';
 
 import './AdminPanel.css';
@@ -11,6 +12,12 @@ import { getSongRequestInfo, getSongRequestsListForReview } from '../../Api/Song
 import Clip from '../../Components/Clip/Clip';
 import VerticalClip from '../../Components/VerticalClip/VerticalClip';
 import Song from '../AccountPage/Songs/Song';
+import Playlists from '../Featured/Playlists';
+import { createNewPlaylist, getGeneratedplaylists } from '../../Api/Playlist';
+import Playlist from '../../Components/Playlist/Playlist';
+import { useNavigate } from 'react-router-dom';
+import { updatePlaylistsValue } from '../../Redux/slices/playlistsSlice';
+import { useDispatch } from 'react-redux';
 
 function AdminPanel() {
     const [songRequestsList, setSongRequestsList] = useState([]);
@@ -22,6 +29,9 @@ function AdminPanel() {
     const [searchQuery, setSearchQuery] = useState('');
     const [users, setUsers] = useState([]);
     const [currentUser, setCurrentUser] = useState(undefined);
+    const [playlists, setPlaylists] = useState([]);
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     useEffect(() => {
         if (currPage === 0)
@@ -30,6 +40,9 @@ function AdminPanel() {
             getClipRequestsList();
         else if (currPage === 3)
             getBlogsRequestsList();
+        else if (currPage === 4) {
+            getPlaylists();
+        }
         else 
             getUsersList();
     }, [currPage, searchQuery]);
@@ -99,6 +112,17 @@ function AdminPanel() {
         setBlogsRequestsList(list);
     }
 
+    async function getPlaylists() {
+        let list = await getGeneratedplaylists();
+        setPlaylists(list);
+    }
+
+    async function addNewPlaylist() {
+        let id = await createNewPlaylist('Новый плейлист', true);
+        dispatch(updatePlaylistsValue([...playlists, {id: id, name: "Новый плейлист", isPrivate: true}]));
+        navigate(`/playlist/${id}`);
+    };
+
     return (
         <div className='comment-page-wrapper'>
             <div className='featured'>
@@ -119,6 +143,10 @@ function AdminPanel() {
                         <a onClick={() => handleChangePage(3)} 
                             className={currPage === 3 ? 'account-page-menu-item account-page-active' : 'account-page-menu-item'}>
                             Блоги
+                        </a>
+                        <a onClick={() => handleChangePage(4)} 
+                            className={currPage === 4 ? 'account-page-menu-item account-page-active' : 'account-page-menu-item'}>
+                            Плейлисты
                         </a>
                         <a onClick={() => handleChangePage(2)} 
                             className={currPage === 2 ? 'account-page-menu-item account-page-active' : 'account-page-menu-item'}>
@@ -180,6 +208,17 @@ function AdminPanel() {
                     <div className="blog">
                         {blogsRequestsList?.map(video=>(
                             <VerticalClip clipRequestId={video.id} status={video.status} authorId={video.authorId} authorName={video.authorName}                    />
+                        ))}
+                    </div>
+                ) : (<></>)}
+
+                {currPage === 4 ? (
+                    <div className="playlists">
+                        <div draggable='false' className='playlist'>
+                            <img draggable='false' className='new-playlist' alt='add new playlist' src={newPlaylist} onClick={addNewPlaylist}/>
+                        </div>
+                        {playlists?.map(el => (
+                            <Playlist id={el.id} isPrivate={el.isPrivate}/>
                         ))}
                     </div>
                 ) : (<></>)}

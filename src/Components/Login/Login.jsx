@@ -14,6 +14,7 @@ import { updatePlaylistsValue } from '../../Redux/slices/playlistsSlice';
 import { updateExcludedValue } from '../../Redux/slices/excludedSlice';
 import { updateFeaturedValue } from '../../Redux/slices/featuredSlice';
 import { updateSubscriptionsValue } from '../../Redux/slices/subscriptionsSlice';
+import { getPlaylistsForUser } from '../../Api/Playlist';
 
 function Login() {
     const [cookies, setCookies] = useCookies(['accessToken', 'refreshToken', 'authorId', 'role', 'subscriptions', 'userId']);
@@ -98,14 +99,9 @@ function Login() {
     }
 
     async function getPlaylists(userId) {
-        await axiosUnauthorized.get(`api/playlist/list/${userId}`)
-        .then (
-            response => {
-                let arr = [];
-                response.data.playlistInfoList.map(e => arr.push(e.id));
-                dispatch(updatePlaylistsValue(arr))
-                window.location.replace('/');
-            })
+        let arr = await getPlaylistsForUser(userId);
+        dispatch(updatePlaylistsValue(arr));
+        window.location.replace('/');
     }
 
     return (

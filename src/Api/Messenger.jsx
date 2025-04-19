@@ -17,7 +17,7 @@ export async function createNewChat(name, chatType, members, logoFile=undefined)
     let response = await axiosAuthorized.post('api/chat', data, { headers: {
         "Content-Type": "multipart/form-data",
     }})
-    .catch(err => console.log(err));
+    .catch(err => Promise.reject(err));
 
     return response?.data?.id;
 }
@@ -53,9 +53,8 @@ export async function sendMessage(chatId, text, files=[], songs=[]) {
 export async function getRecentChatsList() {
     // Получить существующие чаты и вернуть списком
     let response = await axiosAuthorized.get('api/chat/list')
-    .catch(err => {window.location.replace('/')});
+    .catch(err => {window.location.replace('/login')});
 
-    if (response === undefined) {window.location.replace('/')}
     return response?.data?.chatList;
 }
 

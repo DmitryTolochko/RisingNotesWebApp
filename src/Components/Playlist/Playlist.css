@@ -1,0 +1,14 @@
+.playlist-public-label {
+    font-size: 16px;
+    font-weight: 500;
+    color: white;
+
+    display: flex;
+    padding: 10px;
+    border-radius: 100px;
+    background-color: #FE1170;
+
+    position: absolute;
+    margin-top: 12px;
+    margin-left: 12px;
+}
